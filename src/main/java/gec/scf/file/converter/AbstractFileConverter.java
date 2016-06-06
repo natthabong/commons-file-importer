@@ -162,6 +162,12 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 				fieldSetter.setValue(entity, value);
 			}
 
+			// Apply SupplierId
+			if (itemConfig.getExpectedValue() != null
+					&& ValidationType.IN_CUSTOMER_CODE_GROUP
+							.equals(itemConfig.getValidationType())) {
+				fieldSetter.setValue(entity, tempDataString);
+			}
 		}
 
 	}
