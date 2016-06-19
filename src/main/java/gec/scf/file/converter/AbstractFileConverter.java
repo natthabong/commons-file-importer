@@ -390,14 +390,13 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		// Validate require field
 		if (configItem.isRequired()) {
 			try {
-				if (StringUtils.isEmpty(number)) {
-					number = "0";
-				}
+//				if (StringUtils.isEmpty(number)) {
+//					number = "0";
+//				}
 
 				number = number.replaceAll(",", "");
 
-				BigDecimal amount = new BigDecimal(number);
-				if (StringUtils.isEmpty(number) || amount.intValue() == 0) {
+				if (StringUtils.isEmpty(number)) {//number 0 is valid
 					throw new WrongFormatDetailException(MessageFormat.format(
 							CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
 							configItem.getDisplayValue()));
