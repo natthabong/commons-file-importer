@@ -8,7 +8,7 @@ public class FileConverterFactory {
 			Class<T> clazz) {
 
 		// TODO: Implement converter selection here
-		CSVFileConverter<T> converter = new CSVFileConverter<T>();
+		CSVFileConverter<T> converter = new CSVFileConverter<T>(clazz);
 		converter.setSponsorConfig(config);
 		return converter;
 
