@@ -4,8 +4,18 @@ public interface FileLayoutConfigItem {
 
 	String getFieldName();
 
-	int getStartIndex();
+	String getRecordType();
+
+	Integer getStartIndex();
+
+	Integer getLenght();
 
 	String getDatetimeFormat();
+
+	String getPlusSymbol();
+
+	String getMinusSymbol();
+
+	Integer getDecimalPlace();
 
 }

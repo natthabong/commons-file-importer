@@ -6,4 +6,6 @@ public interface FileLayoutConfig {
 
 	public List<? extends FileLayoutConfigItem> getConfigItems();
 
+	public String getDetailFlag();
+
 }

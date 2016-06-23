@@ -10,7 +10,7 @@ import gec.scf.file.handler.ImportFileHandler;
 
 public class FileImporter {
 
-	private FileConverter fixLengthFileConverter;
+	private FileConverter<?> fixLengthFileConverter;
 
 	private ImportFileHandler importHandler;
 
@@ -47,8 +47,8 @@ public class FileImporter {
 					}
 					totalFailed++;
 					
-					List<ErrorLineDetail> errorDetails = detailResult
-							.getErrorLineDetails();
+//					List<ErrorLineDetail> errorDetails = detailResult
+//							.getErrorLineDetails();
 //					for (ErrorLineDetail error : errorDetails) {
 //						addLineDetailError(error.getErrorMessage(), error.getErrorLineNo());
 //					}
@@ -75,11 +75,11 @@ public class FileImporter {
 		return importerResult;
 	}
 
-	private void addLineDetailError(String errorMessage, Integer errorLineNo) {
-		
-	}
+//	private void addLineDetailError(String errorMessage, Integer errorLineNo) {
+//		
+//	}
 
-	public void setConverter(FileConverter fixLengthFileConverter) {
+	public void setConverter(FileConverter<?> fixLengthFileConverter) {
 		this.fixLengthFileConverter = fixLengthFileConverter;
 	}
 
