@@ -29,6 +29,8 @@ public class FileImporter {
 		FileImporterResult importerResult = new FileImporterResult();
 		importerResult.setProcessNo(processNo);
 
+		List<ErrorLineDetail> errorLineDetailList = new ArrayList<ErrorLineDetail>();
+
 		try {
 			fileConverter.checkFileFormat(documentFile);
 
@@ -49,11 +51,10 @@ public class FileImporter {
 						totalSuccess++;
 					}
 					catch (IllegalArgumentException e) {
-						List<ErrorLineDetail> errorLineDetails = new ArrayList<ErrorLineDetail>();
 						ErrorLineDetail errorLineDetail = new ErrorLineDetail();
 						errorLineDetail.setErrorMessage(e.getMessage());
 						errorLineDetail.setErrorLineNo(lineCount);
-						errorLineDetails.add(errorLineDetail);
+						errorLineDetailList.add(errorLineDetail);
 						totalFailed++;
 					}
 				}
@@ -66,29 +67,31 @@ public class FileImporter {
 				}
 			}
 
-			if (totalFailed==0) {
+			if (totalFailed == 0) {
 				importerResult.setStatus(ResultType.SUCCESS);
-				importerResult.setTotalSuccess(totalSuccess);
-				importerResult.setTotalFailed(totalFailed);			
-			}else{
+			}
+			else if (totalSuccess == 0) {
+				importerResult.setStatus(ResultType.FAIL);
+			}
+			else {
 				importerResult.setStatus(ResultType.INCOMPLETE);
-				importerResult.setTotalSuccess(totalSuccess);
-				importerResult.setTotalFailed(totalFailed);
+			}
+
+			importerResult.setTotalSuccess(totalSuccess);
+			importerResult.setTotalFailed(totalFailed);
+			if (errorLineDetailList.size() > 0) {
+				importerResult.setErrorLineDetails(errorLineDetailList);
 			}
 
 		}
 		catch (WrongFormatFileException e) {
-			List<ErrorLineDetail> errorLineDetails = new ArrayList<ErrorLineDetail>();
-
 			ErrorLineDetail errorLineDetail = new ErrorLineDetail();
 			errorLineDetail.setErrorMessage(e.getErrorMessage());
 			errorLineDetail.setErrorLineNo(e.getErrorLineNo());
-			errorLineDetails.add(errorLineDetail);
-
+			errorLineDetailList.add(errorLineDetail);
 			importerResult.setStatus(ResultType.FAIL);
-			importerResult.setErrorLineDetails(errorLineDetails);
-		}
 
+		}
 		return importerResult;
 	}
 
