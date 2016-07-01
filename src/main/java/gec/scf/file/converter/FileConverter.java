@@ -5,14 +5,10 @@ import java.io.InputStream;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
 
-public class FileConverter {
+public interface FileConverter<T> {
 
-	public void checkFileFormat(InputStream documentFile) throws WrongFormatFileException{
-		
-	}
+	public void checkFileFormat(InputStream documentFile) throws WrongFormatFileException;
 
-	public DetailResult getDetail() {
-		return null;
-	}
+	public DetailResult getDetail();
 
 }

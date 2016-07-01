@@ -1,16 +1,25 @@
 package gec.scf.file.importer;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class FileImporterResult {
 
 	private ResultType status;
 
-	private List<ErrorLineDetail> errorLineDetails;
-
 	private int totalSuccess;
 
-	private Integer totalFail;
+	private Integer totalFailed;
+	
+	private Integer totalRecords;
+
+	private List<ErrorLineDetail> errorLineDetails;
+	
+	private String processNo;
+
+	private String fileName;
+	
+	private BigDecimal totalAmountSuccess;
 
 	public ResultType getStatus() {
 		return status;
@@ -20,12 +29,28 @@ public class FileImporterResult {
 		this.status = status;
 	}
 
-	public Integer getTotalFail() {
-		return totalFail;
-	}
-
 	public int getTotalSuccess() {
 		return totalSuccess;
+	}
+
+	public void setTotalSuccess(int totalSuccess) {
+		this.totalSuccess = totalSuccess;
+	}
+
+	public Integer getTotalFailed() {
+		return totalFailed;
+	}
+
+	public void setTotalFailed(Integer totalFailed) {
+		this.totalFailed = totalFailed;
+	}
+	
+	public Integer getTotalRecords() {
+		return totalRecords;
+	}
+
+	public void setTotalRecords(Integer totalRecords) {
+		this.totalRecords = totalRecords;
 	}
 
 	public List<ErrorLineDetail> getErrorLineDetails() {
@@ -36,11 +61,28 @@ public class FileImporterResult {
 		this.errorLineDetails = errorLineDetails;
 	}
 
-	public void setTotalSuccess(int totalSuccess) {
-		this.totalSuccess = totalSuccess;
+	public String getProcessNo() {
+		return processNo;
 	}
 
-	public void setTotalFail(Integer totalFail) {
-		this.totalFail = totalFail;
+	public void setProcessNo(String processNo) {
+		this.processNo = processNo;
 	}
+
+	public String getFileName() {
+		return fileName;
+	}
+	
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public BigDecimal getTotalAmountSuccess() {
+		return totalAmountSuccess;
+	}
+
+	public void setTotalAmountSuccess(BigDecimal totalAmountSuccess) {
+		this.totalAmountSuccess = totalAmountSuccess;
+	}
+
 }
