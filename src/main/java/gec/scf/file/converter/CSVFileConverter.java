@@ -26,6 +26,8 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
 	private int offset;
 
+	private int startLineNo;
+
 	public CSVFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz,
 			FieldValidatorFactory fieldValidatorFactory) {
 
@@ -53,24 +55,22 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 	@Override
 	public void checkFileFormat(InputStream fileContent) throws WrongFormatFileException {
 
-		int startRow = 0;
 		if (getFileLayoutConfig().getOffsetRowNo() != null) {
 			offset = getFileLayoutConfig().getOffsetRowNo().intValue();
-			startRow += offset;
 		}
 
-		if (startRow < 1) {
-			startRow = 1;
+		if (offset < 1) {
+			offset = 1;
 		}
 
-		int cuurentRow = startRow;
+		int cuurentRow = offset;
 		try {
 			List<FileLayoutConfigItem> detailConfigs = getFileLayoutMappingFor(
 					RecordType.DETAIL);
 
 			@SuppressWarnings("resource")
 			CSVReader reader = new CSVReader(new InputStreamReader(fileContent,
-					getFileLayoutConfig().getCharsetName()), ',', '"', startRow);
+					getFileLayoutConfig().getCharsetName()), ',', '"', offset);
 
 			csvRecords = reader.readAll();
 			for (String[] record : csvRecords) {
@@ -117,12 +117,12 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
 			result.setObjectValue(detail);
 			result.setSuccess(true);
-			result.setLineNo(currentLine);
+			result.setLineNo(offset + currentLine);
 		}
 		catch (WrongFormatDetailException e) {
 			result.setErrorLineDetails(e.getErrorLineDetails());
 			result.setSuccess(false);
-			result.setLineNo(currentLine);
+			result.setLineNo(offset + currentLine);
 		}
 		catch (IndexOutOfBoundsException e) {
 			result = null;
@@ -156,14 +156,14 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 			}
 			catch (WrongFormatDetailException e) {
 				ErrorLineDetail errorLineDetail = new ErrorLineDetail();
-				errorLineDetail.setErrorLineNo(currentLine);
+				errorLineDetail.setErrorLineNo(offset + currentLine);
 				errorLineDetail.setErrorMessage(e.getErrorMessage());
 				errorLineDetails.add(errorLineDetail);
 				isError = true;
 			}
 			catch (Exception e) {
 				ErrorLineDetail errorLineDetail = new ErrorLineDetail();
-				errorLineDetail.setErrorLineNo(currentLine);
+				errorLineDetail.setErrorLineNo(offset + currentLine);
 				errorLineDetail.setErrorMessage(e.getMessage());
 				errorLineDetails.add(errorLineDetail);
 				isError = true;
