@@ -8,7 +8,7 @@ public class WrongFormatDetailException extends RuntimeException {
 
 	private static final long serialVersionUID = 1567306686291944506L;
 	private List<ErrorLineDetail> errorLineDetails;
-	private String errorMessage ;
+	private String errorMessage;
 
 	public WrongFormatDetailException(List<ErrorLineDetail> errorLineDetails) {
 		super();
@@ -16,6 +16,11 @@ public class WrongFormatDetailException extends RuntimeException {
 	}
 
 	public WrongFormatDetailException() {
+	}
+
+	@Override
+	public String getMessage() {
+		return this.errorMessage;
 	}
 
 	public WrongFormatDetailException(String errorMessage) {
