@@ -4,8 +4,10 @@ public class DetailResult {
 
 	private boolean success;
 
+	private Integer lineNo;
+
 	public void setLineNo(int lineNo) {
-		
+		this.lineNo = lineNo;
 	}
 
 	public boolean isSuccess() {
@@ -15,5 +17,9 @@ public class DetailResult {
 	public void setSuccess(boolean success) {
 		this.success = success;
 	}
-	
+
+	public Integer getLineNo() {
+		return lineNo;
+	}
+
 }

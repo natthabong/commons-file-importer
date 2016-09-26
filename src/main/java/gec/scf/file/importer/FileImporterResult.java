@@ -6,11 +6,11 @@ public class FileImporterResult {
 
 	private ResultType status;
 
-	private List<ErrorLineDetail> errorLineDetails;
-
 	private int totalSuccess;
 
-	private Integer totalFail;
+	private Integer totalFailed;
+
+	private List<ErrorLineDetail> errorLineDetails;
 
 	public ResultType getStatus() {
 		return status;
@@ -20,12 +20,20 @@ public class FileImporterResult {
 		this.status = status;
 	}
 
-	public Integer getTotalFail() {
-		return totalFail;
-	}
-
 	public int getTotalSuccess() {
 		return totalSuccess;
+	}
+
+	public void setTotalSuccess(int totalSuccess) {
+		this.totalSuccess = totalSuccess;
+	}
+
+	public Integer getTotalFailed() {
+		return totalFailed;
+	}
+
+	public void setTotalFailed(Integer totalFailed) {
+		this.totalFailed = totalFailed;
 	}
 
 	public List<ErrorLineDetail> getErrorLineDetails() {
@@ -36,11 +44,4 @@ public class FileImporterResult {
 		this.errorLineDetails = errorLineDetails;
 	}
 
-	public void setTotalSuccess(int totalSuccess) {
-		this.totalSuccess = totalSuccess;
-	}
-
-	public void setTotalFail(Integer totalFail) {
-		this.totalFail = totalFail;
-	}
 }

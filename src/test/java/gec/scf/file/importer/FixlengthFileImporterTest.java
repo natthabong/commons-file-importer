@@ -12,23 +12,25 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import gec.scf.file.converter.FileConverter;
 import gec.scf.file.exception.WrongFormatFileException;
+import gec.scf.file.handler.ImportFileHandler;
 
 public class FixlengthFileImporterTest {
 
 	private static final String RECORD_ID_INVALID = "Record Id (HDR) invalide";
-	FileImporter importer;
+	FileImporter fileImporter;
 	private FileConverter fixLengthFileConverter;
 
 	@Before
 	public void init() {
-		importer = new FileImporter();
+		fileImporter = new FileImporter();
 
 		fixLengthFileConverter = Mockito.mock(FileConverter.class);
-		importer.setConverter(fixLengthFileConverter);
+		fileImporter.setConverter(fixLengthFileConverter);
 	}
 
 	@Test
@@ -37,7 +39,7 @@ public class FixlengthFileImporterTest {
 		InputStream validFileContent = Mockito.mock(InputStream.class);
 
 		// Actual
-		FileImporterResult actualResult = importer.doImport(validFileContent);
+		FileImporterResult actualResult = fileImporter.doImport(validFileContent);
 
 		// Assert
 		assertEquals(ResultType.SUCCESS, actualResult.getStatus());
@@ -48,10 +50,11 @@ public class FixlengthFileImporterTest {
 			throws WrongFormatFileException {
 		// Arrage
 		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
-		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter).checkFileFormat(wrongFormatFileContent);
+		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter)
+				.checkFileFormat(wrongFormatFileContent);
 
 		// Actual
-		FileImporterResult actualResult = importer.doImport(wrongFormatFileContent);
+		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
 
 		// Assert
 		assertEquals(ResultType.FAIL, actualResult.getStatus());
@@ -62,13 +65,14 @@ public class FixlengthFileImporterTest {
 			throws WrongFormatFileException {
 		// Arrage
 		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
-		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter).checkFileFormat(wrongFormatFileContent);
+		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter)
+				.checkFileFormat(wrongFormatFileContent);
 
 		// Actual
-		FileImporterResult actualResult = importer.doImport(wrongFormatFileContent);
+		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
 
 		// Assert
-		assertNull(actualResult.getTotalFail());
+		assertNull(actualResult.getTotalFailed());
 	}
 
 	@Test
@@ -76,10 +80,11 @@ public class FixlengthFileImporterTest {
 			throws WrongFormatFileException {
 		// Arrage
 		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
-		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter).checkFileFormat(wrongFormatFileContent);
+		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter)
+				.checkFileFormat(wrongFormatFileContent);
 
 		// Actual
-		FileImporterResult actualResult = importer.doImport(wrongFormatFileContent);
+		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
 
 		// Assert
 		assertEquals(0, actualResult.getTotalSuccess());
@@ -94,10 +99,11 @@ public class FixlengthFileImporterTest {
 		WrongFormatFileException wrongFormatFileException = new WrongFormatFileException();
 		wrongFormatFileException.setErrorMessage(RECORD_ID_INVALID);
 
-		doThrow(wrongFormatFileException).when(fixLengthFileConverter).checkFileFormat(wrongFormatFileContent);
+		doThrow(wrongFormatFileException).when(fixLengthFileConverter)
+				.checkFileFormat(wrongFormatFileContent);
 
 		// Actual
-		FileImporterResult actualResult = importer.doImport(wrongFormatFileContent);
+		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
 
 		// Assert
 		List<ErrorLineDetail> errorLineDetails = actualResult.getErrorLineDetails();
@@ -115,10 +121,11 @@ public class FixlengthFileImporterTest {
 		WrongFormatFileException wrongFormatFileException = new WrongFormatFileException();
 		wrongFormatFileException.setErrorLineNo(1);
 
-		doThrow(wrongFormatFileException).when(fixLengthFileConverter).checkFileFormat(wrongFormatFileContent);
+		doThrow(wrongFormatFileException).when(fixLengthFileConverter)
+				.checkFileFormat(wrongFormatFileContent);
 
 		// Actual
-		FileImporterResult actualResult = importer.doImport(wrongFormatFileContent);
+		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
 
 		// Assert
 		List<ErrorLineDetail> errorLineDetails = actualResult.getErrorLineDetails();
@@ -144,15 +151,15 @@ public class FixlengthFileImporterTest {
 		invalidLineDetail.setLineNo(3);
 		invalidLineDetail.setSuccess(false);
 
-		when(fixLengthFileConverter.getDetail()).thenReturn(validLineDetail1, invalidLineDetail, validLineDetail2,
-				null);
+		when(fixLengthFileConverter.getDetail()).thenReturn(validLineDetail1,
+				invalidLineDetail, validLineDetail2, null);
 
 		// Actual
-		FileImporterResult actualResult = importer.doImport(wrongFormatFileContent);
+		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
 
 		// Assert
 		verify(fixLengthFileConverter, times(4)).getDetail();
-		assertEquals(1, actualResult.getTotalFail().intValue());
+		assertEquals(1, actualResult.getTotalFailed().intValue());
 	}
 
 	@Test
@@ -172,15 +179,70 @@ public class FixlengthFileImporterTest {
 		validLineDetail3.setLineNo(3);
 		validLineDetail3.setSuccess(true);
 
-		when(fixLengthFileConverter.getDetail()).thenReturn(validLineDetail1, validLineDetail2, validLineDetail3, null);
+		when(fixLengthFileConverter.getDetail()).thenReturn(validLineDetail1,
+				validLineDetail2, validLineDetail3, null);
 
 		// Actual
-		FileImporterResult actualResult = importer.doImport(wrongFormatFileContent);
+		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
 
 		// Assert
 		assertEquals(3, actualResult.getTotalSuccess());
-		assertNull("Total fail should be null", actualResult.getTotalFail());
+		assertEquals(0, actualResult.getTotalFailed().intValue());
 	}
-	
-	
+
+	@Test
+	public void given_a_wrong_format_detail_when_import_the_file_then_the_onConvertFailed_event_should_be_fired() {
+		// Arrange
+		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+
+		DetailResult invalidLineDetail = createDetailResult(3, false);
+
+		when(fixLengthFileConverter.getDetail()).thenReturn(invalidLineDetail, null,
+				null);
+
+		ImportFileHandler importFileHandler = Mockito.mock(ImportFileHandler.class);
+		fileImporter.setHandler(importFileHandler);
+
+		// Actual
+		fileImporter.doImport(wrongFormatFileContent);
+
+		// Assert
+		ArgumentCaptor<DetailResult> captor = ArgumentCaptor.forClass(DetailResult.class);
+
+		verify(importFileHandler, times(1)).onConvertFailed(captor.capture());
+		DetailResult actualFailedDetail = captor.getValue();
+
+		assertEquals(3, actualFailedDetail.getLineNo().intValue());
+	}
+
+	@Test
+	public void given_a_valid_format_detail_when_import_the_file_then_the_onImportData_event_should_be_fired() {
+		// Arrange
+		InputStream validFormatFileContent = Mockito.mock(InputStream.class);
+
+		DetailResult validLineDetail = createDetailResult(5, true);
+
+		when(fixLengthFileConverter.getDetail()).thenReturn(validLineDetail, null, null);
+
+		ImportFileHandler importFileHandler = Mockito.mock(ImportFileHandler.class);
+		fileImporter.setHandler(importFileHandler);
+
+		// Actual
+		fileImporter.doImport(validFormatFileContent);
+
+		// Assert
+		ArgumentCaptor<DetailResult> captor = ArgumentCaptor.forClass(DetailResult.class);
+
+		verify(importFileHandler, times(1)).onImportData(captor.capture());
+		DetailResult actualFailedDetail = captor.getValue();
+
+		assertEquals(new Integer(5), actualFailedDetail.getLineNo());
+	}
+
+	private DetailResult createDetailResult(int lineNo, boolean isSuccess) {
+		DetailResult invalidLineDetail = new DetailResult();
+		invalidLineDetail.setLineNo(lineNo);
+		invalidLineDetail.setSuccess(isSuccess);
+		return invalidLineDetail;
+	}
 }
