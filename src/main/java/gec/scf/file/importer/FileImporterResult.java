@@ -5,8 +5,12 @@ import java.util.List;
 public class FileImporterResult {
 
 	private ResultType status;
-	
+
 	private List<ErrorLineDetail> errorLineDetails;
+
+	private int totalSuccess;
+
+	private Integer totalFail;
 
 	public ResultType getStatus() {
 		return status;
@@ -17,11 +21,11 @@ public class FileImporterResult {
 	}
 
 	public Integer getTotalFail() {
-		return null;
+		return totalFail;
 	}
 
 	public int getTotalSuccess() {
-		return 0;
+		return totalSuccess;
 	}
 
 	public List<ErrorLineDetail> getErrorLineDetails() {
@@ -30,5 +34,13 @@ public class FileImporterResult {
 
 	public void setErrorLineDetails(List<ErrorLineDetail> errorLineDetails) {
 		this.errorLineDetails = errorLineDetails;
+	}
+
+	public void setTotalSuccess(int totalSuccess) {
+		this.totalSuccess = totalSuccess;
+	}
+
+	public void setTotalFail(Integer totalFail) {
+		this.totalFail = totalFail;
 	}
 }
