@@ -9,15 +9,35 @@ import gec.scf.file.exception.WrongFormatFileException;
 
 public class FileImporter {
 	private FileConverter fixLengthFileConverter;
-	public FileImporterResult doImport(InputStream documentFile){
+
+	private int countDetailSuccess;
+	private int countDetailFail;
+
+	public FileImporterResult doImport(InputStream documentFile) {
+		countDetailSuccess = 0;
+		countDetailFail = 0;
+
 		FileImporterResult importerResult = new FileImporterResult();
 		try {
 			fixLengthFileConverter.checkFileFormat(documentFile);
+			DetailResult detailResult = null;
+			while ((detailResult = fixLengthFileConverter.getDetail()) != null) {
+
+				if (detailResult.isSuccess()) {
+					countDetailSuccess++;
+				} else {
+					countDetailFail++;
+				}
+			}
+
 			importerResult.setStatus(ResultType.SUCCESS);
-		}
-		catch (WrongFormatFileException e) {
+			importerResult.setTotalSuccess(countDetailSuccess);
+			if (countDetailFail > 0) {
+				importerResult.setTotalFail(countDetailFail);
+			}
+		} catch (WrongFormatFileException e) {
 			List<ErrorLineDetail> errorLineDetails = new ArrayList<ErrorLineDetail>();
-			
+
 			ErrorLineDetail errorLineDetail = new ErrorLineDetail();
 			errorLineDetail.setErrorMessage(e.getErrorMessage());
 			errorLineDetail.setErrorLineNo(e.getErrorLineNo());
