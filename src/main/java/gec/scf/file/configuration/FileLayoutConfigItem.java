@@ -1,6 +1,6 @@
 package gec.scf.file.configuration;
 
-public interface FileLayoutItemConfig {
+public interface FileLayoutConfigItem {
 
 	String getFieldName();
 
