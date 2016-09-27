@@ -1,11 +1,15 @@
 package gec.scf.file.converter;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -41,11 +45,18 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 	}
 
 	@Override
-	public void checkFileFormat(InputStream fileContent) throws WrongFormatFileException {
+	public void checkFileFormat(File fileContent) throws WrongFormatFileException {
 
 		CSVParser csvParser = null;
 		try {
-			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"),
+
+//			validateBinaryFile(fileContent);
+//			BufferedInputStream bfi = new BufferedInputStream(fileContent);
+//			String mimeType = URLConnection.guessContentTypeFromStream(fileContent);
+//			if(!mimeType.equals("csv")){
+//				throw new WrongFormatFileException("File extenstion (txt) invalid format .csv");
+//			}
+			csvParser = new CSVParser(new InputStreamReader(new FileInputStream(fileContent), "UTF-8"),
 					CSVFormat.EXCEL.withSkipHeaderRecord(true));
 
 			csvRecords = csvParser.getRecords();
@@ -57,6 +68,39 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 		}
 		catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void validateBinaryFile(InputStream fileContent) throws IOException, WrongFormatFileException {
+		int size = fileContent.available();
+		if (size > 1024) {
+			size = 1024;
+		}
+		byte[] data = new byte[size];
+		fileContent.read(data);
+		fileContent.close();
+		
+		int ascii = 0;
+		int other = 0;
+		
+		for(int i = 0; i < data.length; i++) {
+		    byte b = data[i];
+		    if( b < 0x09 ){
+		    	throw new WrongFormatFileException("Data is binary file");
+		    }
+
+		    if( b == 0x09 || b == 0x0A || b == 0x0C || b == 0x0D ){
+		    	ascii++;
+		    }
+		    else if( b >= 0x20  &&  b <= 0x7E ){
+		    	ascii++;
+		    }
+		    else{
+		    	other++;
+		    }
+		}
+		if(100 * other / (ascii + other) > 95){
+			throw new WrongFormatFileException("Data is binary file");
 		}
 	}
 
