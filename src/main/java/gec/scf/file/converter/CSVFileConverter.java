@@ -45,7 +45,7 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 	}
 
 	@Override
-	public void checkFileFormat(File fileContent) throws WrongFormatFileException {
+	public void checkFileFormat(InputStream fileContent) throws WrongFormatFileException {
 
 		CSVParser csvParser = null;
 		try {
@@ -56,7 +56,7 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 //			if(!mimeType.equals("csv")){
 //				throw new WrongFormatFileException("File extenstion (txt) invalid format .csv");
 //			}
-			csvParser = new CSVParser(new InputStreamReader(new FileInputStream(fileContent), "UTF-8"),
+			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"),
 					CSVFormat.EXCEL.withSkipHeaderRecord(true));
 
 			csvRecords = csvParser.getRecords();

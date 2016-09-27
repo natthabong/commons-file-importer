@@ -20,7 +20,7 @@ public class FileImporter {
 
 	private DataImporter dataImporter;
 
-	public FileImporterResult doImport(File documentFile) {
+	public FileImporterResult doImport(InputStream documentFile) {
 		totalSuccess = 0;
 
 		FileImporterResult importerResult = new FileImporterResult();

@@ -25,10 +25,10 @@ public class CSVFileConverterTest {
 		URL part = this.getClass().getResource("binaryFileConverter.txt");
 
 		File csvFile = new File(part.getFile());
-
+		InputStream csvFileContent = new FileInputStream(csvFile);
 		// Actual
 		try {
-			csvFileConverter.checkFileFormat(csvFile);
+			csvFileConverter.checkFileFormat(csvFileContent);
 		}
 		catch (WrongFormatFileException e) {
 			assertEquals("Data is binary file", e.getErrorMessage());
@@ -45,10 +45,10 @@ public class CSVFileConverterTest {
 		URL part = this.getClass().getResource("bigcsponsor2.txt");
 
 		File csvFile = new File(part.getFile());
-
+		InputStream csvFileContent = new FileInputStream(csvFile);
 		// Actual
 		try {
-			csvFileConverter.checkFileFormat(csvFile);
+			csvFileConverter.checkFileFormat(csvFileContent);
 		}
 		catch (WrongFormatFileException e) {
 			assertEquals("File extenstion (txt) invalid format .csv", e.getErrorMessage());
