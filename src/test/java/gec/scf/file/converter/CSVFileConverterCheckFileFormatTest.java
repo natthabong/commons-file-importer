@@ -13,9 +13,8 @@ import org.junit.Test;
 
 import gec.scf.file.exception.WrongFormatFileException;
 
-public class CSVFileConverterTest {
+public class CSVFileConverterCheckFileFormatTest {
 
-	@Ignore
 	@Test(expected = WrongFormatFileException.class)
 	public void given_import_binary_file_when_check_file_format_should_throw_WrongFormatFileException()
 			throws WrongFormatFileException, FileNotFoundException {
@@ -37,23 +36,18 @@ public class CSVFileConverterTest {
 	}
 
 	@Ignore
-	@Test(expected = WrongFormatFileException.class)
-	public void given_import_file_extenstion_txt_when_check_file_format_should_throw_WrongFormatFileException() throws FileNotFoundException, WrongFormatFileException {
+	@Test
+	public void given_import_csv_file_when_check_file_format_should_not_WrongFormatFileException()
+			throws FileNotFoundException, WrongFormatFileException {
 		// Arrange
 		CSVFileConverter<Object> csvFileConverter = new CSVFileConverter<Object>(Object.class);
 
-		URL part = this.getClass().getResource("bigcsponsor2.txt");
+		URL part = this.getClass().getResource("bigcsponsor.csv");
 
 		File csvFile = new File(part.getFile());
 		InputStream csvFileContent = new FileInputStream(csvFile);
+		
 		// Actual
-		try {
-			csvFileConverter.checkFileFormat(csvFileContent);
-		}
-		catch (WrongFormatFileException e) {
-			assertEquals("File extenstion (txt) invalid format .csv", e.getErrorMessage());
-//			assertEquals("Data is binary file", e.getErrorMessage());
-			throw e;
-		}
+		csvFileConverter.checkFileFormat(csvFileContent);
 	}
 }
