@@ -39,6 +39,11 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 		this.domainClass = clazz;
 	}
 
+	public CSVFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
+		this.fileLayoutConfig = fileLayoutConfig;
+		this.domainClass = clazz;
+	}
+
 	@Override
 	public void checkFileFormat(File fileContent) throws WrongFormatFileException {
 
@@ -106,7 +111,8 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 		result.setLineNo(currentLine);
 		try {
 			CSVRecord csvRecord = csvRecords.get(currentLine++);
-			Object document = convertCSVToDocument(csvRecord, fileLayoutConfig.getConfigItems());
+			Object document = convertCSVToDocument(csvRecord,
+					fileLayoutConfig.getConfigItems());
 			result.setValue(document);
 			result.setSuccess(true);
 		}
@@ -117,7 +123,8 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 		return result;
 	}
 
-	private T convertCSVToDocument(CSVRecord csvRecord, List<? extends FileLayoutConfigItem> itemConfigs) {
+	private T convertCSVToDocument(CSVRecord csvRecord,
+			List<? extends FileLayoutConfigItem> itemConfigs) {
 
 		T document = null;
 		try {
@@ -138,7 +145,8 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 				Class<?> classType = field.getType();
 				int startIndex = itemConf.getStartIndex() - 1;
 				if (classType.isAssignableFrom(Date.class)) {
-					SimpleDateFormat sdf = new SimpleDateFormat(itemConf.getDatetimeFormat(), Locale.US);
+					SimpleDateFormat sdf = new SimpleDateFormat(
+							itemConf.getDatetimeFormat(), Locale.US);
 					Date date = sdf.parse(csvRecord.get(startIndex));
 					field.set(document, date);
 				}
@@ -162,14 +170,6 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 
 		}
 		return document;
-	}
-
-	public FileLayoutConfig getSponsorConfig() {
-		return fileLayoutConfig;
-	}
-
-	public void setSponsorConfig(FileLayoutConfig sponsorConfig) {
-		this.fileLayoutConfig = sponsorConfig;
 	}
 
 	public void setFileLayoutConfig(FileLayoutConfig fileLayoutConfig) {

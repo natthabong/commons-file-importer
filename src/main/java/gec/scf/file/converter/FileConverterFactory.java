@@ -6,10 +6,13 @@ public class FileConverterFactory {
 
 	public <T> FileConverter<T> getFileConverter(FileLayoutConfig config,
 			Class<T> clazz) {
-
-		// TODO: Implement converter selection here
-		CSVFileConverter<T> converter = new CSVFileConverter<T>(clazz);
-		converter.setSponsorConfig(config);
+		FileConverter<T> converter = null;
+		if ("FIX_LENGTH".equals(config.getFileType())) {
+			converter = new FixedLengthFileConverter<T>(config, clazz);
+		}
+		else {
+			converter = new CSVFileConverter<T>(config, clazz);
+		}
 		return converter;
 
 	}

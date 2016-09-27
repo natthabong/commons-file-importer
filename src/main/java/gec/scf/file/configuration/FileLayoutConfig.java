@@ -8,4 +8,6 @@ public interface FileLayoutConfig {
 
 	public String getDetailFlag();
 
+	public String getFileType();
+
 }
