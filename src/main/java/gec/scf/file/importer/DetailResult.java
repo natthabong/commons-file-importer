@@ -10,7 +10,7 @@ public class DetailResult {
 
 	private List<ErrorLineDetail> errorLineDetails;
 
-	private Object detailValue;
+	private Object objectValue;
 	
 	public boolean isSuccess() {
 		return success;
@@ -36,12 +36,12 @@ public class DetailResult {
 		this.lineNo = lineNo;
 	}
 
-	public Object getValue() {
-		return detailValue;
+	public Object getObjectValue() {
+		return objectValue;
 	}
 
-	public void setValue(Object detailValue) {
-		this.detailValue = detailValue;		
+	public void setObjectValue(Object objectValue) {
+		this.objectValue = objectValue;
 	}
 
 }

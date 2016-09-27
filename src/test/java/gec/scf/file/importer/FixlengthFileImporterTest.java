@@ -273,7 +273,7 @@ public class FixlengthFileImporterTest {
 		Object document = new Object();
 		
 		DetailResult validLineDetail = createDetailResult(2, true);
-		validLineDetail.setValue(document);
+		validLineDetail.setObjectValue(document);
 		when(fixLengthFileConverter.getDetail()).thenReturn(validLineDetail, null);
 		
 		fileImporter.setDataImporter(dataImporter);
