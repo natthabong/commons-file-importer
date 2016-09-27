@@ -4,9 +4,9 @@ public interface FileLayoutConfigItem {
 
 	String getFieldName();
 
-	String getRecordType();
+	RecordType getRecordType();
 
-	Integer getStartIndex();
+	int getStartIndex();
 
 	Integer getLenght();
 
