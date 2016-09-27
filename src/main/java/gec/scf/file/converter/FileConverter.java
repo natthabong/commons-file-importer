@@ -5,7 +5,7 @@ import java.io.InputStream;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
 
-public interface FileConverter {
+public interface FileConverter<T> {
 
 	public void checkFileFormat(InputStream documentFile) throws WrongFormatFileException;
 

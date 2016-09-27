@@ -4,10 +4,10 @@ import gec.scf.file.configuration.FileLayoutConfig;
 
 public class FileConverterFactory {
 
-	public FileConverter getFileConverter(FileLayoutConfig config) {
+	public <T> FileConverter<T> getFileConverter(FileLayoutConfig config, Class<T> clazz) {
 
 		// TODO: Implement converter selection here
-		CSVFileConverter converter = new CSVFileConverter();
+		CSVFileConverter<T> converter = new CSVFileConverter<T>();
 		converter.setSponsorConfig(config);
 		return converter;
 

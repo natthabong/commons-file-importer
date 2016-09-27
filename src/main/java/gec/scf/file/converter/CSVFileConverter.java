@@ -17,17 +17,19 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.StringUtils;
 
 import gec.scf.file.configuration.FileLayoutConfig;
-import gec.scf.file.configuration.FileLayoutItemConfig;
+import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
 
-public class CSVFileConverter implements FileConverter {
+public class CSVFileConverter<T> implements FileConverter<T> {
 
 	private FileLayoutConfig fileLayoutConfig;
 
 	private List<CSVRecord> csvRecords;
 
 	private int currentLine;
+
+	private Class<T> domainClass;
 
 	@Override
 	public void checkFileFormat(InputStream fileContent) throws WrongFormatFileException {
@@ -56,7 +58,7 @@ public class CSVFileConverter implements FileConverter {
 		result.setLineNo(currentLine);
 		try {
 			CSVRecord csvRecord = csvRecords.get(currentLine++);
-			Object document = convertCSVToDocument(csvRecord, fileLayoutConfig.getItems());
+			Object document = convertCSVToDocument(csvRecord, fileLayoutConfig.getConfigItems());
 			result.setValue(document);
 			result.setSuccess(true);
 		}
@@ -67,20 +69,28 @@ public class CSVFileConverter implements FileConverter {
 		return result;
 	}
 
-	private Object convertCSVToDocument(CSVRecord csvRecord,
-			List<FileLayoutItemConfig> itemConfigs) {
-		Object document = new Object();
-		Class<?> documentClass = document.getClass();
-		for (FileLayoutItemConfig itemConf : itemConfigs) {
+	private T convertCSVToDocument(CSVRecord csvRecord, List<? extends FileLayoutConfigItem> itemConfigs) {
+
+		T document = null;
+		try {
+			document = (T) domainClass.newInstance();
+		}
+		catch (InstantiationException e1) {
+			e1.printStackTrace();
+		}
+		catch (IllegalAccessException e1) {
+			e1.printStackTrace();
+		}
+
+		for (FileLayoutConfigItem itemConf : itemConfigs) {
 			Field field = null;
 			try {
-				field = documentClass.getDeclaredField(itemConf.getFieldName());
+				field = domainClass.getDeclaredField(itemConf.getFieldName());
 				field.setAccessible(true);
 				Class<?> classType = field.getType();
 				int startIndex = itemConf.getStartIndex() - 1;
 				if (classType.isAssignableFrom(Date.class)) {
-					SimpleDateFormat sdf = new SimpleDateFormat(
-							itemConf.getDatetimeFormat(), Locale.US);
+					SimpleDateFormat sdf = new SimpleDateFormat(itemConf.getDatetimeFormat(), Locale.US);
 					Date date = sdf.parse(csvRecord.get(startIndex));
 					field.set(document, date);
 				}
@@ -117,5 +127,4 @@ public class CSVFileConverter implements FileConverter {
 	public void setFileLayoutConfig(FileLayoutConfig fileLayoutConfig) {
 		this.fileLayoutConfig = fileLayoutConfig;
 	}
-
 }
