@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -50,8 +51,7 @@ public class FixlengthFileImporterTest {
 			throws WrongFormatFileException {
 		// Arrage
 		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
-		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter)
-				.checkFileFormat(wrongFormatFileContent);
+		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter).checkFileFormat(wrongFormatFileContent);
 
 		// Actual
 		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
@@ -65,8 +65,7 @@ public class FixlengthFileImporterTest {
 			throws WrongFormatFileException {
 		// Arrage
 		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
-		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter)
-				.checkFileFormat(wrongFormatFileContent);
+		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter).checkFileFormat(wrongFormatFileContent);
 
 		// Actual
 		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
@@ -80,8 +79,7 @@ public class FixlengthFileImporterTest {
 			throws WrongFormatFileException {
 		// Arrage
 		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
-		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter)
-				.checkFileFormat(wrongFormatFileContent);
+		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter).checkFileFormat(wrongFormatFileContent);
 
 		// Actual
 		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
@@ -99,8 +97,7 @@ public class FixlengthFileImporterTest {
 		WrongFormatFileException wrongFormatFileException = new WrongFormatFileException();
 		wrongFormatFileException.setErrorMessage(RECORD_ID_INVALID);
 
-		doThrow(wrongFormatFileException).when(fixLengthFileConverter)
-				.checkFileFormat(wrongFormatFileContent);
+		doThrow(wrongFormatFileException).when(fixLengthFileConverter).checkFileFormat(wrongFormatFileContent);
 
 		// Actual
 		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
@@ -121,8 +118,7 @@ public class FixlengthFileImporterTest {
 		WrongFormatFileException wrongFormatFileException = new WrongFormatFileException();
 		wrongFormatFileException.setErrorLineNo(1);
 
-		doThrow(wrongFormatFileException).when(fixLengthFileConverter)
-				.checkFileFormat(wrongFormatFileContent);
+		doThrow(wrongFormatFileException).when(fixLengthFileConverter).checkFileFormat(wrongFormatFileContent);
 
 		// Actual
 		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
@@ -150,9 +146,9 @@ public class FixlengthFileImporterTest {
 		DetailResult invalidLineDetail = new DetailResult();
 		invalidLineDetail.setLineNo(3);
 		invalidLineDetail.setSuccess(false);
-
-		when(fixLengthFileConverter.getDetail()).thenReturn(validLineDetail1,
-				invalidLineDetail, validLineDetail2, null);
+		
+		when(fixLengthFileConverter.getDetail()).thenReturn(validLineDetail1, invalidLineDetail, validLineDetail2,
+				null);
 
 		// Actual
 		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
@@ -179,8 +175,7 @@ public class FixlengthFileImporterTest {
 		validLineDetail3.setLineNo(3);
 		validLineDetail3.setSuccess(true);
 
-		when(fixLengthFileConverter.getDetail()).thenReturn(validLineDetail1,
-				validLineDetail2, validLineDetail3, null);
+		when(fixLengthFileConverter.getDetail()).thenReturn(validLineDetail1, validLineDetail2, validLineDetail3, null);
 
 		// Actual
 		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
@@ -197,8 +192,7 @@ public class FixlengthFileImporterTest {
 
 		DetailResult invalidLineDetail = createDetailResult(3, false);
 
-		when(fixLengthFileConverter.getDetail()).thenReturn(invalidLineDetail, null,
-				null);
+		when(fixLengthFileConverter.getDetail()).thenReturn(invalidLineDetail, null, null);
 
 		ImportFileHandler importFileHandler = Mockito.mock(ImportFileHandler.class);
 		fileImporter.setHandler(importFileHandler);
@@ -237,6 +231,57 @@ public class FixlengthFileImporterTest {
 		DetailResult actualFailedDetail = captor.getValue();
 
 		assertEquals(new Integer(5), actualFailedDetail.getLineNo());
+	}
+
+//	@Test
+//	public void given_a_wrong_format_detail_when_import_the_file_then_error_line_detail_list_should_have_size_3() {
+//		// Arrage
+//		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+//
+//		DetailResult inValidLineDetail1 = new DetailResult();
+//		inValidLineDetail1.setLineNo(2);
+//		inValidLineDetail1.setSuccess(false);
+//
+//		List<ErrorLineDetail> errors = new ArrayList<ErrorLineDetail>();
+//		ErrorLineDetail errorLineDetail1 = new ErrorLineDetail();
+//		errorLineDetail1.setErrorLineNo(2);
+//		errorLineDetail1.setErrorMessage("SponsorRef invalid format");
+//
+//		ErrorLineDetail errorLineDetail2 = new ErrorLineDetail();
+//		errorLineDetail2.setErrorLineNo(2);
+//		errorLineDetail2.setErrorMessage("SupplierId invalid format");
+//
+//		errors.add(errorLineDetail1);
+//		errors.add(errorLineDetail2);
+//		inValidLineDetail1.setErrorLineDetails(errors);
+//
+//		when(fixLengthFileConverter.getDetail()).thenReturn(inValidLineDetail1, null);
+//
+//		// Actual
+//		FileImporterResult actualResult = fileImporter.doImport(wrongFormatFileContent);
+//
+//		// Assert
+//		assertEquals(2, actualResult.getErrorLineDetails());		
+//
+//	}
+
+	@Test
+	public void given_validate_detail_success_should_save_document() {
+		// Arrange
+		InputStream validFormatFileContent = Mockito.mock(InputStream.class);
+		DataImporter dataImporter = Mockito.mock(DataImporter.class);
+		Object document = new Object();
+		
+		DetailResult validLineDetail = createDetailResult(2, true);
+		validLineDetail.setValue(document);
+		when(fixLengthFileConverter.getDetail()).thenReturn(validLineDetail, null);
+		
+		fileImporter.setDataImporter(dataImporter);
+		// Actual
+		fileImporter.doImport(validFormatFileContent);
+
+		// Assert
+		verify(dataImporter, times(1)).doImport(document);
 	}
 
 	private DetailResult createDetailResult(int lineNo, boolean isSuccess) {
