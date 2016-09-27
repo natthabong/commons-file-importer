@@ -1,4 +1,4 @@
-package gec.scf.file.domain;
+package gec.scf.file.configuration;
 
 public enum FileType {
 
