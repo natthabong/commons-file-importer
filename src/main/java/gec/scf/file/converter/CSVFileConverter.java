@@ -31,6 +31,10 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 
 	private Class<T> domainClass;
 
+	public CSVFileConverter(Class<T> clazz) {
+		this.domainClass = clazz;
+	}
+
 	@Override
 	public void checkFileFormat(InputStream fileContent) throws WrongFormatFileException {
 
