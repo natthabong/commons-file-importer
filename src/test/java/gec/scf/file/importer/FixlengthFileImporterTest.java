@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,10 +38,10 @@ public class FixlengthFileImporterTest {
 	@Test
 	public void given_valid_file_content_when_import_the_file_then_status_should_be_success() {
 		// Arrage
-		InputStream validFileContent = Mockito.mock(InputStream.class);
+		File validFile = Mockito.mock(File.class);
 
 		// Actual
-		FileImporterResult actualResult = fileImporter.doImport(validFileContent);
+		FileImporterResult actualResult = fileImporter.doImport(validFile);
 
 		// Assert
 		assertEquals(ResultType.SUCCESS, actualResult.getStatus());
@@ -50,7 +51,8 @@ public class FixlengthFileImporterTest {
 	public void given_wrong_format_file_content_when_import_the_file_then_status_should_be_fail()
 			throws WrongFormatFileException {
 		// Arrage
-		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+//		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+		File wrongFormatFileContent = Mockito.mock(File.class);
 		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter).checkFileFormat(wrongFormatFileContent);
 
 		// Actual
@@ -64,7 +66,8 @@ public class FixlengthFileImporterTest {
 	public void given_wrong_format_file_content_when_import_the_file_then_total_fail_should_be_NULL()
 			throws WrongFormatFileException {
 		// Arrage
-		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+//		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+		File wrongFormatFileContent = Mockito.mock(File.class);
 		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter).checkFileFormat(wrongFormatFileContent);
 
 		// Actual
@@ -78,7 +81,8 @@ public class FixlengthFileImporterTest {
 	public void given_wrong_format_file_content_when_import_the_file_then_total_success_should_be_0()
 			throws WrongFormatFileException {
 		// Arrage
-		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+//		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+		File wrongFormatFileContent = Mockito.mock(File.class);
 		doThrow(new WrongFormatFileException()).when(fixLengthFileConverter).checkFileFormat(wrongFormatFileContent);
 
 		// Actual
@@ -92,7 +96,8 @@ public class FixlengthFileImporterTest {
 	public void given_wrong_format_file_content_when_import_the_file_then_should_has_an_error_message()
 			throws WrongFormatFileException {
 		// Arrage
-		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+//		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+		File wrongFormatFileContent = Mockito.mock(File.class);
 
 		WrongFormatFileException wrongFormatFileException = new WrongFormatFileException();
 		wrongFormatFileException.setErrorMessage(RECORD_ID_INVALID);
@@ -113,7 +118,8 @@ public class FixlengthFileImporterTest {
 	public void given_wrong_format_file_content_on_line_no_1_when_import_the_file_then_should_has_an_error_on_line_no_1()
 			throws WrongFormatFileException {
 		// Arrage
-		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+//		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+		File wrongFormatFileContent = Mockito.mock(File.class);
 
 		WrongFormatFileException wrongFormatFileException = new WrongFormatFileException();
 		wrongFormatFileException.setErrorLineNo(1);
@@ -133,7 +139,8 @@ public class FixlengthFileImporterTest {
 	@Test
 	public void given_detail_has_3_record_wrong_format_detail_1_record_when_import_the_file_total_fail_should_be_1() {
 		// Arrage
-		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+//		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+		File wrongFormatFileContent = Mockito.mock(File.class);
 
 		DetailResult validLineDetail1 = new DetailResult();
 		validLineDetail1.setLineNo(2);
@@ -161,7 +168,8 @@ public class FixlengthFileImporterTest {
 	@Test
 	public void given_detail_valid_all_record_when_import_the_file_should_total_success_3_record() {
 		// Arrage
-		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+//		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+		File wrongFormatFileContent = Mockito.mock(File.class);
 
 		DetailResult validLineDetail1 = new DetailResult();
 		validLineDetail1.setLineNo(2);
@@ -188,7 +196,8 @@ public class FixlengthFileImporterTest {
 	@Test
 	public void given_a_wrong_format_detail_when_import_the_file_then_the_onConvertFailed_event_should_be_fired() {
 		// Arrange
-		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+//		InputStream wrongFormatFileContent = Mockito.mock(InputStream.class);
+		File wrongFormatFileContent = Mockito.mock(File.class);
 
 		DetailResult invalidLineDetail = createDetailResult(3, false);
 
@@ -212,7 +221,8 @@ public class FixlengthFileImporterTest {
 	@Test
 	public void given_a_valid_format_detail_when_import_the_file_then_the_onImportData_event_should_be_fired() {
 		// Arrange
-		InputStream validFormatFileContent = Mockito.mock(InputStream.class);
+//		InputStream validFormatFileContent = Mockito.mock(InputStream.class);
+		File validFormatFile = Mockito.mock(File.class);
 
 		DetailResult validLineDetail = createDetailResult(5, true);
 
@@ -222,7 +232,7 @@ public class FixlengthFileImporterTest {
 		fileImporter.setHandler(importFileHandler);
 
 		// Actual
-		fileImporter.doImport(validFormatFileContent);
+		fileImporter.doImport(validFormatFile);
 
 		// Assert
 		ArgumentCaptor<DetailResult> captor = ArgumentCaptor.forClass(DetailResult.class);
@@ -268,7 +278,8 @@ public class FixlengthFileImporterTest {
 	@Test
 	public void given_validate_detail_success_should_save_document() {
 		// Arrange
-		InputStream validFormatFileContent = Mockito.mock(InputStream.class);
+//		InputStream validFormatFileContent = Mockito.mock(InputStream.class);
+		File validFormatFileContent = Mockito.mock(File.class);
 		DataImporter dataImporter = Mockito.mock(DataImporter.class);
 		Object document = new Object();
 		

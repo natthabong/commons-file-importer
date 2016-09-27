@@ -1,5 +1,6 @@
 package gec.scf.file.importer;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ public class FileImporter {
 
 	private DataImporter dataImporter;
 
-	public FileImporterResult doImport(InputStream documentFile) {
+	public FileImporterResult doImport(File documentFile) {
 		totalSuccess = 0;
 
 		FileImporterResult importerResult = new FileImporterResult();
