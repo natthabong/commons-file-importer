@@ -58,7 +58,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 	}
 
 	@Override
-	public void checkFileFormat(InputStream fileContent) throws WrongFormatFileException {
+	public void checkFileFormat(File fileContent) throws WrongFormatFileException {
 
 		fileConfigItems = prepareConfigData(fileLayoutConfig.getConfigItems());
 
@@ -76,7 +76,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 					new InputStreamReader(tempFileContent, "UTF-8"));
 
 			bufferReader = new BufferedReader(
-					new InputStreamReader(fileContent, "UTF-8"));
+					new InputStreamReader(new FileInputStream(fileContent), "UTF-8"));
 
 			String currentLine;
 			while ((currentLine = bufferReader.readLine()) != null) {
@@ -287,4 +287,5 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 	public void setFileLayoutConfig(FileLayoutConfig fileLayoutConfig) {
 		this.fileLayoutConfig = fileLayoutConfig;
 	}
+
 }
