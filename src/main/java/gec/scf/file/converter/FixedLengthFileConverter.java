@@ -144,7 +144,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 			if (currentLine != null) {
 				T drawdownAdvice = convertDetail(currentLine);
 				detailResult.setSuccess(true);
-				detailResult.setValue(drawdownAdvice);
+				detailResult.setObjectValue(drawdownAdvice);
 			}
 			else {
 				detailResult = null;

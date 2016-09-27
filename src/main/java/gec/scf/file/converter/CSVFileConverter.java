@@ -113,7 +113,7 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 			CSVRecord csvRecord = csvRecords.get(currentLine++);
 			Object document = convertCSVToDocument(csvRecord,
 					fileLayoutConfig.getConfigItems());
-			result.setValue(document);
+			result.setObjectValue(document);
 			result.setSuccess(true);
 		}
 		catch (IndexOutOfBoundsException e) {

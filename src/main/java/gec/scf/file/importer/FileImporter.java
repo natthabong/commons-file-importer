@@ -38,7 +38,7 @@ public class FileImporter {
 					}
 					
 					if(dataImporter != null){
-						dataImporter.doImport(detailResult.getValue());
+						dataImporter.doImport(detailResult.getObjectValue());
 					}
 					totalSuccess++;
 				}
