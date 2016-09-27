@@ -17,6 +17,8 @@ public class FileImporter {
 	private int totalSuccess;
 	private int totalFailed;
 
+	private DataImporter dataImporter;
+
 	public FileImporterResult doImport(InputStream documentFile) {
 		totalSuccess = 0;
 
@@ -33,6 +35,10 @@ public class FileImporter {
 					if (importHandler != null) {
 						importHandler.onImportData(detailResult);
 					}
+					
+					if(dataImporter != null){
+						dataImporter.doImport(detailResult.getValue());
+					}
 					totalSuccess++;
 				}
 				else {
@@ -40,6 +46,12 @@ public class FileImporter {
 						importHandler.onConvertFailed(detailResult);
 					}
 					totalFailed++;
+					
+					List<ErrorLineDetail> errorDetails = detailResult
+							.getErrorLineDetails();
+//					for (ErrorLineDetail error : errorDetails) {
+//						addLineDetailError(error.getErrorMessage(), error.getErrorLineNo());
+//					}
 				}
 			}
 
@@ -63,6 +75,10 @@ public class FileImporter {
 		return importerResult;
 	}
 
+	private void addLineDetailError(String errorMessage, Integer errorLineNo) {
+		
+	}
+
 	public void setConverter(FileConverter fixLengthFileConverter) {
 		this.fixLengthFileConverter = fixLengthFileConverter;
 	}
@@ -71,4 +87,7 @@ public class FileImporter {
 		this.importHandler = importHandler;
 	}
 
+	public void setDataImporter(DataImporter dataImporter) {
+		this.dataImporter = dataImporter;
+	}
 }
