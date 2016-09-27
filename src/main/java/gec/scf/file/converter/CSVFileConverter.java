@@ -51,11 +51,7 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 		try {
 
 //			validateBinaryFile(fileContent);
-//			BufferedInputStream bfi = new BufferedInputStream(fileContent);
-//			String mimeType = URLConnection.guessContentTypeFromStream(fileContent);
-//			if(!mimeType.equals("csv")){
-//				throw new WrongFormatFileException("File extenstion (txt) invalid format .csv");
-//			}
+
 			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"),
 					CSVFormat.EXCEL.withSkipHeaderRecord(true));
 
