@@ -12,6 +12,8 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private String displayOfField;
 
+	private String expectValue;
+
 	@Override
 	public String getFieldName() {
 		return fieldName;
@@ -84,6 +86,11 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	@Override
 	public String getDisplayOfField() {
 		return displayOfField;
+	}
+
+	@Override
+	public String getExpectValue() {
+		return expectValue;
 	}
 
 }
