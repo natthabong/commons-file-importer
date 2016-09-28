@@ -461,7 +461,26 @@ public class CSVFileConverterGetDetailFileTest {
 		// Assert
 		assertFalse(actualResult.isSuccess());
 		String payerErrMsg = actualResult.getErrorLineDetails().get(0).getErrorMessage();
-		assertEquals("Desposit digit is over max digit (2)", payerErrMsg);
+		assertEquals("Cheque Amount digit is over max digit (2)", payerErrMsg);
+	}
+	
+	@Test
+	public void given_clearing_type_is_blank_when_get_detail_should_status_success() throws WrongFormatFileException {
+		// Arrage
+		String[] csvValidFileContent = new String[2];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554,";
+
+		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
+
+		// Actual
+		DetailResult actualResult = csvFileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("5572692", sponsorDoc.getSupplierCode());
+		
 	}
 
 	private CSVFileConverter<SponsorDocument> mockSponsorFileLayout(String[] csvValidFileContent)
@@ -564,6 +583,13 @@ public class CSVFileConverterGetDetailFileTest {
 		chequeAmount.setRequired(true);
 		chequeAmount.setDisplayValue("Cheque Amount");
 		chequeAmount.setDecimalPlace(2);
+		
+		DefaultFileLayoutConfigItem clearingType = new DefaultFileLayoutConfigItem();
+		clearingType.setStartIndex(13);
+		clearingType.setLength(10);
+		clearingType.setFieldName(null);
+		clearingType.setRequired(false);
+		clearingType.setDisplayValue("Clearing Type");
 
 		layoutItems.add(supplierCode);
 		layoutItems.add(depositBranch);

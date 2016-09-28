@@ -141,7 +141,6 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 		}
 
 		for (FileLayoutConfigItem itemConf : itemConfigs) {
-			// Field field = null;
 			try {
 				int startIndex = itemConf.getStartIndex() - 1;
 				String recordValue = csvRecord.get(startIndex);
@@ -195,8 +194,9 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 			field.set(document, recordValue);
 		}
 	}
-	
-	private BigDecimal setAmountToField(FileLayoutConfigItem itemConf, String recordValue) throws IllegalAccessException {
+
+	private BigDecimal setAmountToField(FileLayoutConfigItem itemConf, String recordValue)
+			throws IllegalAccessException {
 		recordValue = recordValue.trim();
 		BigDecimal valueAmount = null;
 		if (StringUtils.isNotBlank(itemConf.getPlusSymbol()) && StringUtils.isNotBlank(itemConf.getMinusSymbol())) {
@@ -207,6 +207,9 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 				recordValue = "-" + recordValue.substring(1);
 			}
 		}
+
+		validateDecimalPlace(itemConf, recordValue);
+
 		String normalNumber = recordValue.substring(0, (recordValue.length() - itemConf.getDecimalPlace()));
 		String degitNumber = recordValue.substring(recordValue.length() - itemConf.getDecimalPlace());
 		try {
@@ -218,6 +221,18 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 		}
 
 		return valueAmount;
+	}
+
+	private void validateDecimalPlace(FileLayoutConfigItem itemConf, String recordValue) {
+		String[] splitter = recordValue.toString().split("\\.");
+		if (splitter.length > 1) {
+			int decimalLength = splitter[1].length();
+
+			if (decimalLength != itemConf.getDecimalPlace()) {
+				throw new WrongFormatDetailException(MessageFormat.format(FixedLengthErrorConstant.DIGIT_OVER_MAX_DIGIT,
+						itemConf.getDisplayValue(), itemConf.getDecimalPlace()));
+			}
+		}
 	}
 
 	private void validateBigDecimalFormat(FileLayoutConfigItem itemConf, String recordValue) {

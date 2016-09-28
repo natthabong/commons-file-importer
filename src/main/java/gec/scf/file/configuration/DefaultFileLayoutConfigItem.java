@@ -18,8 +18,6 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private String datetimeFormat;
 
-	private Integer decimalPlace;
-
 	private String paddingCharacter;
 
 	private PaddingType paddingType;
