@@ -10,7 +10,7 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private String fieldName;
 
-	private String displayOfField;
+	private String displayValue;
 
 	private String expectValue;
 
@@ -79,18 +79,24 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	}
 
 	public void setDisplayOfField(String displayOfField) {
-		this.displayOfField = displayOfField;
+		this.displayValue = displayOfField;
 
 	}
 
 	@Override
-	public String getDisplayOfField() {
-		return displayOfField;
+	public String getDisplayValue() {
+		return displayValue;
 	}
 
 	@Override
 	public String getExpectValue() {
 		return expectValue;
+	}
+
+	@Override
+	public boolean isRequired() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

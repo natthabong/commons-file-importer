@@ -271,6 +271,7 @@ public class FixedLengthFileConverterTest {
 
 		DefaultFileLayoutConfigItem detailRecordTypeConfig = new DefaultFileLayoutConfigItem();
 		detailRecordTypeConfig.setFieldName("recordId");
+		detailRecordTypeConfig.setDisplayOfField("Record Type");
 		detailRecordTypeConfig.setStartIndex(1);
 		detailRecordTypeConfig.setLength(1);
 		detailRecordTypeConfig.setRecordType(RecordType.DETAIL);
@@ -287,6 +288,7 @@ public class FixedLengthFileConverterTest {
 
 		DefaultFileLayoutConfigItem footerRecordTypeConfig = new DefaultFileLayoutConfigItem();
 		footerRecordTypeConfig.setFieldName("recordId");
+		footerRecordTypeConfig.setDisplayOfField("Record Type");
 		footerRecordTypeConfig.setStartIndex(1);
 		footerRecordTypeConfig.setLength(1);
 		footerRecordTypeConfig.setRecordType(RecordType.FOOTER);
