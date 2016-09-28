@@ -14,6 +14,8 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private String expectValue;
 
+	private boolean required;
+
 	private String datetimeFormat;
 
 	private String paddingCharacter;
@@ -25,6 +27,7 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	private String minusSymbol;
 
 	private Integer decimalPlace;
+
 
 	@Override
 	public String getFieldName() {
@@ -96,9 +99,13 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 		return expectValue;
 	}
 
+	public void setRequired(boolean required) {
+		this.required = required;
+	}
+
 	@Override
 	public boolean isRequired() {
-		return false;
+		return required;
 	}
 
 	public void setDisplayValue(String displayValue) {
@@ -116,6 +123,11 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	public void setExpectValue(String expectValue) {
 		this.expectValue = expectValue;
+
+	}
+
+	public void setDecimalPlace(Integer decimalPlace) {
+		this.decimalPlace = decimalPlace;
 	}
 
 	public void setPaddingCharacter(String paddingCharacter) {
