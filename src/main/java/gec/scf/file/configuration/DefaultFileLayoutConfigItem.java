@@ -18,6 +18,8 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private String datetimeFormat;
 
+	private Integer decimalPlace;
+
 
 	@Override
 	public String getFieldName() {
@@ -58,8 +60,7 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	@Override
 	public Integer getDecimalPlace() {
-		// TODO Auto-generated method stub
-		return null;
+		return decimalPlace;
 	}
 
 	public void setStartIndex(int startIndex) {
@@ -97,12 +98,8 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	}
 
 	@Override
-	public boolean getIsRequired() {
-		return required;
-	}
-	@Override
 	public boolean isRequired() {
-		return false;
+		return required;
 	}
 
 	public void setDisplayValue(String displayValue) {
@@ -121,6 +118,10 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	public void setExpectValue(String expectValue) {
 		this.expectValue = expectValue;
 
+	}
+
+	public void setDecimalPlace(Integer decimalPlace) {
+		this.decimalPlace = decimalPlace;
 	}
 
 }
