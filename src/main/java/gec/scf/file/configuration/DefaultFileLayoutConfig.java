@@ -14,6 +14,8 @@ public class DefaultFileLayoutConfig implements FileLayoutConfig {
 
 	private String footerFlag;
 
+	private String delimeter;
+
 	@Override
 	public List<? extends FileLayoutConfigItem> getConfigItems() {
 		return configItems;
@@ -72,6 +74,15 @@ public class DefaultFileLayoutConfig implements FileLayoutConfig {
 	@Override
 	public String getFooterFlag() {
 		return footerFlag;
+	}
+
+	@Override
+	public String getDelimeter() {
+		return delimeter;
+	}
+
+	public void setDelimeter(String delimeter) {
+		this.delimeter = delimeter;
 	}
 
 }
