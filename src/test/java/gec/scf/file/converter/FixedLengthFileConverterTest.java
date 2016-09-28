@@ -211,7 +211,7 @@ public class FixedLengthFileConverterTest {
 		String[] fileContent = new String[4];
 		fileContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
 		fileContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
-		fileContent[2] = "T0000020000000100000000                                                                                                                                                                                                                                                                                     ";
+		fileContent[2] = "T0000010000000100000000                                                                                                                                                                                                                                                                                     ";
 		fileContent[3] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                               ";
 		InputStream drawdownAdviceFile = new ByteArrayInputStream(
 				StringUtils.join(fileContent, System.lineSeparator()).getBytes());
@@ -285,7 +285,7 @@ public class FixedLengthFileConverterTest {
 	}
 
 	@Test
-	public void given_total_document_amount_in_the_footer_is_not_equal_to_sum_of_document_in_detail_when_check_file_format_should_throw_WrongFormatFileException()
+	public void given_total_document_amount_in_the_footer_is_not_equal_to_sum_of_document_amount_in_detail_when_check_file_format_should_throw_WrongFormatFileException()
 			throws WrongFormatFileException {
 
 		// Arrange
@@ -301,6 +301,26 @@ public class FixedLengthFileConverterTest {
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage(
 				"Total Document Amount (99,000.00) is invalid. Total detail line is 101,000.00");
+
+		// Actual
+		fixLengthFileConverter.checkFileFormat(documentFile);
+	}
+
+	@Test
+	public void given_total_document_in_the_footer_is_not_equal_to_total_of_document_in_detail_when_check_file_format_should_throw_WrongFormatFileException()
+			throws WrongFormatFileException {
+
+		// Arrange
+		String[] fixedLengthContent = new String[4];
+		fixedLengthContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
+		fixedLengthContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
+		fixedLengthContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                               ";
+		fixedLengthContent[3] = "T0000010000000101000000                                                                                                                                                                                                                                                                                     ";
+		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+
+		// Assert
+		thrown.expect(WrongFormatFileException.class);
+		thrown.expectMessage("Total line (1) is invalid. Total detail line is 2");
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -388,6 +408,17 @@ public class FixedLengthFileConverterTest {
 		footerRecordTypeConfig.setRecordType(RecordType.FOOTER);
 
 		configItems.add(footerRecordTypeConfig);
+
+		DefaultFileLayoutConfigItem footerTotalDocConfig = new DefaultFileLayoutConfigItem();
+		footerTotalDocConfig.setFieldName("totalDocumentNumber");
+		footerTotalDocConfig.setStartIndex(2);
+		footerTotalDocConfig.setLength(6);
+		footerTotalDocConfig.setDecimalPlace(0);
+		footerTotalDocConfig.setPaddingCharacter("0");
+		footerTotalDocConfig.setPaddingType(PaddingType.LEFT);
+		footerTotalDocConfig.setRecordType(RecordType.FOOTER);
+
+		configItems.add(footerTotalDocConfig);
 
 		DefaultFileLayoutConfigItem footerDocAmountConfig = new DefaultFileLayoutConfigItem();
 		footerDocAmountConfig.setFieldName("totalDocumentAmount");
