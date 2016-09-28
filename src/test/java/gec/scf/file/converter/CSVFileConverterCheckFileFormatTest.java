@@ -47,8 +47,9 @@ public class CSVFileConverterCheckFileFormatTest {
 
 		File csvFile = new File(part.getFile());
 		InputStream csvFileContent = new FileInputStream(csvFile);
-		
+
 		// Actual
 		csvFileConverter.checkFileFormat(csvFileContent);
 	}
+
 }

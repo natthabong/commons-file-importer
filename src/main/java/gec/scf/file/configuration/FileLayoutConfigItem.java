@@ -22,4 +22,6 @@ public interface FileLayoutConfigItem {
 
 	String getExpectValue();
 
+	boolean getIsRequired();
+
 }

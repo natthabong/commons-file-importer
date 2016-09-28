@@ -14,6 +14,8 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private String expectValue;
 
+	private boolean required;
+
 	@Override
 	public String getFieldName() {
 		return fieldName;
@@ -91,6 +93,15 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	@Override
 	public String getExpectValue() {
 		return expectValue;
+	}
+
+	public void setRequired(boolean required) {
+		this.required = required;
+	}
+
+	@Override
+	public boolean getIsRequired() {
+		return required;
 	}
 
 }

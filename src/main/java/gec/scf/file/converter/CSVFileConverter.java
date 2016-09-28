@@ -6,7 +6,9 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -18,8 +20,10 @@ import org.apache.commons.lang.StringUtils;
 
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
+import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
+import gec.scf.file.importer.ErrorLineDetail;
 
 public class CSVFileConverter<T> implements FileConverter<T> {
 
@@ -47,10 +51,10 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 		try {
 
 //			validateBinaryFile(fileContent);
-
+			
 			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"),
-					CSVFormat.EXCEL.withSkipHeaderRecord(true));
-
+					CSVFormat.EXCEL.withSkipHeaderRecord(true).withDelimiter(fileLayoutConfig.getDelimeter().charAt(0)));
+			
 			csvRecords = csvParser.getRecords();
 
 			currentLine = 1;
@@ -110,14 +114,19 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 		}
 		catch (IndexOutOfBoundsException e) {
 			result = null;
+		}catch(WrongFormatDetailException e){
+			result.setErrorLineDetails(e.getErrorLineDetails());
+			result.setSuccess(false);
 		}
 
 		return result;
 	}
 
 	private T convertCSVToDocument(CSVRecord csvRecord,
-			List<? extends FileLayoutConfigItem> itemConfigs) {
-
+			List<? extends FileLayoutConfigItem> itemConfigs) throws WrongFormatDetailException{
+		boolean isError = false;
+		List<ErrorLineDetail> errorLineDetails = new ArrayList<ErrorLineDetail>();
+		
 		T document = null;
 		try {
 			document = (T) domainClass.newInstance();
@@ -132,34 +141,55 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 		for (FileLayoutConfigItem itemConf : itemConfigs) {
 			Field field = null;
 			try {
-				field = domainClass.getDeclaredField(itemConf.getFieldName());
-				field.setAccessible(true);
-				Class<?> classType = field.getType();
 				int startIndex = itemConf.getStartIndex() - 1;
-				if (classType.isAssignableFrom(Date.class)) {
-					SimpleDateFormat sdf = new SimpleDateFormat(
-							itemConf.getDatetimeFormat(), Locale.US);
-					Date date = sdf.parse(csvRecord.get(startIndex));
-					field.set(document, date);
-				}
-				else if (classType.isAssignableFrom(BigDecimal.class)) {
-					String money = csvRecord.get(startIndex);
-					if (StringUtils.isBlank(money)) {
-						money = "0";
+				String recordValue = csvRecord.get(startIndex);
+				
+				if(StringUtils.isNotBlank(itemConf.getFieldName())){
+					field = domainClass.getDeclaredField(itemConf.getFieldName());
+					field.setAccessible(true);
+					Class<?> classType = field.getType();				
+					
+					if (classType.isAssignableFrom(Date.class)) {
+						SimpleDateFormat sdf = new SimpleDateFormat(
+								itemConf.getDatetimeFormat(), Locale.US);
+						Date date = sdf.parse(recordValue);
+						field.set(document, date);
 					}
-					money = money.replace(",", "");
-					BigDecimal amount = new BigDecimal(money);
-					field.set(document, amount);
+					else if (classType.isAssignableFrom(BigDecimal.class)) {
+						if (StringUtils.isBlank(recordValue)) {
+							recordValue = "0";
+						}
+						recordValue = recordValue.replace(",", "");
+						BigDecimal amount = new BigDecimal(recordValue);
+						field.set(document, amount);
+					}
+					else {
+						if(itemConf.getIsRequired()){
+							if(StringUtils.isBlank(recordValue)){
+								throw new WrongFormatDetailException(itemConf.getDisplayOfField() + FixedLengthErrorConstant.ERROR_MESSAGE_IS_REQUIRE);
+							}else if(recordValue.length() > itemConf.getLenght()){
+								throw new WrongFormatDetailException(MessageFormat.format(FixedLengthErrorConstant.DATA_OVER_MAX_LENGTH, itemConf.getDisplayOfField(), recordValue.length(), itemConf.getLenght()));
+							}						
+						}
+						field.set(document, recordValue);
+					}
 				}
-				else {
-					field.set(document, csvRecord.get(startIndex));
-				}
+				
+			}catch(WrongFormatDetailException e){
+				ErrorLineDetail errorLineDetail = new ErrorLineDetail();
+				errorLineDetail.setErrorLineNo(currentLine);
+				errorLineDetail.setErrorMessage(e.getErrorMessage());
+				errorLineDetails.add(errorLineDetail);
+				isError = true;
 			}
 			catch (Exception e) {
-				// TODO: Implement on detail error here
+				//TODO manage error message
 				e.printStackTrace();
 			}
-
+		}
+		
+		if(isError){
+			throw new WrongFormatDetailException(errorLineDetails);
 		}
 		return document;
 	}

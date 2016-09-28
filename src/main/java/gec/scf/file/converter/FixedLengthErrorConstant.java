@@ -13,5 +13,5 @@ public class FixedLengthErrorConstant {
 	public static final String MISMATCH_FORMAT = " ({0}) mismatch";
 	public static final String DOCUMENT_NO_INVALID = " ({0}) is invalid. current Document No is {1}";
 	public static final String FILE_INVALID_FORMAT = "File invalid format";
-
+	public static final String DATA_OVER_MAX_LENGTH = "{0} length ({1}) is over max length ({2})";
 }

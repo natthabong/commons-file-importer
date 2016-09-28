@@ -14,4 +14,6 @@ public interface FileLayoutConfig {
 
 	public FileType getFileType();
 
+	public String getDelimeter();
+
 }
