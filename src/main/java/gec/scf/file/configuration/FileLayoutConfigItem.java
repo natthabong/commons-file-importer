@@ -18,10 +18,10 @@ public interface FileLayoutConfigItem {
 
 	Integer getDecimalPlace();
 
-	String getDisplayOfField();
+	String getDisplayValue();
 
 	String getExpectValue();
 
-	boolean getIsRequired();
+	boolean isRequired();
 
 }

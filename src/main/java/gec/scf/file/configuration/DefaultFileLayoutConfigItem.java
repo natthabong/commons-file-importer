@@ -10,11 +10,14 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private String fieldName;
 
-	private String displayOfField;
+	private String displayValue;
 
 	private String expectValue;
 
 	private boolean required;
+
+	private String datetimeFormat;
+
 
 	@Override
 	public String getFieldName() {
@@ -38,8 +41,7 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	@Override
 	public String getDatetimeFormat() {
-		// TODO Auto-generated method stub
-		return null;
+		return datetimeFormat;
 	}
 
 	@Override
@@ -80,14 +82,9 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	}
 
-	public void setDisplayOfField(String displayOfField) {
-		this.displayOfField = displayOfField;
-
-	}
-
 	@Override
-	public String getDisplayOfField() {
-		return displayOfField;
+	public String getDisplayValue() {
+		return displayValue;
 	}
 
 	@Override
@@ -102,6 +99,28 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	@Override
 	public boolean getIsRequired() {
 		return required;
+	}
+	@Override
+	public boolean isRequired() {
+		return false;
+	}
+
+	public void setDisplayValue(String displayValue) {
+		this.displayValue = displayValue;
+
+	}
+
+	public void setDatetimeFormat(String datetimeFormat) {
+		this.datetimeFormat = datetimeFormat;
+	}
+
+	public int getLength() {
+		return length;
+	}
+
+	public void setExpectValue(String expectValue) {
+		this.expectValue = expectValue;
+
 	}
 
 }

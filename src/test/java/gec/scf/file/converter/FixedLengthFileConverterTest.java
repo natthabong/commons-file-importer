@@ -71,7 +71,7 @@ public class FixedLengthFileConverterTest {
 	}
 
 	@Test
-	public void given_a_file_which_has_small_case_hader_flag_when_check_file_format_should_throw_WrongFormatFileException()
+	public void given_a_file_which_has_a_small_case_header_flag_when_check_file_format_should_throw_WrongFormatFileException()
 			throws WrongFormatFileException {
 
 		// Arrange
@@ -85,6 +85,46 @@ public class FixedLengthFileConverterTest {
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage("Record Type (h) mismatch");
+
+		// Actual
+		fixLengthFileConverter.checkFileFormat(documentFile);
+	}
+
+	@Test
+	public void given_a_file_which_has_a_document_date_wrong_format_when_check_file_format_should_throw_WrongFormatFileException()
+			throws WrongFormatFileException {
+
+		// Arrange
+		String[] fixedLengthContent = new String[4];
+		fixedLengthContent[0] = "H20161311120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
+		fixedLengthContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
+		fixedLengthContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                               ";
+		fixedLengthContent[3] = "T0000020000000099000000                                                                                                                                                                                                                                                                                     ";
+		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+
+		// Assert
+		thrown.expect(WrongFormatFileException.class);
+		thrown.expectMessage("Send Date (20161311) invalid format");
+
+		// Actual
+		fixLengthFileConverter.checkFileFormat(documentFile);
+	}
+
+	@Test
+	public void given_a_header_line_which_coporate_code_mismatched_when_check_file_format_should_throw_WrongFormatFileException()
+			throws WrongFormatFileException {
+
+		// Arrange
+		String[] fixedLengthContent = new String[4];
+		fixedLengthContent[0] = "H20161211120000Siam Makro P c.               MAK  004                                                                                                                                                                                                                                                       ";
+		fixedLengthContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
+		fixedLengthContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                               ";
+		fixedLengthContent[3] = "T0000020000000099000000                                                                                                                                                                                                                                                                                     ";
+		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+
+		// Assert
+		thrown.expect(WrongFormatFileException.class);
+		thrown.expectMessage("Corporate Name (Siam Makro P c.) mismatch");
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -256,10 +296,30 @@ public class FixedLengthFileConverterTest {
 		headerRecordTypeConfig.setFieldName("recordId");
 		headerRecordTypeConfig.setStartIndex(1);
 		headerRecordTypeConfig.setLength(1);
-		headerRecordTypeConfig.setDisplayOfField("Record Type");
+		headerRecordTypeConfig.setDisplayValue("Record Type");
 		headerRecordTypeConfig.setRecordType(RecordType.HEADER);
 
 		configItems.add(headerRecordTypeConfig);
+
+		DefaultFileLayoutConfigItem documentDateConfig = new DefaultFileLayoutConfigItem();
+		documentDateConfig.setFieldName("documentDate");
+		documentDateConfig.setStartIndex(2);
+		documentDateConfig.setLength(8);
+		documentDateConfig.setDisplayValue("Send Date");
+		documentDateConfig.setDatetimeFormat("yyyyMMdd");
+		documentDateConfig.setRecordType(RecordType.HEADER);
+
+		configItems.add(documentDateConfig);
+
+		DefaultFileLayoutConfigItem corporateNameConfig = new DefaultFileLayoutConfigItem();
+		corporateNameConfig.setFieldName("corporateName");
+		corporateNameConfig.setStartIndex(16);
+		corporateNameConfig.setLength(30);
+		corporateNameConfig.setExpectValue("Siam Makro Plc.");
+		corporateNameConfig.setDisplayValue("Corporate Name");
+		corporateNameConfig.setRecordType(RecordType.HEADER);
+
+		configItems.add(corporateNameConfig);
 
 		DefaultFileLayoutConfigItem filterConfig = new DefaultFileLayoutConfigItem();
 		filterConfig.setFieldName("filter");
@@ -271,6 +331,7 @@ public class FixedLengthFileConverterTest {
 
 		DefaultFileLayoutConfigItem detailRecordTypeConfig = new DefaultFileLayoutConfigItem();
 		detailRecordTypeConfig.setFieldName("recordId");
+		detailRecordTypeConfig.setDisplayValue("Record Type");
 		detailRecordTypeConfig.setStartIndex(1);
 		detailRecordTypeConfig.setLength(1);
 		detailRecordTypeConfig.setRecordType(RecordType.DETAIL);
@@ -287,6 +348,7 @@ public class FixedLengthFileConverterTest {
 
 		DefaultFileLayoutConfigItem footerRecordTypeConfig = new DefaultFileLayoutConfigItem();
 		footerRecordTypeConfig.setFieldName("recordId");
+		footerRecordTypeConfig.setDisplayValue("Record Type");
 		footerRecordTypeConfig.setStartIndex(1);
 		footerRecordTypeConfig.setLength(1);
 		footerRecordTypeConfig.setRecordType(RecordType.FOOTER);
