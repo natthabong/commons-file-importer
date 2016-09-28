@@ -48,9 +48,15 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 
 	private int totalDetailRecord;
 
+	private BigDecimal totalDetailAmount = new BigDecimal("0");
+
 	private File tempFile;
 
 	private BufferedReader tempFileReader;
+
+	private FileLayoutConfigItem detailDocAmountLayoutConfig;
+
+	private FileLayoutConfigItem footerTotalDocAmountLayoutConfig;
 
 	public FixedLengthFileConverter(Class<T> clazz) {
 		this.domainClass = clazz;
@@ -145,8 +151,8 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 					if (fileLayoutConfig.getFooterFlag().equals(recordType)) {
 						List<FileLayoutConfigItem> footerConfigItems = fileConfigItems
 								.get(RecordType.FOOTER);
+						validateFooter(currentLine, footerConfigItems);
 
-						validateLineDataFormat(currentLine, footerConfigItems);
 						hasCheckedFooter = true;
 						continue;
 					}
@@ -178,6 +184,22 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 					}
 
 					totalDetailRecord++;
+
+					if (detailDocAmountLayoutConfig != null) {
+						try {
+							int beginIndex = detailDocAmountLayoutConfig.getStartIndex()
+									- 1;
+							String data = currentLine.substring(beginIndex,
+									beginIndex + detailDocAmountLayoutConfig.getLenght());
+
+							BigDecimal docAmount = getBigDecimalValue(data,
+									detailDocAmountLayoutConfig);
+							totalDetailAmount = totalDetailAmount.add(docAmount);
+						}
+						catch (Exception e) {
+							log.warn(e.getMessage(), e);
+						}
+					}
 				}
 				else {
 					FileLayoutConfigItem recordTypeLayoutCofig = detailRecordTypeExtractor
@@ -213,6 +235,40 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 			}
 
 		}
+
+	}
+
+	private void validateFooter(String currentLine,
+			List<FileLayoutConfigItem> footerConfigItems)
+			throws WrongFormatFileException {
+
+		int start = footerTotalDocAmountLayoutConfig.getStartIndex() - 1;
+		int end = (footerTotalDocAmountLayoutConfig.getStartIndex()
+				+ footerTotalDocAmountLayoutConfig.getLenght()) - 1;
+
+		String totalDocAmoutData = currentLine.substring(start, end).trim();
+
+		try {
+
+			BigDecimal footerTotalAmount = getBigDecimalValue(totalDocAmoutData,
+					footerTotalDocAmountLayoutConfig);
+
+			if (footerTotalAmount.compareTo(totalDetailAmount) != 0) {
+				throw new WrongFormatFileException(MessageFormat.format(
+						FixedLengthErrorConstant.FOOTER_TOTAL_AMOUNT_INVALIDE_LENGTH_MESSAGE,
+						footerTotalAmount.doubleValue(), totalDetailAmount.doubleValue()));
+			}
+		}
+		catch (WrongFormatFileException e) {
+			throw e;
+		}
+		catch (Exception e) {
+			throw new WrongFormatFileException(MessageFormat.format(
+					FixedLengthErrorConstant.FOOTER_TOTAL_AMOUNT_INVALIDE_FORMAT_MESSAGE,
+					totalDocAmoutData));
+		}
+
+		validateLineDataFormat(currentLine, footerConfigItems);
 
 	}
 
@@ -285,9 +341,15 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 					headerList.add(fileLayoutConfig);
 					break;
 				case FOOTER:
+					if ("totalDocumentAmount".equals(fileLayoutConfig.getFieldName())) {
+						footerTotalDocAmountLayoutConfig = fileLayoutConfig;
+					}
 					footerList.add(fileLayoutConfig);
 					break;
 				case DETAIL:
+					if ("documentAmount".equals(fileLayoutConfig.getFieldName())) {
+						detailDocAmountLayoutConfig = fileLayoutConfig;
+					}
 					detailList.add(fileLayoutConfig);
 					break;
 
@@ -347,7 +409,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 			e1.printStackTrace();
 		}
 
-		// List<DetailError> messageErrorDetails = new ArrayList<DetailError>();
+		List<DetailError> messageErrorDetails = new ArrayList<DetailError>();
 		boolean isError = false;
 		for (FileLayoutConfigItem config : fileLayoutConfigs) {
 			if (config.getFieldName().equals("recordId")) {
@@ -366,7 +428,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 
 				if (classType.isAssignableFrom(Date.class)) {
 					try {
-						// validateDateDetail(messageErrorDetails, item, data);
+						validateDateDetail(messageErrorDetails, config, data);
 						SimpleDateFormat sdf = new SimpleDateFormat(
 								config.getDatetimeFormat(), Locale.US);
 						Date date = sdf.parse(data.trim());
@@ -378,11 +440,11 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 				}
 				else if (classType.isAssignableFrom(BigDecimal.class)) {
 					if (StringUtils.isBlank(data)) {
-						// setDetailErrorInvalideFormat(messageErrorDetails, item, data);
+						addDetailErrorInvalideFormat(messageErrorDetails, config, data);
 						isError = true;
 					}
 					else if (data.contains("+")) {
-						// setDetailErrorInvalideFormat(messageErrorDetails, item, data);
+						addDetailErrorInvalideFormat(messageErrorDetails, config, data);
 						isError = true;
 					}
 					else {
@@ -392,7 +454,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 				}
 				else {
 					if (StringUtils.isBlank(data) && config.isRequired()) {
-						// setDetailErrorRequire(messageErrorDetails, config);
+						addDetailErrorRequire(messageErrorDetails, config);
 						isError = true;
 					}
 					else {
@@ -402,7 +464,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 				}
 			}
 			catch (NumberFormatException e) {
-				// setDetailErrorInvalideFormat(messageErrorDetails, config, data);
+				addDetailErrorInvalideFormat(messageErrorDetails, config, data);
 				isError = true;
 			}
 			catch (IllegalArgumentException e) {
@@ -427,6 +489,37 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 		return domainObj;
 	}
 
+	private void validateDateDetail(List<DetailError> messageErrorDetails,
+			FileLayoutConfigItem config, String data) {
+		DateValidator dateValidator = DateValidator.getInstance();
+		if (StringUtils.isBlank(data)) {
+			addDetailErrorRequire(messageErrorDetails, config);
+			throw new WrongFormatDetailException();
+		}
+		else if (!dateValidator.isValid(data, config.getDatetimeFormat(), Locale.US)) {
+			addDetailErrorInvalideFormat(messageErrorDetails, config, data);
+			throw new WrongFormatDetailException();
+		}
+
+	}
+
+	private void addDetailErrorInvalideFormat(List<DetailError> messageErrorDetails,
+			FileLayoutConfigItem config, String data) {
+		DetailError error = new DetailError();
+		error.setMessage(MessageFormat.format(FixedLengthErrorConstant.INVALIDE_FORMAT,
+				config.getDisplayValue(), data));
+		messageErrorDetails.add(error);
+	}
+
+	private void addDetailErrorRequire(List<DetailError> messageErrorDetails,
+			FileLayoutConfigItem config) {
+		DetailError error = new DetailError();
+		error.setMessage(
+				MessageFormat.format(FixedLengthErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
+						config.getDisplayValue()));
+		messageErrorDetails.add(error);
+	}
+
 	private void validateDateFormat(FileLayoutConfigItem configItem, String dataValidate)
 			throws WrongFormatFileException {
 		DateValidator dateValidator = DateValidator.getInstance();
@@ -442,6 +535,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 			throws IllegalAccessException {
 		if (StringUtils.isNotBlank(config.getPlusSymbol())
 				&& StringUtils.isNotBlank(config.getMinusSymbol())) {
+
 			if (data.startsWith(config.getPlusSymbol())) {
 				data = data.substring(1);
 			}
@@ -453,8 +547,9 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 				(data.length() - config.getDecimalPlace()));
 		String degitNumber = data.substring(data.length() - config.getDecimalPlace());
 
-		BigDecimal valueAmount = new BigDecimal(normalNumber + "." + degitNumber)
-				.setScale(config.getDecimalPlace());
+		BigDecimal valueAmount = new BigDecimal(normalNumber + "."
+				+ (StringUtils.isBlank(degitNumber) ? "0" : degitNumber))
+						.setScale(config.getDecimalPlace());
 
 		return valueAmount;
 	}

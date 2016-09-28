@@ -16,6 +16,16 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private String datetimeFormat;
 
+	private String paddingCharacter;
+
+	private PaddingType paddingType;
+
+	private String plusSymbol;
+
+	private String minusSymbol;
+
+	private Integer decimalPlace;
+
 	@Override
 	public String getFieldName() {
 		return fieldName;
@@ -43,20 +53,17 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	@Override
 	public String getPlusSymbol() {
-		// TODO Auto-generated method stub
-		return null;
+		return plusSymbol;
 	}
 
 	@Override
 	public String getMinusSymbol() {
-		// TODO Auto-generated method stub
-		return null;
+		return minusSymbol;
 	}
 
 	@Override
 	public Integer getDecimalPlace() {
-		// TODO Auto-generated method stub
-		return null;
+		return decimalPlace;
 	}
 
 	public void setStartIndex(int startIndex) {
@@ -109,6 +116,27 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	public void setExpectValue(String expectValue) {
 		this.expectValue = expectValue;
+	}
+
+	public void setPaddingCharacter(String paddingCharacter) {
+		this.paddingCharacter = paddingCharacter;
+
+	}
+
+	public String getPaddingCharacter() {
+		return paddingCharacter;
+	}
+
+	public void setPaddingType(PaddingType paddingType) {
+		this.paddingType = paddingType;
+	}
+
+	public PaddingType getPaddingType() {
+		return paddingType;
+	}
+
+	public void setDecimalPlace(int decimalPlace) {
+		this.decimalPlace = decimalPlace;
 	}
 
 }
