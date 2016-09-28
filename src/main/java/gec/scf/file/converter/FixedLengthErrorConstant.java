@@ -5,6 +5,8 @@ public class FixedLengthErrorConstant {
 	public static final String DATA_LENGTH_OVER = "data length ({0}) must have {1} characters";
 	public static final String FOOTER_TOTAL_LINE_INVALIDE_FORMAT_MESSAGE = "Total line ({0}) invalid format";
 	public static final String FOOTER_TOTAL_LINE_INVALIDE_LENGTH_MESSAGE = "Total line ({0}) is invalid. Total detail line is {1}";
+	public static final String FOOTER_TOTAL_AMOUNT_INVALIDE_LENGTH_MESSAGE = "Total Document Amount ({0,number,#,##0.00}) is invalid. Total detail line is {1,number,#,###.00}";
+	public static final String FOOTER_TOTAL_AMOUNT_INVALIDE_FORMAT_MESSAGE = "Total amount ({0}) invalid format";
 	public static final String FOOTER_NOT_LAST_FILE = "Record Type ({0}) not found on last row";
 	public static final String RECORD_ID_MISS_MATCH = "{0} ({1}) mismatch";
 	public static final String HEADER_NOT_FIRST_LINE_OF_FILE = "Record Type ({0}) not found on first row";
