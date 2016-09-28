@@ -107,13 +107,31 @@ public class FixedLengthFileConverterTest {
 	}
 
 	@Test
+	public void given_detail_length_config_is_300_when_check_file_format_found_length_301_should_throw_WrongFileFormatException()
+			throws WrongFormatFileException {
+		// Arrange
+		String[] fixedLengthContent = new String[3];
+		fixedLengthContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
+		fixedLengthContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                              ";
+		fixedLengthContent[2] = "T0000020000000099000000                                                                                                                                                                                                                                                                                     ";
+		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+
+		// Assert
+		thrown.expect(WrongFormatFileException.class);
+		thrown.expectMessage("data length (300) must have 301 characters");
+
+		// Actual
+		fixLengthFileConverter.checkFileFormat(documentFile);
+	}
+
+	@Test
 	public void given_a_file_which_found_line_space_after_footer_when_check_file_format_should_be_valid()
 			throws WrongFormatFileException {
 		// Arrang
 		String[] fileContent = new String[5];
 		fileContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
-		fileContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                              ";
-		fileContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                              ";
+		fileContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
+		fileContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                               ";
 		fileContent[3] = "T0000020000000099000000                                                                                                                                                                                                                                                                                     ";
 		fileContent[4] = "                  ";
 
@@ -131,8 +149,8 @@ public class FixedLengthFileConverterTest {
 		// Arrang
 		String[] fileContent = new String[7];
 		fileContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
-		fileContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                              ";
-		fileContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                              ";
+		fileContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
+		fileContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                               ";
 		fileContent[3] = "T0000020000000099000000                                                                                                                                                                                                                                                                                     ";
 		fileContent[4] = "";
 		fileContent[5] = "";
@@ -151,9 +169,9 @@ public class FixedLengthFileConverterTest {
 		// Arrang
 		String[] fileContent = new String[4];
 		fileContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
-		fileContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                              ";
+		fileContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
 		fileContent[2] = "T0000020000000099000000                                                                                                                                                                                                                                                                                     ";
-		fileContent[3] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                              ";
+		fileContent[3] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                               ";
 		InputStream drawdownAdviceFile = new ByteArrayInputStream(
 				StringUtils.join(fileContent, System.lineSeparator()).getBytes());
 
@@ -212,7 +230,7 @@ public class FixedLengthFileConverterTest {
 		// Arrange
 		String[] fileContent = new String[2];
 		fileContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
-		fileContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                              ";
+		fileContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
 
 		InputStream drawdownAdviceFile = new ByteArrayInputStream(
 				StringUtils.join(fileContent, System.lineSeparator()).getBytes());
@@ -256,17 +274,16 @@ public class FixedLengthFileConverterTest {
 		detailRecordTypeConfig.setStartIndex(1);
 		detailRecordTypeConfig.setLength(1);
 		detailRecordTypeConfig.setRecordType(RecordType.DETAIL);
-		
+
 		configItems.add(detailRecordTypeConfig);
-		
-		DefaultFileLayoutConfigItem footerFilterConfig = new DefaultFileLayoutConfigItem();
-		footerFilterConfig.setFieldName("filter");
-		footerFilterConfig.setStartIndex(54);
-		footerFilterConfig.setLength(247);
-		footerFilterConfig.setRecordType(RecordType.FOOTER);
-		
-		configItems.add(footerFilterConfig);
-		
+
+		DefaultFileLayoutConfigItem detailFilterConfig = new DefaultFileLayoutConfigItem();
+		detailFilterConfig.setFieldName("filter");
+		detailFilterConfig.setStartIndex(54);
+		detailFilterConfig.setLength(248);
+		detailFilterConfig.setRecordType(RecordType.DETAIL);
+
+		configItems.add(detailFilterConfig);
 
 		DefaultFileLayoutConfigItem footerRecordTypeConfig = new DefaultFileLayoutConfigItem();
 		footerRecordTypeConfig.setFieldName("recordId");
@@ -276,6 +293,14 @@ public class FixedLengthFileConverterTest {
 
 		configItems.add(footerRecordTypeConfig);
 
+		DefaultFileLayoutConfigItem footerFilterConfig = new DefaultFileLayoutConfigItem();
+		footerFilterConfig.setFieldName("filter");
+		footerFilterConfig.setStartIndex(54);
+		footerFilterConfig.setLength(247);
+		footerFilterConfig.setRecordType(RecordType.FOOTER);
+
+		configItems.add(footerFilterConfig);
+
 		fileLayout.setConfigItems(configItems);
 
 		return fileLayout;
@@ -284,8 +309,8 @@ public class FixedLengthFileConverterTest {
 	private InputStream getFixedLengthFileContent() {
 		String[] fixedLengthContent = new String[4];
 		fixedLengthContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
-		fixedLengthContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                              ";
-		fixedLengthContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                              ";
+		fixedLengthContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
+		fixedLengthContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                               ";
 		fixedLengthContent[3] = "T0000020000000099000000                                                                                                                                                                                                                                                                                     ";
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());

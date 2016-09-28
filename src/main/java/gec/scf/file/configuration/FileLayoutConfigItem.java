@@ -20,4 +20,6 @@ public interface FileLayoutConfigItem {
 
 	String getDisplayOfField();
 
+	String getExpectValue();
+
 }
