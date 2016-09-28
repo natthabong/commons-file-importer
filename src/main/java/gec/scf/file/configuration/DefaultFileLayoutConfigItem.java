@@ -1,15 +1,14 @@
-package gec.scf.file.converter;
+package gec.scf.file.configuration;
 
-import gec.scf.file.configuration.FileLayoutConfigItem;
-import gec.scf.file.configuration.RecordType;
+public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
-public class SponsorFileLayoutConfigItem implements FileLayoutConfigItem {
+	private int startIndex;
 
 	private int length;
 
-	private String fieldName;
+	private RecordType recordType;
 
-	private int startIndex;
+	private String fieldName;
 
 	private String displayOfField;
 
@@ -20,7 +19,7 @@ public class SponsorFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	@Override
 	public RecordType getRecordType() {
-		return null;
+		return recordType;
 	}
 
 	@Override
@@ -35,34 +34,51 @@ public class SponsorFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	@Override
 	public String getDatetimeFormat() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getPlusSymbol() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public String getMinusSymbol() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Integer getDecimalPlace() {
+		// TODO Auto-generated method stub
 		return null;
-	}
-
-	public void setLength(int length) {
-		this.length = length;
-	}
-
-	public void setFieldName(String fieldName) {
-		this.fieldName = fieldName;
 	}
 
 	public void setStartIndex(int startIndex) {
 		this.startIndex = startIndex;
+
+	}
+
+	public void setLength(int length) {
+		this.length = length;
+
+	}
+
+	public void setRecordType(RecordType recordType) {
+		this.recordType = recordType;
+
+	}
+
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
+
+	}
+
+	public void setDisplayOfField(String displayOfField) {
+		this.displayOfField = displayOfField;
+
 	}
 
 	@Override

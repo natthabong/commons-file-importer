@@ -1,6 +1,5 @@
 package gec.scf.file.importer;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +10,7 @@ import gec.scf.file.handler.ImportFileHandler;
 
 public class FileImporter {
 
-	private FileConverter<?> fixLengthFileConverter;
+	private FileConverter<?> fileConverter;
 
 	private ImportFileHandler importHandler;
 
@@ -25,19 +24,19 @@ public class FileImporter {
 
 		FileImporterResult importerResult = new FileImporterResult();
 		try {
-			fixLengthFileConverter.checkFileFormat(documentFile);
+			fileConverter.checkFileFormat(documentFile);
 
 			DetailResult detailResult = null;
 			totalFailed = 0;
 
-			while ((detailResult = fixLengthFileConverter.getDetail()) != null) {
+			while ((detailResult = fileConverter.getDetail()) != null) {
 
 				if (detailResult.isSuccess()) {
 					if (importHandler != null) {
 						importHandler.onImportData(detailResult);
 					}
-					
-					if(dataImporter != null){
+
+					if (dataImporter != null) {
 						dataImporter.doImport(detailResult.getObjectValue());
 					}
 					totalSuccess++;
@@ -47,12 +46,7 @@ public class FileImporter {
 						importHandler.onConvertFailed(detailResult);
 					}
 					totalFailed++;
-					
-//					List<ErrorLineDetail> errorDetails = detailResult
-//							.getErrorLineDetails();
-//					for (ErrorLineDetail error : errorDetails) {
-//						addLineDetailError(error.getErrorMessage(), error.getErrorLineNo());
-//					}
+
 				}
 			}
 
@@ -76,12 +70,8 @@ public class FileImporter {
 		return importerResult;
 	}
 
-//	private void addLineDetailError(String errorMessage, Integer errorLineNo) {
-//		
-//	}
-
 	public void setConverter(FileConverter<?> fixLengthFileConverter) {
-		this.fixLengthFileConverter = fixLengthFileConverter;
+		this.fileConverter = fixLengthFileConverter;
 	}
 
 	public void setHandler(ImportFileHandler importHandler) {
