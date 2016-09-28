@@ -121,7 +121,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 						List<FileLayoutConfigItem> headerConfigItems = fileConfigItems
 								.get(RecordType.HEADER);
 
-						validateDataFormat(currentLine, headerConfigItems);
+						validateLineDataFormat(currentLine, headerConfigItems);
 						hasCheckedHeader = true;
 						continue;
 					}
@@ -146,7 +146,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 						List<FileLayoutConfigItem> footerConfigItems = fileConfigItems
 								.get(RecordType.FOOTER);
 
-						validateDataFormat(currentLine, footerConfigItems);
+						validateLineDataFormat(currentLine, footerConfigItems);
 						hasCheckedFooter = true;
 						continue;
 					}
@@ -167,7 +167,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 					List<FileLayoutConfigItem> detailConfigItems = fileConfigItems
 							.get(RecordType.DETAIL);
 
-					validateDataFormat(currentLine, detailConfigItems);
+					validateLineDataFormat(currentLine, detailConfigItems);
 
 					try {
 						bufferedWriter.write(currentLine);
@@ -216,7 +216,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 
 	}
 
-	private void validateDataFormat(String currentLine,
+	private void validateLineDataFormat(String currentLine,
 			List<FileLayoutConfigItem> configItems) throws WrongFormatFileException {
 
 		int lineLength = getLengthOfLine(configItems);
@@ -246,10 +246,10 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 	private void validateExpectedValue(FileLayoutConfigItem item, String dataValidate)
 			throws WrongFormatFileException {
 
-		if (!dataValidate.equals(item.getExpectValue())) {
+		if (!item.getExpectValue().equals(dataValidate.trim())) {
 			throw new WrongFormatFileException(
 					MessageFormat.format(FixedLengthErrorConstant.MISMATCH_FORMAT,
-							item.getDisplayValue(), dataValidate));
+							item.getDisplayValue(), dataValidate.trim()));
 		}
 
 	}
