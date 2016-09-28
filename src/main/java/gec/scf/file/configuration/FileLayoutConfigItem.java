@@ -18,4 +18,6 @@ public interface FileLayoutConfigItem {
 
 	Integer getDecimalPlace();
 
+	String getDisplayOfField();
+
 }

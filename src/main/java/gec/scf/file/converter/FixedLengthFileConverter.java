@@ -10,11 +10,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.apache.log4j.Logger;
 
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
+import gec.scf.file.configuration.RecordType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
@@ -34,19 +36,20 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 
 	private FileLayoutConfig fileLayoutConfig;
 
+	private Map<RecordType, List<FileLayoutConfigItem>> fileConfigItems = null;
+
+	private Map<RecordType, RecordTypeExtractor> extractors = new EnumMap<RecordType, RecordTypeExtractor>(
+			RecordType.class);
+
+	private Class<T> domainClass;
+
 	private int currentLineNo;
 
-	// private int totalDetailRecord;
+	private int totalDetailRecord;
 
 	private File tempFile;
 
 	private BufferedReader tempFileReader;
-
-	private Map<String, List<? extends FileLayoutConfigItem>> fileConfigItems = null;
-
-	private static final String DETAIL = "DETAIL";
-
-	private Class<T> domainClass;
 
 	public FixedLengthFileConverter(Class<T> clazz) {
 		this.domainClass = clazz;
@@ -60,7 +63,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 	@Override
 	public void checkFileFormat(InputStream fileContent) throws WrongFormatFileException {
 
-		fileConfigItems = prepareConfigData(fileLayoutConfig.getConfigItems());
+		fileConfigItems = prepareConfiguration(fileLayoutConfig.getConfigItems());
 
 		BufferedWriter bufferedWriter = null;
 		BufferedReader bufferReader = null;
@@ -78,10 +81,60 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 			bufferReader = new BufferedReader(
 					new InputStreamReader(fileContent, "UTF-8"));
 
+			boolean hasCheckedHeader = false;
+
+			boolean hasCheckedFooter = false;
+
 			String currentLine;
 			while ((currentLine = bufferReader.readLine()) != null) {
-				String recordId = currentLine.substring(0, 3);
-				if (recordId.startsWith(fileLayoutConfig.getDetailFlag())) {
+
+				if (!hasCheckedHeader) {
+
+					List<FileLayoutConfigItem> headerConfigItems = fileConfigItems
+							.get(RecordType.HEADER);
+
+					validateHeader(currentLine, headerConfigItems);
+
+					hasCheckedHeader = true;
+					continue;
+				}
+
+				if (!hasCheckedFooter) {
+
+					RecordTypeExtractor footerRecordTypeExtractor = extractors
+							.get(RecordType.FOOTER);
+					String recordType = footerRecordTypeExtractor.extract(currentLine);
+
+					if (fileLayoutConfig.getFooterFlag().equals(recordType)) {
+						List<FileLayoutConfigItem> footerConfigItems = fileConfigItems
+								.get(RecordType.FOOTER);
+
+						validateFooter(currentLine, footerConfigItems);
+						hasCheckedFooter = true;
+						continue;
+					}
+
+				}
+				else if (StringUtils.isBlank(currentLine)) {
+					continue;
+				}
+
+				if (StringUtils.isBlank(currentLine)) {
+					throw new WrongFormatFileException(
+							FixedLengthErrorConstant.FILE_INVALID_FORMAT);
+				}
+
+				RecordTypeExtractor detailRecordTypeExtractor = extractors
+						.get(RecordType.DETAIL);
+				String recordType = detailRecordTypeExtractor.extract(currentLine);
+
+				if (fileLayoutConfig.getDetailFlag().equals(recordType)) {
+					if (hasCheckedFooter) {
+						throw new WrongFormatFileException(MessageFormat.format(
+								FixedLengthErrorConstant.FOOTER_NOT_LAST_FILE,
+								fileLayoutConfig.getFooterFlag()));
+					}
+
 					try {
 						bufferedWriter.write(currentLine);
 						bufferedWriter.newLine();
@@ -89,8 +142,18 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 					catch (IOException e) {
 						log.error(e.getMessage(), e);
 					}
-					// totalDetailRecord++;
+					totalDetailRecord++;
 				}
+				else {
+					throw new WrongFormatFileException(MessageFormat.format(
+							FixedLengthErrorConstant.RECORD_ID_MISS_MATCH, recordType));
+				}
+
+			}
+			if (!hasCheckedFooter) {
+				throw new WrongFormatFileException(MessageFormat.format(
+						FixedLengthErrorConstant.FOOTER_NOT_LAST_FILE,
+						fileLayoutConfig.getFooterFlag()));
 			}
 		}
 		catch (IOException e) {
@@ -114,20 +177,93 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 
 	}
 
-	private Map<String, List<? extends FileLayoutConfigItem>> prepareConfigData(
+	private void validateFooter(String footerLine,
+			List<FileLayoutConfigItem> footerConfigItems)
+			throws WrongFormatFileException {
+
+		int lineLength = getLengthOfLine(footerConfigItems);
+		if (lineLength != StringUtils.length(footerLine)) {
+			throw new WrongFormatFileException(
+					MessageFormat.format(FixedLengthErrorConstant.DATA_LENGTH_OVER,
+							footerLine.length(), lineLength));
+		}
+
+	}
+
+	private void validateHeader(String headerLine,
+			List<? extends FileLayoutConfigItem> headerConfigItems)
+			throws WrongFormatFileException {
+
+		RecordTypeExtractor headerRecordTypeExtractor = extractors.get(RecordType.HEADER);
+		String recordType = headerRecordTypeExtractor.extract(headerLine);
+
+		if (recordType == null) {
+			throw new WrongFormatFileException(MessageFormat.format(
+					FixedLengthErrorConstant.HEADER_NOT_FIRST_LINE_OF_FILE,
+					fileLayoutConfig.getHeaderFlag()));
+		}
+		if (!recordType.equals(fileLayoutConfig.getHeaderFlag())) {
+			throw new WrongFormatFileException(MessageFormat
+					.format(FixedLengthErrorConstant.RECORD_ID_MISS_MATCH, recordType));
+		}
+		else {
+			int lineLength = getLengthOfLine(headerConfigItems);
+			if (lineLength != StringUtils.length(headerLine)) {
+				throw new WrongFormatFileException(
+						MessageFormat.format(FixedLengthErrorConstant.DATA_LENGTH_OVER,
+								headerLine.length(), lineLength));
+			}
+		}
+	}
+
+	private int getLengthOfLine(
+			List<? extends FileLayoutConfigItem> fileLayoutConfigItems) {
+		int result = 0;
+		for (FileLayoutConfigItem item : fileLayoutConfigItems) {
+			int length = (item.getStartIndex() + item.getLenght()) - 1;
+			if (result < length)
+				result = length;
+		}
+		return result;
+	}
+
+	private Map<RecordType, List<FileLayoutConfigItem>> prepareConfiguration(
 			List<? extends FileLayoutConfigItem> list) {
 
-		Map<String, List<? extends FileLayoutConfigItem>> fileLayoutMapping = new HashMap<String, List<? extends FileLayoutConfigItem>>();
+		Map<RecordType, List<FileLayoutConfigItem>> fileLayoutMapping = new EnumMap<RecordType, List<FileLayoutConfigItem>>(
+				RecordType.class);
+		List<FileLayoutConfigItem> headerList = new ArrayList<FileLayoutConfigItem>();
 		List<FileLayoutConfigItem> detailList = new ArrayList<FileLayoutConfigItem>();
+		List<FileLayoutConfigItem> footerList = new ArrayList<FileLayoutConfigItem>();
 
 		for (FileLayoutConfigItem fileLayoutConfig : list) {
-			if (fileLayoutConfig.getRecordType().equals(DETAIL)) {
-				detailList.add(fileLayoutConfig);
+			if ("recordId".equals(fileLayoutConfig.getFieldName())) {
+				RecordTypeExtractor extractor = new RecordTypeExtractor(
+						fileLayoutConfig.getStartIndex(), fileLayoutConfig.getLenght());
+				extractors.put(fileLayoutConfig.getRecordType(), extractor);
+			}
+			else {
+				switch (fileLayoutConfig.getRecordType()) {
+				case HEADER:
+					headerList.add(fileLayoutConfig);
+					break;
+				case FOOTER:
+					footerList.add(fileLayoutConfig);
+					break;
+				case DETAIL:
+					detailList.add(fileLayoutConfig);
+					break;
+
+				default:
+					break;
+				}
 			}
 
 		}
 
-		fileLayoutMapping.put(DETAIL, detailList);
+		fileLayoutMapping.put(RecordType.HEADER, headerList);
+		fileLayoutMapping.put(RecordType.DETAIL, detailList);
+		fileLayoutMapping.put(RecordType.FOOTER, footerList);
 
 		return fileLayoutMapping;
 	}
@@ -161,7 +297,7 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 	public T convertDetail(String currentLine) {
 
 		List<? extends FileLayoutConfigItem> fileLayoutConfigs = fileConfigItems
-				.get(DETAIL);
+				.get(RecordType.DETAIL);
 
 		T domainObj = null;
 		try {
@@ -288,4 +424,27 @@ public class FixedLengthFileConverter<T> implements FileConverter<T> {
 		this.fileLayoutConfig = fileLayoutConfig;
 	}
 
+	private static class RecordTypeExtractor {
+
+		private int startIndex;
+		private Integer lenght;
+
+		public RecordTypeExtractor(int startIndex, Integer lenght) {
+			this.startIndex = startIndex;
+			this.lenght = lenght;
+		}
+
+		public String extract(String currentLine) {
+			int beginIndex = startIndex - 1;
+			String recordType = null;
+			try {
+				recordType = currentLine.substring(beginIndex, beginIndex + lenght);
+			}
+			catch (IndexOutOfBoundsException e) {
+				log.debug(e.getMessage());
+			}
+			return recordType;
+		}
+
+	}
 }

@@ -7,6 +7,7 @@ public class WrongFormatFileException extends Exception {
 	private Integer errorLineNo;
 
 	public WrongFormatFileException(String errorMessage) {
+		super(errorMessage);
 		this.errorMessage = errorMessage;
 	}
 
@@ -28,5 +29,4 @@ public class WrongFormatFileException extends Exception {
 	public Integer getErrorLineNo() {
 		return errorLineNo;
 	}
-
 }
