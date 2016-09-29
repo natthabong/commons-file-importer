@@ -4,6 +4,8 @@ import java.util.List;
 
 public class DefaultFileLayoutConfig implements FileLayoutConfig {
 
+	private Integer startIndex;
+	
 	private FileType fileType;
 
 	private String detailFlag;
@@ -15,6 +17,14 @@ public class DefaultFileLayoutConfig implements FileLayoutConfig {
 	private String footerFlag;
 
 	private String delimeter;
+
+	public Integer getStartIndex() {
+		return startIndex;
+	}
+
+	public void setStartIndex(Integer startIndex) {
+		this.startIndex = startIndex;
+	}
 
 	@Override
 	public List<? extends FileLayoutConfigItem> getConfigItems() {

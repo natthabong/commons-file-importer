@@ -328,6 +328,9 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 	private int getLengthOfLine(List<? extends FileLayoutConfigItem> fileLayoutConfigItems) {
 		int result = 0;
 		for (FileLayoutConfigItem item : fileLayoutConfigItems) {
+			if(item.getStartIndex()==null){
+				continue;
+			}
 			int length = (item.getStartIndex() - 1) + item.getLenght();
 			if (result <= length)
 				result = length;

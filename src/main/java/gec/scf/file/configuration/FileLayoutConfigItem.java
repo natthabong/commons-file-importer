@@ -6,7 +6,7 @@ public interface FileLayoutConfigItem {
 
 	RecordType getRecordType();
 
-	int getStartIndex();
+	Integer getStartIndex();
 
 	Integer getLenght();
 
