@@ -17,5 +17,5 @@ public class CovertErrorConstant {
 	public static final String FILE_INVALID_FORMAT = "File invalid format";
 	public static final String DATA_OVER_MAX_LENGTH = "{0} length ({1}) is over max length ({2})";
 	public static final String DIGIT_OVER_MAX_DIGIT = "{0} digit is over max digit ({1})";
-	public static final String DATA_FIELD_INVALID = "data length ({0}) must have {1} field";
+	public static final String DATA_LENGTH_OF_FIELD_OVER = "data length ({0}) must have {1} field";
 }

@@ -327,7 +327,7 @@ public class FixedLengthFileConverterTest {
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
 	}
-
+	
 	private FileLayoutConfig createFixedLengthFileLayout() {
 		DefaultFileLayoutConfig fileLayout = new DefaultFileLayoutConfig();
 		fileLayout.setFileType(FileType.FIXED_LENGTH);
