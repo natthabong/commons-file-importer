@@ -75,7 +75,7 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 			if(recordLength != csvLengthConfig){
 				WrongFormatFileException error = new WrongFormatFileException();
 				error.setErrorLineNo((int)record.getRecordNumber());
-				error.setErrorMessage(MessageFormat.format(CovertErrorConstant.DATA_FIELD_INVALID, recordLength, csvLengthConfig));
+				error.setErrorMessage(MessageFormat.format(CovertErrorConstant.DATA_LENGTH_OF_FIELD_OVER, recordLength, csvLengthConfig));
 				throw error;
 			}
 		}
