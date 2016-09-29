@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
-
-import java.util.Date;
 import java.util.Iterator;
-
 import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
@@ -77,42 +75,9 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 			if(recordLength != csvLengthConfig){
 				WrongFormatFileException error = new WrongFormatFileException();
 				error.setErrorLineNo((int)record.getRecordNumber());
-				error.setErrorMessage(MessageFormat.format(FixedLengthErrorConstant.DATA_FIELD_INVALID, recordLength, csvLengthConfig));
+				error.setErrorMessage(MessageFormat.format(CovertErrorConstant.DATA_FIELD_INVALID, recordLength, csvLengthConfig));
 				throw error;
 			}
-		}
-	}
-
-	private void validateBinaryFile(InputStream fileContent) throws IOException, WrongFormatFileException {
-		int size = fileContent.available();
-		if (size > 1024) {
-			size = 1024;
-		}
-		byte[] data = new byte[size];
-		fileContent.read(data);
-		fileContent.close();
-
-		int ascii = 0;
-		int other = 0;
-
-		for (int i = 0; i < data.length; i++) {
-			byte b = data[i];
-			if (b < 0x09) {
-				throw new WrongFormatFileException("Data is binary file");
-			}
-
-			if (b == 0x09 || b == 0x0A || b == 0x0C || b == 0x0D) {
-				ascii++;
-			}
-			else if (b >= 0x20 && b <= 0x7E) {
-				ascii++;
-			}
-			else {
-				other++;
-			}
-		}
-		if (100 * other / (ascii + other) > 95) {
-			throw new WrongFormatFileException("Data is binary file");
 		}
 	}
 

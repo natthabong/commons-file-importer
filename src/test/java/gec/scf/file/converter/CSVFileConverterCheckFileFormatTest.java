@@ -111,8 +111,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		DefaultFileLayoutConfig fileLayout = getLayoutConfig();
 
 		CSVFileConverter<SponsorDocument> csvFileConverter = new CSVFileConverter<SponsorDocument>(
-				SponsorDocument.class);
-		csvFileConverter.setFileLayoutConfig(fileLayout);
+				fileLayout, SponsorDocument.class);
 		return csvFileConverter;
 	}
 

@@ -53,7 +53,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 		else {
 			validateRequiredField(itemConf, recordValue);
-			field.set(document, recordValue);
+			field.set(document, recordValue.trim());
 		}
 	}
 
