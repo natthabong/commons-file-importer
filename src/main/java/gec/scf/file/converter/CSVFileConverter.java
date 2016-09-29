@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -53,19 +54,41 @@ public class CSVFileConverter<T> implements FileConverter<T> {
 		try {
 
 			// validateBinaryFile(fileContent);
-
+			int csvLengthConfig = fileLayoutConfig.getConfigItems().size();
+			
 			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"), CSVFormat.EXCEL
 					.withSkipHeaderRecord(true).withDelimiter(fileLayoutConfig.getDelimeter().charAt(0)));
 
 			csvRecords = csvParser.getRecords();
-
+			
+			validateDataLength(csvLengthConfig);
+			
 			currentLine = 1;
+		}catch(WrongFormatFileException e){
+			throw e;
 		}
 		catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void validateDataLength(int csvLengthConfig) throws WrongFormatFileException {
+		for(CSVRecord record : csvRecords){
+			Iterator iterator = record.iterator();
+			int recordLength = 0;
+			while(iterator.hasNext()){
+				iterator.next();
+				recordLength++;
+			}
+			if(recordLength != csvLengthConfig){
+				WrongFormatFileException error = new WrongFormatFileException();
+				error.setErrorLineNo((int)record.getRecordNumber());
+				error.setErrorMessage(MessageFormat.format(FixedLengthErrorConstant.DATA_FIELD_INVALID, recordLength, csvLengthConfig));
+				throw error;
+			}
 		}
 	}
 
