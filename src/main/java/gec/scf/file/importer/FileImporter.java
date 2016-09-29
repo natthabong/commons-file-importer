@@ -89,6 +89,8 @@ public class FileImporter {
 			errorLineDetail.setErrorMessage(e.getErrorMessage());
 			errorLineDetail.setErrorLineNo(e.getErrorLineNo());
 			errorLineDetailList.add(errorLineDetail);
+			importerResult.setErrorLineDetails(errorLineDetailList);
+			importerResult.setTotalSuccess(totalSuccess);
 			importerResult.setStatus(ResultType.FAIL);
 
 		}
