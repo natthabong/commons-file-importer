@@ -18,18 +18,20 @@ import org.junit.Test;
 import gec.scf.file.configuration.DefaultFileLayoutConfig;
 import gec.scf.file.configuration.DefaultFileLayoutConfigItem;
 import gec.scf.file.configuration.FileLayoutConfigItem;
+
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatFileException;
 
 public class CSVFileConverterCheckFileFormatTest {
+
+	private CSVFileConverter<SponsorDocument> csvFileConverter = new CSVFileConverter<SponsorDocument>(
+			null, SponsorDocument.class);
 
 	@Ignore
 	@Test(expected = WrongFormatFileException.class)
 	public void given_import_binary_file_when_check_file_format_should_throw_WrongFormatFileException()
 			throws WrongFormatFileException, FileNotFoundException {
 		// Arrange
-		CSVFileConverter<Object> csvFileConverter = new CSVFileConverter<Object>(Object.class);
-
 		URL part = this.getClass().getResource("binaryFileConverter.txt");
 
 		File csvFile = new File(part.getFile());
@@ -48,9 +50,6 @@ public class CSVFileConverterCheckFileFormatTest {
 	@Test
 	public void given_import_csv_file_when_check_file_format_should_not_WrongFormatFileException()
 			throws FileNotFoundException, WrongFormatFileException {
-		// Arrange
-		CSVFileConverter<Object> csvFileConverter = new CSVFileConverter<Object>(Object.class);
-
 		URL part = this.getClass().getResource("bigcsponsor.csv");
 
 		File csvFile = new File(part.getFile());

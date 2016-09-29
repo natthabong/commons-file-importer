@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -91,6 +92,7 @@ public class FixedLengthFileConverterTest {
 		fixLengthFileConverter.checkFileFormat(documentFile);
 	}
 
+	@Ignore
 	@Test
 	public void given_a_file_which_has_a_document_date_wrong_format_when_check_file_format_should_throw_WrongFormatFileException()
 			throws WrongFormatFileException {

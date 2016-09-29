@@ -11,6 +11,8 @@ public class FileImporterResult {
 	private Integer totalFailed;
 
 	private List<ErrorLineDetail> errorLineDetails;
+	
+	private String processNo;
 
 	public ResultType getStatus() {
 		return status;
@@ -42,6 +44,14 @@ public class FileImporterResult {
 
 	public void setErrorLineDetails(List<ErrorLineDetail> errorLineDetails) {
 		this.errorLineDetails = errorLineDetails;
+	}
+
+	public String getProcessNo() {
+		return processNo;
+	}
+
+	public void setProcessNo(String processNo) {
+		this.processNo = processNo;
 	}
 
 }
