@@ -11,9 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import gec.scf.file.configuration.DefaultFileLayoutConfig;
 import gec.scf.file.configuration.DefaultFileLayoutConfigItem;
@@ -24,8 +22,6 @@ import gec.scf.file.importer.DetailResult;
 
 public class CSVFileConverterGetDetailFileTest {
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 	private CSVFileConverter<SponsorDocument> csvFileConverter;
 
 	@Test
@@ -542,6 +538,7 @@ public class CSVFileConverterGetDetailFileTest {
 		supplierCode.setFieldName("supplierCode");
 		supplierCode.setRequired(true);
 		supplierCode.setDisplayValue("Payer Code");
+		supplierCode.setEntityField(true);
 
 		DefaultFileLayoutConfigItem depositBranch = new DefaultFileLayoutConfigItem();
 		depositBranch.setStartIndex(3);
@@ -549,13 +546,14 @@ public class CSVFileConverterGetDetailFileTest {
 		depositBranch.setFieldName(null);
 		depositBranch.setRequired(false);
 		depositBranch.setDisplayValue("Deposit branch");
-
+		
 		DefaultFileLayoutConfigItem payer = new DefaultFileLayoutConfigItem();
 		payer.setStartIndex(4);
 		payer.setLength(20);
 		payer.setFieldName("optionVarcharField1");
 		payer.setRequired(true);
 		payer.setDisplayValue("Payer");
+		payer.setEntityField(true);
 
 		DefaultFileLayoutConfigItem bankCode = new DefaultFileLayoutConfigItem();
 		bankCode.setStartIndex(5);
@@ -563,13 +561,15 @@ public class CSVFileConverterGetDetailFileTest {
 		bankCode.setFieldName("optionVarcharField2");
 		bankCode.setRequired(true);
 		bankCode.setDisplayValue("Bank Code");
-
+		bankCode.setEntityField(true);
+		
 		DefaultFileLayoutConfigItem bank = new DefaultFileLayoutConfigItem();
 		bank.setStartIndex(6);
 		bank.setLength(20);
 		bank.setFieldName("optionVarcharField3");
 		bank.setRequired(true);
 		bank.setDisplayValue("Bank");
+		bank.setEntityField(true);
 
 		DefaultFileLayoutConfigItem chequeBranch = new DefaultFileLayoutConfigItem();
 		chequeBranch.setStartIndex(7);
@@ -584,6 +584,7 @@ public class CSVFileConverterGetDetailFileTest {
 		chequeNo.setFieldName("documentNo");
 		chequeNo.setRequired(true);
 		chequeNo.setDisplayValue("Cheque No");
+		chequeNo.setEntityField(true);
 
 		DefaultFileLayoutConfigItem chequeDueDate = new DefaultFileLayoutConfigItem();
 		chequeDueDate.setStartIndex(9);
@@ -592,6 +593,7 @@ public class CSVFileConverterGetDetailFileTest {
 		chequeDueDate.setRequired(true);
 		chequeDueDate.setDisplayValue("Cheque Due Date");
 		chequeDueDate.setDatetimeFormat("dd/MM/yyyy");
+		chequeDueDate.setEntityField(true);
 
 		DefaultFileLayoutConfigItem goodFundDate = new DefaultFileLayoutConfigItem();
 		goodFundDate.setStartIndex(10);
@@ -600,7 +602,8 @@ public class CSVFileConverterGetDetailFileTest {
 		goodFundDate.setRequired(true);
 		goodFundDate.setDisplayValue("Good Fund Date");
 		goodFundDate.setDatetimeFormat("dd/MM/yyyy");
-
+		goodFundDate.setEntityField(true);
+		
 		DefaultFileLayoutConfigItem depositDate = new DefaultFileLayoutConfigItem();
 		depositDate.setStartIndex(11);
 		depositDate.setLength(10);
@@ -608,6 +611,7 @@ public class CSVFileConverterGetDetailFileTest {
 		depositDate.setRequired(true);
 		depositDate.setDisplayValue("Deposit Date");
 		depositDate.setDatetimeFormat("dd/MM/yyyy");
+		depositDate.setEntityField(true);
 
 		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
 		chequeAmount.setStartIndex(12);
@@ -616,6 +620,7 @@ public class CSVFileConverterGetDetailFileTest {
 		chequeAmount.setRequired(true);
 		chequeAmount.setDisplayValue("Cheque Amount");
 		chequeAmount.setDecimalPlace(2);
+		chequeAmount.setEntityField(true);
 
 		DefaultFileLayoutConfigItem clearingType = new DefaultFileLayoutConfigItem();
 		clearingType.setStartIndex(13);

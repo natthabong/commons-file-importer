@@ -24,4 +24,10 @@ public interface FileLayoutConfigItem {
 
 	boolean isRequired();
 
+	boolean isEntityField();
+
+	boolean isCheckAmountZero();
+
+	String getConstanceValue();
+
 }

@@ -28,6 +28,12 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private Integer decimalPlace;
 
+	private boolean entityField;
+
+	private boolean checkAmountZero;
+
+	private String constanceValue;
+
 
 	@Override
 	public String getFieldName() {
@@ -149,6 +155,33 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	public void setDecimalPlace(int decimalPlace) {
 		this.decimalPlace = decimalPlace;
+	}
+
+	public void setEntityField(boolean entityField) {
+		this.entityField = entityField;		
+	}
+
+	@Override
+	public boolean isEntityField() {
+		return entityField;
+	}
+
+	public void setCheckAmountZero(boolean checkAmountZero) {
+		this.checkAmountZero = checkAmountZero;
+	}
+
+	@Override
+	public boolean isCheckAmountZero() {
+		return checkAmountZero;
+	}
+
+	public void setConstanceValue(String constanceValue) {
+		this.constanceValue = constanceValue;
+	}
+
+	@Override
+	public String getConstanceValue() {
+		return constanceValue;
 	}
 
 }
