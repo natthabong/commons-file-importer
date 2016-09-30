@@ -178,7 +178,7 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	}
 
 	@Override
-	public String getConstanceValue() {
+	public String getConstantValue() {
 		return constanceValue;
 	}
 

@@ -28,6 +28,6 @@ public interface FileLayoutConfigItem {
 
 	boolean isCheckAmountZero();
 
-	String getConstanceValue();
+	String getConstantValue();
 
 }

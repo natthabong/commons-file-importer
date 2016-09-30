@@ -509,8 +509,8 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 			try {
 
-				if (StringUtils.isNotBlank(config.getConstanceValue())) {
-					applyObjectValue(config.getConstanceValue(), config, entity);
+				if (StringUtils.isNotBlank(config.getConstantValue())) {
+					applyObjectValue(config.getConstantValue(), config, entity);
 					continue;
 				}
 
