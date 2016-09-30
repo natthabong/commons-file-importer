@@ -10,6 +10,7 @@ public class CovertErrorConstant {
 	public static final String FOOTER_NOT_LAST_FILE = "{0} ({1}) not found on last row";
 	public static final String RECORD_ID_MISS_MATCH = "{0} ({1}) mismatch";
 	public static final String HEADER_NOT_FIRST_LINE_OF_FILE = "{0} ({1}) not found on first row";
+	public static final String FOOTER_NOT_LAST_LINE_OF_FILE = "{0} ({1}) not found on last row";
 	public static final String ERROR_MESSAGE_IS_REQUIRE = "{0} is required";
 	public static final String INVALIDE_FORMAT = "{0} ({1}) invalid format";
 	public static final String MISMATCH_FORMAT = "{0} ({1}) mismatch";

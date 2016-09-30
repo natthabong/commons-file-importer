@@ -91,6 +91,26 @@ public class FixedLengthFileConverterTest {
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
 	}
+	
+	@Test
+	public void given_a_file_which_has_a_space_case_header_flag_when_check_file_format_should_throw_WrongFormatFileException()
+			throws WrongFormatFileException {
+
+		// Arrange
+		String[] fixedLengthContent = new String[4];
+		fixedLengthContent[0] = " 20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
+		fixedLengthContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
+		fixedLengthContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                               ";
+		fixedLengthContent[3] = "T0000010000000101000000                                                                                                                                                                                                                                                                                     ";
+		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+
+		// Assert
+		thrown.expect(WrongFormatFileException.class);
+		thrown.expectMessage("Record Type (H) not found on first row");
+
+		// Actual
+		fixLengthFileConverter.checkFileFormat(documentFile);
+	}
 
 	@Ignore
 	@Test
@@ -284,6 +304,26 @@ public class FixedLengthFileConverterTest {
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(drawdownAdviceFile);
+	}
+	
+	@Test
+	public void given_a_file_which_has_a_space_case_footer_flag_when_check_file_format_should_throw_WrongFormatFileException()
+			throws WrongFormatFileException {
+
+		// Arrange
+		String[] fixedLengthContent = new String[4];
+		fixedLengthContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
+		fixedLengthContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
+		fixedLengthContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                               ";
+		fixedLengthContent[3] = " 0000010000000101000000                                                                                                                                                                                                                                                                                     ";
+		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+
+		// Assert
+		thrown.expect(WrongFormatFileException.class);
+		thrown.expectMessage("Record Type (T) not found on last row");
+
+		// Actual
+		fixLengthFileConverter.checkFileFormat(documentFile);
 	}
 
 	@Test

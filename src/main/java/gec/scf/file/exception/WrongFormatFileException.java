@@ -10,6 +10,12 @@ public class WrongFormatFileException extends Exception {
 		super(errorMessage);
 		this.errorMessage = errorMessage;
 	}
+	
+	public WrongFormatFileException(String errorMessage, Integer errorLineNo) {
+		super(errorMessage);
+		this.errorMessage = errorMessage;
+		this.errorLineNo = errorLineNo;
+	}
 
 	public WrongFormatFileException() {
 	}

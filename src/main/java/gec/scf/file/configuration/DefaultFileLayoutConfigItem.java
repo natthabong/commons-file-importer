@@ -2,7 +2,7 @@ package gec.scf.file.configuration;
 
 public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
-	private int startIndex;
+	private Integer startIndex;
 
 	private int length;
 
@@ -34,7 +34,6 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private String constanceValue;
 
-
 	@Override
 	public String getFieldName() {
 		return fieldName;
@@ -46,7 +45,7 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	}
 
 	@Override
-	public int getStartIndex() {
+	public Integer getStartIndex() {
 		return startIndex;
 	}
 
@@ -75,9 +74,8 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 		return decimalPlace;
 	}
 
-	public void setStartIndex(int startIndex) {
+	public void setStartIndex(Integer startIndex) {
 		this.startIndex = startIndex;
-
 	}
 
 	public void setLength(int length) {
@@ -158,7 +156,7 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	}
 
 	public void setEntityField(boolean entityField) {
-		this.entityField = entityField;		
+		this.entityField = entityField;
 	}
 
 	@Override
@@ -180,7 +178,7 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	}
 
 	@Override
-	public String getConstanceValue() {
+	public String getConstantValue() {
 		return constanceValue;
 	}
 
