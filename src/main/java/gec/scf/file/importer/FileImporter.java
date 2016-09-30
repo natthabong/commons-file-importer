@@ -62,8 +62,13 @@ public class FileImporter {
 					if (importHandler != null) {
 						importHandler.onConvertFailed(detailResult);
 					}
+					for(ErrorLineDetail errorDetail : detailResult.getErrorLineDetails()){
+						ErrorLineDetail errorLineDetail = new ErrorLineDetail();
+						errorLineDetail.setErrorMessage(errorDetail.getErrorMessage());
+						errorLineDetail.setErrorLineNo(errorDetail.getErrorLineNo());
+						errorLineDetailList.add(errorLineDetail);
+					}
 					totalFailed++;
-
 				}
 			}
 
