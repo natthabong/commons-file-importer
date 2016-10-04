@@ -41,7 +41,7 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
 			// validateBinaryFile(fileContent);
 
-			int csvLengthConfig = fileLayoutConfig.getConfigItems().size();
+//			int csvLengthConfig = fileLayoutConfig.getConfigItems().size();
 			
 			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"), CSVFormat.EXCEL
 					.withSkipHeaderRecord(true).withDelimiter(fileLayoutConfig.getDelimeter().charAt(0)));
@@ -49,7 +49,7 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
 			csvRecords = csvParser.getRecords();
 			
-			validateDataLength(csvLengthConfig);
+			validateDataLength(fileLayoutConfig.getConfigItems());
 			
 			currentLine = 1;
 		}catch(WrongFormatFileException e){
@@ -64,7 +64,14 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 	}
 
 
-	private void validateDataLength(int csvLengthConfig) throws WrongFormatFileException {
+	private void validateDataLength(List<? extends FileLayoutConfigItem> fileLayoutItems) throws WrongFormatFileException {
+		int totalLengthConfig = 0;
+		for(FileLayoutConfigItem item : fileLayoutItems){
+			if(totalLengthConfig < item.getStartIndex().intValue()){
+				totalLengthConfig = item.getStartIndex().intValue();
+			}
+		}
+		
 		for(CSVRecord record : csvRecords){
 			Iterator iterator = record.iterator();
 			int recordLength = 0;
@@ -72,10 +79,11 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 				iterator.next();
 				recordLength++;
 			}
-			if(recordLength != csvLengthConfig){
+			
+			if(recordLength != totalLengthConfig){
 				WrongFormatFileException error = new WrongFormatFileException();
 				error.setErrorLineNo((int)record.getRecordNumber());
-				error.setErrorMessage(MessageFormat.format(CovertErrorConstant.DATA_LENGTH_OF_FIELD_OVER, recordLength, csvLengthConfig));
+				error.setErrorMessage(MessageFormat.format(CovertErrorConstant.DATA_LENGTH_OF_FIELD_OVER, recordLength, totalLengthConfig));
 				throw error;
 			}
 		}
