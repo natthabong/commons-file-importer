@@ -4,11 +4,11 @@ import java.util.List;
 
 public class DataValidator {
 
-	public DataValidator(List<DataConditional> conditions) {
+	public DataValidator(List<DataCondition> conditions) {
 
 	}
 
-	public void validate(Object document) throws DataInvalidException {
+	public void validate(Object object) throws DataInvalidException {
 
 	}
 }
