@@ -41,11 +41,8 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
 			// validateBinaryFile(fileContent);
 
-//			int csvLengthConfig = fileLayoutConfig.getConfigItems().size();
-			
 			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"), CSVFormat.EXCEL
 					.withSkipHeaderRecord(true).withDelimiter(fileLayoutConfig.getDelimeter().charAt(0)));
-
 
 			csvRecords = csvParser.getRecords();
 			
@@ -62,7 +59,6 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 			e.printStackTrace();
 		}
 	}
-
 
 	private void validateDataLength(List<? extends FileLayoutConfigItem> fileLayoutItems) throws WrongFormatFileException {
 		int totalLengthConfig = 0;
