@@ -8,7 +8,7 @@ public class DataValidator {
 
 	}
 
-	public void validate(Object document){
-		
+	public void validate(Object document) throws DataInvalidException {
+
 	}
 }
