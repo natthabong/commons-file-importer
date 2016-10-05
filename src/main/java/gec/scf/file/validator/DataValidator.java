@@ -7,11 +7,11 @@ import gec.scf.file.validator.exception.ConditionMismatchException;
 
 public class DataValidator {
 
-	private List<DataCondition> conditions;
+	private List<? extends DataCondition> conditions;
 
 	private ConditionMatchingFactory conditionMatchingFactory;
 
-	public DataValidator(List<DataCondition> conditions) {
+	public DataValidator(List<? extends DataCondition> conditions) {
 		this.setConditions(conditions);
 	}
 
@@ -46,11 +46,11 @@ public class DataValidator {
 
 	}
 
-	public List<DataCondition> getConditions() {
+	public List<? extends DataCondition> getConditions() {
 		return conditions;
 	}
 
-	public void setConditions(List<DataCondition> conditions) {
+	public void setConditions(List<? extends DataCondition> conditions) {
 		this.conditions = conditions;
 	}
 
