@@ -142,17 +142,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 		validateDecimalPlace(configItem, data);
 
-//		if (configItem.isUseDecimalPlace()) {
-//			data = data.replace(".", "");
-//		}
-		
-		
-
 		try {
-//			String normalNumber = data.substring(0, (data.length() - configItem.getDecimalPlace()));
-//			String degitNumber = data.substring(data.length() - configItem.getDecimalPlace());
-//			valueAmount = new BigDecimal(normalNumber + "." + degitNumber).setScale(configItem.getDecimalPlace());
-			
 			if (configItem.isUseDecimalPlace()) {
 				String normalNumber = data.substring(0, (data.length() - configItem.getDecimalPlace()));
 				String degitNumber = data.substring(data.length() - configItem.getDecimalPlace());
@@ -165,19 +155,6 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			throw new WrongFormatDetailException(
 					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT, configItem.getDisplayValue(), data));
 		}
-		// String normalNumber = data.substring(0, (data.length() -
-		// configItem.getDecimalPlace()));
-		// String degitNumber = data.substring(data.length() -
-		// configItem.getDecimalPlace());
-		// try {
-		// valueAmount = new BigDecimal(normalNumber + "." +
-		// degitNumber).setScale(configItem.getDecimalPlace());
-		// }
-		// catch (NumberFormatException e) {
-		// throw new WrongFormatDetailException(
-		// MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
-		// configItem.getDisplayValue(), data));
-		// }
 
 		return valueAmount;
 	}
