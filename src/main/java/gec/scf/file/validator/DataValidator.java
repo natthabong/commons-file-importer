@@ -29,7 +29,7 @@ public class DataValidator {
 				try {
 					ConditionMatching<T> conditionMatching = conditionMatchingFactory
 							.create(dataCondition, objectClass);
-					conditionMatching.match(object);
+					conditionMatching.match(object, dataCondition);
 				}
 				catch (ConditionMismatchException e) {
 					errors.add(e.getMessage());
