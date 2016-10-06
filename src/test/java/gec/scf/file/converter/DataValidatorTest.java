@@ -87,7 +87,7 @@ public class DataValidatorTest {
 						.thenReturn(new ConditionMatching<SponsorDocument>() {
 
 							@Override
-							public void match(SponsorDocument object)
+							public void match(SponsorDocument object, DataCondition condition)
 									throws ConditionMismatchException {
 								throw new ConditionMismatchException();
 
@@ -109,7 +109,7 @@ public class DataValidatorTest {
 
 	private final class DoNothingCondition implements ConditionMatching<SponsorDocument> {
 		@Override
-		public void match(SponsorDocument object) throws ConditionMismatchException {
+		public void match(SponsorDocument object, DataCondition condition) throws ConditionMismatchException {
 
 		}
 

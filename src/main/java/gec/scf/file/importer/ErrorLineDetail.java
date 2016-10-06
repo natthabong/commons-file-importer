@@ -2,11 +2,28 @@ package gec.scf.file.importer;
 
 import java.io.Serializable;
 
-public class ErrorLineDetail implements Serializable{
+import gec.scf.file.exception.WrongFormatFileException;
+
+public class ErrorLineDetail implements Serializable {
 
 	private static final long serialVersionUID = -6887731652449627677L;
+
 	private String errorMessage;
+
 	private Integer errorLineNo;
+
+	public ErrorLineDetail() {
+	}
+
+	public ErrorLineDetail(Integer errorLineNo, String errorMessage) {
+		super();
+		this.errorMessage = errorMessage;
+		this.errorLineNo = errorLineNo;
+	}
+
+	public ErrorLineDetail(WrongFormatFileException e) {
+		this(e.getErrorLineNo(), e.getMessage());
+	}
 
 	public String getErrorMessage() {
 		return errorMessage;
@@ -21,7 +38,7 @@ public class ErrorLineDetail implements Serializable{
 	}
 
 	public void setErrorLineNo(Integer errorLineNo) {
-		this.errorLineNo = errorLineNo;		
+		this.errorLineNo = errorLineNo;
 	}
 
 }
