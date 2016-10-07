@@ -9,6 +9,6 @@ public interface FileConverter<T> {
 
 	public void checkFileFormat(InputStream documentFile) throws WrongFormatFileException;
 
-	public DetailResult getDetail();
+	public DetailResult<T> getDetail();
 
 }

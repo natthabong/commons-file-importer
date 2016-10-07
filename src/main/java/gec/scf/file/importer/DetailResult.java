@@ -2,7 +2,7 @@ package gec.scf.file.importer;
 
 import java.util.List;
 
-public class DetailResult {
+public class DetailResult<T> {
 
 	private boolean success;
 
@@ -10,8 +10,8 @@ public class DetailResult {
 
 	private List<ErrorLineDetail> errorLineDetails;
 
-	private Object objectValue;
-	
+	private T objectValue;
+
 	public boolean isSuccess() {
 		return success;
 	}
@@ -36,11 +36,11 @@ public class DetailResult {
 		this.lineNo = lineNo;
 	}
 
-	public Object getObjectValue() {
+	public T getObjectValue() {
 		return objectValue;
 	}
 
-	public void setObjectValue(Object objectValue) {
+	public void setObjectValue(T objectValue) {
 		this.objectValue = objectValue;
 	}
 

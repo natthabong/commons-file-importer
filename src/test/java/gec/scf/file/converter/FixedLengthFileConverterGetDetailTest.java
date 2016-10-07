@@ -41,7 +41,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		assertTrue(actualResult.isSuccess());
@@ -64,7 +64,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -87,7 +87,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -111,7 +111,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		SponsorDocument actualDocument = (SponsorDocument) actualResult.getObjectValue();
@@ -133,7 +133,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -156,7 +156,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -179,7 +179,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -202,7 +202,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -226,7 +226,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -249,7 +249,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -272,7 +272,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -295,7 +295,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -319,7 +319,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		assertEquals(2, actualResult.getErrorLineDetails().size());
@@ -341,7 +341,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		ErrorLineDetail errorLineDetail = actualResult.getErrorLineDetails().get(0);
@@ -365,7 +365,7 @@ public class FixedLengthFileConverterGetDetailTest {
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
-		DetailResult actualResult = fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
 		assertTrue(actualResult.isSuccess());

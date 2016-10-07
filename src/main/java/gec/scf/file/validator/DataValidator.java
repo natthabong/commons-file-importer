@@ -9,7 +9,7 @@ public class DataValidator {
 
 	private List<? extends DataCondition> conditions;
 
-	private ConditionMatchingFactory conditionMatchingFactory;
+	private ConditionMatchingProvider conditionMatchingProvider;
 
 	public DataValidator(List<? extends DataCondition> conditions) {
 		this.setConditions(conditions);
@@ -27,7 +27,7 @@ public class DataValidator {
 			for (DataCondition dataCondition : conditions) {
 
 				try {
-					ConditionMatching<T> conditionMatching = conditionMatchingFactory
+					ConditionMatching<T> conditionMatching = conditionMatchingProvider
 							.create(dataCondition, objectClass);
 					conditionMatching.match(object, dataCondition);
 				}
@@ -54,13 +54,13 @@ public class DataValidator {
 		this.conditions = conditions;
 	}
 
-	public ConditionMatchingFactory getConditionMatchingFactory() {
-		return conditionMatchingFactory;
+	public ConditionMatchingProvider getConditionMatchingFactory() {
+		return conditionMatchingProvider;
 	}
 
-	public void setConditionMatchingFactory(
-			ConditionMatchingFactory conditionMatchingFactory) {
-		this.conditionMatchingFactory = conditionMatchingFactory;
+	public void setConditionMatchingProvider(
+			ConditionMatchingProvider conditionMatchingFactory) {
+		this.conditionMatchingProvider = conditionMatchingFactory;
 	}
 
 }

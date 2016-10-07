@@ -359,7 +359,8 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 		if (lineLength != StringUtils.length(currentLine)) {
 			throw new WrongFormatFileException(
 					MessageFormat.format(CovertErrorConstant.DATA_LENGTH_OVER,
-							StringUtils.length(currentLine), lineLength),currentLineNo);
+							StringUtils.length(currentLine), lineLength),
+					currentLineNo);
 		}
 	}
 
@@ -385,7 +386,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			throw new WrongFormatDetailException(errorMessage);
 		}
 		else {
-			throw new WrongFormatFileException(errorMessage,currentLineNo);
+			throw new WrongFormatFileException(errorMessage, currentLineNo);
 		}
 	}
 
@@ -453,8 +454,8 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 	}
 
 	@Override
-	public DetailResult getDetail() {
-		DetailResult detailResult = new DetailResult();
+	public DetailResult<T> getDetail() {
+		DetailResult<T> detailResult = new DetailResult<T>();
 
 		String currentLine = null;
 		detailResult.setLineNo(++currentLineNo);

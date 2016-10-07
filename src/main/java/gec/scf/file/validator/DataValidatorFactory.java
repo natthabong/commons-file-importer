@@ -2,13 +2,13 @@ package gec.scf.file.validator;
 
 import java.util.List;
 
-public class DataValidatorCreation {
+public class DataValidatorFactory {
 
 	public DataValidator getDataValidator(List<? extends DataCondition> conditionals,
-			ConditionMatchingFactory conditionMatchingFactory) {
+			ConditionMatchingProvider conditionMatchingProvider) {
 
 		DataValidator dataValidator = new DataValidator(conditionals);
-		dataValidator.setConditionMatchingFactory(conditionMatchingFactory);
+		dataValidator.setConditionMatchingProvider(conditionMatchingProvider);
 
 		return dataValidator;
 	}

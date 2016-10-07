@@ -5,7 +5,7 @@ import gec.scf.file.configuration.FileType;
 
 public class FileConverterFactory {
 
-	public <T> FileConverter<T> getFileConverter(FileLayoutConfig config,
+	public static <T> FileConverter<T> getInstance(FileLayoutConfig config,
 			Class<T> clazz) {
 		FileConverter<T> converter = null;
 		if (FileType.FIXED_LENGTH.equals(config.getFileType())) {

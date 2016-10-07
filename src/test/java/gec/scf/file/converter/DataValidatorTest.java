@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.validator.ConditionMatching;
-import gec.scf.file.validator.ConditionMatchingFactory;
+import gec.scf.file.validator.ConditionMatchingProvider;
 import gec.scf.file.validator.ConditionType;
 import gec.scf.file.validator.DataCondition;
 import gec.scf.file.validator.DataInvalidException;
@@ -29,7 +29,7 @@ public class DataValidatorTest {
 	private DataValidator dataValidator;
 
 	@Mock
-	private ConditionMatchingFactory conditionMatchingFactory;
+	private ConditionMatchingProvider conditionMatchingFactory;
 
 	private Date yesterday;
 
@@ -39,7 +39,7 @@ public class DataValidatorTest {
 	public void setUp() {
 
 		dataValidator = new DataValidator();
-		dataValidator.setConditionMatchingFactory(conditionMatchingFactory);
+		dataValidator.setConditionMatchingProvider(conditionMatchingFactory);
 
 		MockitoAnnotations.initMocks(this);
 

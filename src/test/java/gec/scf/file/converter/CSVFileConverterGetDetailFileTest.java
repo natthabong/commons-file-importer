@@ -35,7 +35,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 		SponsorDocument docResult = (SponsorDocument) actualResult.getObjectValue();
 
 		// Assert
@@ -54,7 +54,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -74,7 +74,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -95,7 +95,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -114,7 +114,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertTrue(actualResult.isSuccess());
@@ -131,7 +131,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -149,7 +149,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -167,7 +167,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -185,7 +185,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -203,7 +203,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -221,7 +221,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -239,7 +239,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertTrue(actualResult.isSuccess());
@@ -256,7 +256,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -274,7 +274,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -292,7 +292,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -311,7 +311,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -329,7 +329,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -348,7 +348,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -366,7 +366,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -384,7 +384,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -402,7 +402,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -421,7 +421,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -440,7 +440,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -459,7 +459,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertFalse(actualResult.isSuccess());
@@ -477,7 +477,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertTrue(actualResult.isSuccess());
@@ -496,7 +496,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertTrue(actualResult.isSuccess());
