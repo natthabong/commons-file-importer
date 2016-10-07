@@ -430,6 +430,7 @@ public class FixedLengthFileConverterTest {
 		docAmountConfig.setPaddingCharacter("0");
 		docAmountConfig.setPaddingType(PaddingType.LEFT);
 		docAmountConfig.setDecimalPlace(2);
+		docAmountConfig.setUseDecimalPlace(true);
 		docAmountConfig.setRecordType(RecordType.DETAIL);
 
 		configItems.add(docAmountConfig);
@@ -467,6 +468,7 @@ public class FixedLengthFileConverterTest {
 		footerDocAmountConfig.setStartIndex(8);
 		footerDocAmountConfig.setLength(15);
 		footerDocAmountConfig.setDecimalPlace(2);
+		footerDocAmountConfig.setUseDecimalPlace(true);
 		footerDocAmountConfig.setPaddingCharacter("0");
 		footerDocAmountConfig.setPaddingType(PaddingType.LEFT);
 		footerDocAmountConfig.setRecordType(RecordType.FOOTER);

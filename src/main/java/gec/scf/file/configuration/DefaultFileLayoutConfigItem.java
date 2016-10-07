@@ -34,6 +34,10 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private String constanceValue;
 
+	private boolean use1000Separator;
+
+	private boolean useDecimalPlace;
+
 	@Override
 	public String getFieldName() {
 		return fieldName;
@@ -180,6 +184,24 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	@Override
 	public String getConstantValue() {
 		return constanceValue;
+	}
+
+	public void setUse1000Separator(boolean use1000Separator) {
+		this.use1000Separator = use1000Separator;
+	}
+
+	@Override
+	public boolean isUse1000Separator() {
+		return use1000Separator;
+	}
+
+	public void setUseDecimalPlace(boolean useDecimalPlace) {
+		this.useDecimalPlace = useDecimalPlace;
+	}
+
+	@Override
+	public boolean isUseDecimalPlace() {
+		return useDecimalPlace;
 	}
 
 }

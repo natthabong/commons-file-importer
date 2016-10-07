@@ -93,12 +93,12 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		String[] splitter = recordValue.toString().split("\\.");
 		if (splitter.length > 1) {
 			int decimalLength = splitter[1].length();
-
 			if (decimalLength != itemConf.getDecimalPlace()) {
 				throw new WrongFormatDetailException(MessageFormat.format(CovertErrorConstant.DIGIT_OVER_MAX_DIGIT,
 						itemConf.getDisplayValue(), itemConf.getDecimalPlace()));
 			}
 		}
+
 	}
 
 	protected void validateBigDecimalFormat(FileLayoutConfigItem configItem, String data) {
@@ -136,12 +136,20 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			}
 		}
 
+		if (configItem.isUse1000Separator()) {
+			data = data.replaceAll(",", "");
+		}
+
 		validateDecimalPlace(configItem, data);
 
-		String normalNumber = data.substring(0, (data.length() - configItem.getDecimalPlace()));
-		String degitNumber = data.substring(data.length() - configItem.getDecimalPlace());
 		try {
-			valueAmount = new BigDecimal(normalNumber + "." + degitNumber).setScale(configItem.getDecimalPlace());
+			if (configItem.isUseDecimalPlace()) {
+				String normalNumber = data.substring(0, (data.length() - configItem.getDecimalPlace()));
+				String degitNumber = data.substring(data.length() - configItem.getDecimalPlace());
+				valueAmount = new BigDecimal(normalNumber + "." + degitNumber).setScale(configItem.getDecimalPlace());
+			}else{
+				valueAmount = new BigDecimal(data);
+			}
 		}
 		catch (NumberFormatException e) {
 			throw new WrongFormatDetailException(

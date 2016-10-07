@@ -30,4 +30,8 @@ public interface FileLayoutConfigItem {
 
 	String getConstantValue();
 
+	boolean isUse1000Separator();
+
+	boolean isUseDecimalPlace();
+
 }

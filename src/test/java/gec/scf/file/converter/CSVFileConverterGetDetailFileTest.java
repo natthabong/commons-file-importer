@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import gec.scf.file.configuration.DefaultFileLayoutConfig;
@@ -429,6 +430,7 @@ public class CSVFileConverterGetDetailFileTest {
 		assertEquals("Cheque Amount (+100) invalid format", payerErrMsg);
 	}
 
+	@Ignore
 	@Test
 	public void given_cheque_amount_have_comma_invalid_format_when_get_detail_should_status_fail()
 			throws WrongFormatFileException {
@@ -484,6 +486,42 @@ public class CSVFileConverterGetDetailFileTest {
 		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
 		assertEquals("5572692", sponsorDoc.getSupplierCode());
 
+	}
+	
+	@Test
+	public void given_amount_have_commar_and_set_use_1000_separator_when_get_detail_should_status_success() throws WrongFormatFileException {
+		// Arrage
+		String[] csvValidFileContent = new String[2];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,\"100,554.00\",";
+
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
+
+		// Actual
+		DetailResult actualResult = csvFileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("5572692", sponsorDoc.getSupplierCode());
+	}
+	
+	@Test
+	public void given_set_config_use_decimal_place_is_false_when_get_detail_should_status_success() throws WrongFormatFileException {
+		// Arrage
+		String[] csvValidFileContent = new String[2];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,\"100,554.00\",";
+
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
+
+		// Actual
+		DetailResult actualResult = csvFileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("100554.00", sponsorDoc.getDocumentAmount().toString());
 	}
 
 	@Test
@@ -620,6 +658,8 @@ public class CSVFileConverterGetDetailFileTest {
 		chequeAmount.setRequired(true);
 		chequeAmount.setDisplayValue("Cheque Amount");
 		chequeAmount.setDecimalPlace(2);
+		chequeAmount.setUse1000Separator(true);
+		chequeAmount.setUseDecimalPlace(false);
 		chequeAmount.setEntityField(true);
 
 		DefaultFileLayoutConfigItem clearingType = new DefaultFileLayoutConfigItem();
