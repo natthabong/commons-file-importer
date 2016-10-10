@@ -2,8 +2,6 @@ package gec.scf.file.configuration;
 
 import java.util.List;
 
-import gec.scf.file.converter.DataReference;
-
 public class DefaultFileLayoutConfig implements FileLayoutConfig {
 
 	private Integer startIndex;
@@ -18,9 +16,7 @@ public class DefaultFileLayoutConfig implements FileLayoutConfig {
 
 	private String footerFlag;
 
-	private String delimeter;
-
-	private List<? extends DataReference> dataReferences;
+	private String delimeter;	
 
 	public Integer getStartIndex() {
 		return startIndex;
@@ -99,14 +95,4 @@ public class DefaultFileLayoutConfig implements FileLayoutConfig {
 		this.delimeter = delimeter;
 	}
 
-	@Override
-	public boolean isRequiredFindAndMergeOption() {
-		return dataReferences != null && dataReferences.size() > 0;
-	}
-
-	@Override
-	public List<? extends DataReference> getDataReferences() {
-		return dataReferences;
-	}
-	
 }

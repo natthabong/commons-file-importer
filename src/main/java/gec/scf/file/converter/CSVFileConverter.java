@@ -13,6 +13,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
@@ -22,6 +23,8 @@ import gec.scf.file.importer.DetailResult;
 import gec.scf.file.importer.ErrorLineDetail;
 
 public class CSVFileConverter<T> extends AbstractFileConverter<T> {
+	
+	private static final Logger log = Logger.getLogger(CSVFileConverter.class);
 
 	private FileLayoutConfig fileLayoutConfig;
 

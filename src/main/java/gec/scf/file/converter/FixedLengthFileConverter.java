@@ -42,7 +42,9 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 	private int totalDetailRecord;
 
 	private BigDecimal totalDetailAmount = new BigDecimal("0");
-
+	
+	private Long lastDocumentNo;
+	
 	private File tempFile;
 
 	private BufferedReader tempFileReader;
@@ -349,6 +351,10 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			if (StringUtils.isNotBlank(configItem.getDatetimeFormat())) {
 				validateDateFormat(configItem, dataValidate);
 			}
+			
+			if ("documentNo".equals(configItem.getFieldName())) {
+				lastDocumentNo = validateDocumentNo(configItem, dataValidate, lastDocumentNo);
+			}
 		}
 
 	}
@@ -466,16 +472,6 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 				T detailObject = convertDetail(currentLine);
 				detailResult.setSuccess(true);
 				detailResult.setObjectValue(detailObject);
-				if (fileLayoutConfig.isRequiredFindAndMergeOption()) {
-					DataMerge dataMerge = new DataMerge(
-							fileLayoutConfig.getDataReferences());
-					try {
-						dataMerge.merge(detailObject, detailObject.getClass());
-					}
-					catch (Exception e) {
-						log.error(e.getMessage(), e);
-					}
-				}
 			}
 			else {
 				detailResult = null;
@@ -562,6 +558,14 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 	public void setFileLayoutConfig(FileLayoutConfig fileLayoutConfig) {
 		this.fileLayoutConfig = fileLayoutConfig;
+	}
+
+	public Long getLastDocumentNo() {
+		return lastDocumentNo;
+	}
+
+	public void setLastDocumentNo(Long lastDocumentNo) {
+		this.lastDocumentNo = lastDocumentNo;
 	}
 
 	private static class RecordTypeExtractor {
