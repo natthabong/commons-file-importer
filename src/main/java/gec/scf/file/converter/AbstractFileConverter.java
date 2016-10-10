@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -63,11 +64,12 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 	protected void validateDateFormat(FileLayoutConfigItem configItem, String data)
 			throws WrongFormatDetailException, WrongFormatFileException {
-		String dateZeroPatter = "00000000";
+		
 		DateValidator dateValidator = DateValidator.getInstance();
 
 		validateRequiredField(configItem, data);
-
+		
+		String dateZeroPatter = "00000000";
 		if (data.trim().equals(dateZeroPatter)) {
 			throw new WrongFormatDetailException(
 					MessageFormat.format(CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
@@ -116,12 +118,11 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 								itemConf.getDisplayValue(), itemConf.getDecimalPlace()));
 			}
 		}
-
 	}
 
 	protected void validateBigDecimalFormat(FileLayoutConfigItem configItem,
 			String data) {
-
+		
 		validateRequiredField(configItem, data);
 		if (configItem.isCheckAmountZero()) {
 			try {

@@ -41,7 +41,7 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
 			// validateBinaryFile(fileContent);
 
-			int csvLengthConfig = fileLayoutConfig.getConfigItems().size();
+//			int csvLengthConfig = fileLayoutConfig.getConfigItems().size();
 
 			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"),
 					CSVFormat.EXCEL.withSkipHeaderRecord(true)
@@ -49,7 +49,7 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
 			csvRecords = csvParser.getRecords();
 
-			validateDataLength(csvLengthConfig);
+			validateDataLength(fileLayoutConfig.getConfigItems());
 
 			currentLine = 1;
 		}
@@ -64,20 +64,32 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 		}
 	}
 
-	private void validateDataLength(int csvLengthConfig) throws WrongFormatFileException {
+	private void validateDataLength(List<? extends FileLayoutConfigItem> layoutConfigItems) throws WrongFormatFileException {
+		int layoutItemLength = 0;
+		for(FileLayoutConfigItem item : layoutConfigItems){
+			if(item.getStartIndex() == null)
+				continue;
+			
+			if(layoutItemLength < item.getStartIndex()){
+				layoutItemLength = item.getStartIndex();
+			}
+		}
+		
 		for (CSVRecord record : csvRecords) {
 			Iterator<String> iterator = record.iterator();
+			
 			int recordLength = 0;
 			while (iterator.hasNext()) {
 				iterator.next();
 				recordLength++;
 			}
-			if (recordLength != csvLengthConfig) {
+			
+			if (recordLength != layoutItemLength) {
 				WrongFormatFileException error = new WrongFormatFileException();
 				error.setErrorLineNo((int) record.getRecordNumber());
 				error.setErrorMessage(MessageFormat.format(
 						CovertErrorConstant.DATA_LENGTH_OF_FIELD_OVER, recordLength,
-						csvLengthConfig));
+						layoutItemLength));
 				throw error;
 			}
 		}
@@ -87,23 +99,25 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 	public DetailResult<T> getDetail() {
 
 		DetailResult<T> result = new DetailResult<T>();
-		result.setLineNo(currentLine);
+		
 		try {
 			CSVRecord csvRecord = csvRecords.get(currentLine++);
-
+			
 			T document = convertCSVToObject(csvRecord, fileLayoutConfig.getConfigItems());
 
 			result.setObjectValue(document);
 			result.setSuccess(true);
+			result.setLineNo(currentLine);
+		}catch (WrongFormatDetailException e) {
+			result.setErrorLineDetails(e.getErrorLineDetails());
+			result.setSuccess(false);
+			result.setLineNo(currentLine);
 		}
 		catch (IndexOutOfBoundsException e) {
 			result = null;
 		}
-		catch (WrongFormatDetailException e) {
-			result.setErrorLineDetails(e.getErrorLineDetails());
-			result.setSuccess(false);
-		}
-
+		
+		
 		return result;
 	}
 
@@ -128,9 +142,15 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
 		for (FileLayoutConfigItem itemConf : itemConfigs) {
 			try {
-				int startIndex = itemConf.getStartIndex() - 1;
-				String recordValue = csvRecord.get(startIndex);
-
+				String recordValue = "";
+				
+				if(StringUtils.isNotBlank(itemConf.getConstantValue())){
+					recordValue = itemConf.getConstantValue();
+				}else{
+					int startIndex = itemConf.getStartIndex() - 1;
+					recordValue = csvRecord.get(startIndex);
+				}
+				
 				if (StringUtils.isNotBlank(itemConf.getFieldName())) {
 					applyObjectValue(recordValue, itemConf, document);
 				}

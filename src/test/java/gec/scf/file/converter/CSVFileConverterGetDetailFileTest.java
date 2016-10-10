@@ -540,9 +540,26 @@ public class CSVFileConverterGetDetailFileTest {
 		assertTrue(actualResult.isSuccess());
 		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
 		assertEquals("5572692", sponsorDoc.getSupplierCode());
+	}
+	
+	@Test
+	public void given_config_instant_documentType_CHQ_when_get_detail_should_set_value_to_documentType() throws WrongFormatFileException {
+		// Arrage
+		String[] csvValidFileContent = new String[2];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = ",5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554,";
+
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
+
+		// Assert
+		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("CHQ", sponsorDoc.getDocumentType());
 
 	}
-
+	
 	private CSVFileConverter<SponsorDocument> mockSponsorFileLayout(String[] csvValidFileContent)
 			throws WrongFormatFileException {
 		InputStream csvFileContent = new ByteArrayInputStream(
@@ -668,6 +685,14 @@ public class CSVFileConverterGetDetailFileTest {
 		clearingType.setFieldName(null);
 		clearingType.setRequired(false);
 		clearingType.setDisplayValue("Clearing Type");
+		
+		DefaultFileLayoutConfigItem documentType = new DefaultFileLayoutConfigItem();
+		documentType.setLength(3);
+		documentType.setFieldName("documentType");
+		documentType.setRequired(false);
+		documentType.setEntityField(true);
+		documentType.setConstanceValue("CHQ");
+		documentType.setDisplayValue("Document Type");
 
 		layoutItems.add(no);
 		layoutItems.add(supplierCode);
@@ -682,7 +707,8 @@ public class CSVFileConverterGetDetailFileTest {
 		layoutItems.add(depositDate);
 		layoutItems.add(chequeAmount);
 		layoutItems.add(clearingType);
-
+		layoutItems.add(documentType);
+		
 		fileLayout.setConfigItems(layoutItems);
 		return fileLayout;
 	}
