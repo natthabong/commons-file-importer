@@ -116,8 +116,6 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 	}
 
-	}
-
 	protected void validateBigDecimalFormat(FileLayoutConfigItem configItem, String data) {
 
 		validateRequiredField(configItem, data);
