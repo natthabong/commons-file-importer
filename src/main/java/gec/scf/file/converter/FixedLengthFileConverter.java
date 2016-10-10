@@ -42,7 +42,9 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 	private int totalDetailRecord;
 
 	private BigDecimal totalDetailAmount = new BigDecimal("0");
-
+	
+	private Long lastDocumentNo;
+	
 	private File tempFile;
 
 	private BufferedReader tempFileReader;
@@ -349,6 +351,10 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			if (StringUtils.isNotBlank(configItem.getDatetimeFormat())) {
 				validateDateFormat(configItem, dataValidate);
 			}
+			
+			if ("documentNo".equals(configItem.getFieldName())) {
+				lastDocumentNo = validateDocumentNo(configItem, dataValidate, lastDocumentNo);
+			}
 		}
 
 	}
@@ -461,7 +467,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 		detailResult.setLineNo(++currentLineNo);
 		try {
 			currentLine = tempFileReader.readLine();
-
+System.out.println(currentLine);
 			if (currentLine != null) {
 				T detailObject = convertDetail(currentLine);
 				detailResult.setSuccess(true);
@@ -562,6 +568,14 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 	public void setFileLayoutConfig(FileLayoutConfig fileLayoutConfig) {
 		this.fileLayoutConfig = fileLayoutConfig;
+	}
+
+	public Long getLastDocumentNo() {
+		return lastDocumentNo;
+	}
+
+	public void setLastDocumentNo(Long lastDocumentNo) {
+		this.lastDocumentNo = lastDocumentNo;
 	}
 
 	private static class RecordTypeExtractor {

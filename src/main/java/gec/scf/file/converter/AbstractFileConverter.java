@@ -60,6 +60,17 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 
 	}
+	
+	protected long validateDocumentNo(FileLayoutConfigItem configItem, String data, Long lastDocumentNo)
+			throws WrongFormatDetailException {
+		Long docNoValidate = Long.parseLong(data.trim());
+		if (docNoValidate <= lastDocumentNo) {
+			throw new WrongFormatDetailException(
+					MessageFormat.format(CovertErrorConstant.DOCUMENT_NO_INVALID,
+							configItem.getDisplayValue(), data));
+		}
+		return docNoValidate;
+	}
 
 	protected void validateDateFormat(FileLayoutConfigItem configItem, String data)
 			throws WrongFormatDetailException, WrongFormatFileException {
