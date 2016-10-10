@@ -467,7 +467,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 		detailResult.setLineNo(++currentLineNo);
 		try {
 			currentLine = tempFileReader.readLine();
-System.out.println(currentLine);
+
 			if (currentLine != null) {
 				T detailObject = convertDetail(currentLine);
 				detailResult.setSuccess(true);
