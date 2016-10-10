@@ -472,16 +472,6 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 				T detailObject = convertDetail(currentLine);
 				detailResult.setSuccess(true);
 				detailResult.setObjectValue(detailObject);
-				if (fileLayoutConfig.isRequiredFindAndMergeOption()) {
-					DataMerge dataMerge = new DataMerge(
-							fileLayoutConfig.getDataReferences());
-					try {
-						dataMerge.merge(detailObject, detailObject.getClass());
-					}
-					catch (Exception e) {
-						log.error(e.getMessage(), e);
-					}
-				}
 			}
 			else {
 				detailResult = null;

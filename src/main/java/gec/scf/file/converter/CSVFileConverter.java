@@ -95,16 +95,6 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 			CSVRecord csvRecord = csvRecords.get(currentLine++);
 
 			T document = convertCSVToObject(csvRecord, fileLayoutConfig.getConfigItems());
-			if (fileLayoutConfig.isRequiredFindAndMergeOption()) {
-				DataMerge dataMerge = new DataMerge(
-						fileLayoutConfig.getDataReferences());
-				try {
-					dataMerge.merge(document, document.getClass());
-				}
-				catch (Exception e) {
-					log.error(e.getMessage(), e);
-				}
-			}
 
 			result.setObjectValue(document);
 			result.setSuccess(true);
