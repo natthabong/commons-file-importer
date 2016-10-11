@@ -1,5 +1,7 @@
 package gec.scf.file.configuration;
 
-public enum PaddingType {
+import java.io.Serializable;
+
+public enum PaddingType implements Serializable{
 	LEFT, RIGHT
 }

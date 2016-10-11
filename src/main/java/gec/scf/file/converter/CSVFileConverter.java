@@ -145,7 +145,7 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 				String recordValue = csvRecord.get(startIndex);
 
 				if (StringUtils.isNotBlank(itemConf.getFieldName())) {
-					applyObjectValue(recordValue, itemConf, document);
+					applyObjectValue(document, itemConf, recordValue);
 				}
 
 			}

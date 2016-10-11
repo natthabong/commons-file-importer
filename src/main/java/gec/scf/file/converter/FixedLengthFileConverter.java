@@ -72,6 +72,9 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			bufferedWriter = new BufferedWriter(new FileWriter(tempFile));
 
 			InputStream tempFileContent = new FileInputStream(tempFile);
+			
+//			validateBinaryFile(tempFileContent);
+			
 			tempFileReader = new BufferedReader(
 					new InputStreamReader(tempFileContent, "UTF-8"));
 
@@ -101,18 +104,16 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 						// Found a blank line on top of file, throw an error
 						FileLayoutConfigItem headerRecordType = headerRecordTypeExtractor
 								.getConfig();
-						throw new WrongFormatFileException(
-								MessageFormat.format(
-										CovertErrorConstant.HEADER_NOT_FIRST_LINE_OF_FILE,
-										headerRecordType.getDisplayValue(),
-										fileLayoutConfig.getHeaderFlag()),
-								currentLineNo);
+						throw new WrongFormatFileException(MessageFormat.format(
+								CovertErrorConstant.HEADER_NOT_FIRST_LINE_OF_FILE,
+								headerRecordType.getDisplayValue(),
+								fileLayoutConfig.getHeaderFlag()));
 					}
 					else if (!hasCheckedFooter) {
 
 						// Found a blank line between header and detail, throw an error
 						throw new WrongFormatFileException(
-								CovertErrorConstant.FILE_INVALID_FORMAT, currentLineNo);
+								CovertErrorConstant.FILE_INVALID_FORMAT);
 					}
 				}
 
@@ -124,12 +125,10 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 						// Found a blank recoredId
 						FileLayoutConfigItem headerRecordType = headerRecordTypeExtractor
 								.getConfig();
-						throw new WrongFormatFileException(
-								MessageFormat.format(
-										CovertErrorConstant.HEADER_NOT_FIRST_LINE_OF_FILE,
-										headerRecordType.getDisplayValue(),
-										fileLayoutConfig.getHeaderFlag()),
-								currentLineNo);
+						throw new WrongFormatFileException(MessageFormat.format(
+								CovertErrorConstant.HEADER_NOT_FIRST_LINE_OF_FILE,
+								headerRecordType.getDisplayValue(),
+								fileLayoutConfig.getHeaderFlag()));
 					}
 					else if (fileLayoutConfig.getHeaderFlag().equals(recordType)) {
 						List<FileLayoutConfigItem> headerConfigItems = fileConfigItems
@@ -146,8 +145,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 						throw new WrongFormatFileException(MessageFormat.format(
 								CovertErrorConstant.RECORD_ID_MISS_MATCH,
-								recordTypeLayoutCofig.getDisplayValue(), recordType),
-								currentLineNo);
+								recordTypeLayoutCofig.getDisplayValue(), recordType));
 					}
 				}
 
@@ -180,8 +178,11 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 				String recordType = detailRecordTypeExtractor.extract(currentLine);
 
+				// Validate Detail
 				if (fileLayoutConfig.getDetailFlag().equals(recordType)) {
+
 					if (hasCheckedFooter) {
+
 						FileLayoutConfigItem detialRecordTypeConfig = detailRecordTypeExtractor
 								.getConfig();
 						throw new WrongFormatFileException(
@@ -195,7 +196,6 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 					List<FileLayoutConfigItem> detailConfigItems = fileConfigItems
 							.get(RecordType.DETAIL);
 					//
-					// validateLineDataFormat(currentLine, detailConfigItems);
 					validateLineDataLength(currentLine, detailConfigItems);
 					try {
 						bufferedWriter.write(currentLine);
@@ -209,13 +209,21 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 					if (detailDocAmountLayoutConfig != null) {
 						try {
-							int beginIndex = detailDocAmountLayoutConfig.getStartIndex()
-									- 1;
-							String data = currentLine.substring(beginIndex,
-									beginIndex + detailDocAmountLayoutConfig.getLenght());
+
+							String data = getCuttedData(detailDocAmountLayoutConfig,
+									currentLine);
 
 							BigDecimal docAmount = getBigDecimalValue(
 									detailDocAmountLayoutConfig, data);
+							if (detailDocAmountLayoutConfig.getSignFlagConfig() != null) {
+
+								String signFlagData = getCuttedData(
+										detailDocAmountLayoutConfig.getSignFlagConfig(),
+										currentLine);
+								totalDetailAmount = applySignFlag(totalDetailAmount,
+										detailDocAmountLayoutConfig, signFlagData);
+
+							}
 							totalDetailAmount = totalDetailAmount.add(docAmount);
 						}
 						catch (Exception e) {
@@ -228,8 +236,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 							.getConfig();
 					throw new WrongFormatFileException(
 							MessageFormat.format(CovertErrorConstant.RECORD_ID_MISS_MATCH,
-									recordTypeLayoutCofig.getDisplayValue(), recordType),
-							currentLineNo);
+									recordTypeLayoutCofig.getDisplayValue(), recordType));
 				}
 
 			}
@@ -241,12 +248,15 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 				throw new WrongFormatFileException(
 						MessageFormat.format(CovertErrorConstant.FOOTER_NOT_LAST_FILE,
 								recordTypeLayoutCofig.getDisplayValue(),
-								fileLayoutConfig.getFooterFlag()),
-						currentLineNo);
+								fileLayoutConfig.getFooterFlag()));
 			}
 		}
+		catch (WrongFormatFileException e) {
+			e.setErrorLineNo(null);
+			throw e;
+		}
 		catch (IOException e) {
-			throw new WrongFormatFileException("File read error occurred");
+			throw new WrongFormatFileException("File read error occurred", null);
 		}
 		finally {
 			currentLineNo = 0;
@@ -264,6 +274,13 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 		}
 
+	}
+
+	private String getCuttedData(FileLayoutConfigItem configItem, String currentLine) {
+		int start = configItem.getStartIndex() - 1;
+		int end = (configItem.getStartIndex() + configItem.getLenght()) - 1;
+
+		return currentLine.substring(start, end).trim();
 	}
 
 	private void validateFooter(String currentLine,
@@ -286,6 +303,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 					throw new WrongFormatFileException(
 							MessageFormat.format(
 									CovertErrorConstant.FOOTER_TOTAL_LINE_INVALIDE_LENGTH_MESSAGE,
+									footerTotalDocLayoutConfig.getDisplayValue(),
 									footeTotalDocuments, totalDetailRecord),
 							currentLineNo);
 				}
@@ -294,27 +312,38 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 				throw e;
 			}
 			catch (Exception e) {
-				throw new WrongFormatFileException(MessageFormat.format(
-						CovertErrorConstant.FOOTER_TOTAL_LINE_INVALIDE_FORMAT_MESSAGE,
-						totalDocData), currentLineNo);
+				throw new WrongFormatFileException(
+						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+								footerTotalDocLayoutConfig.getDisplayValue(),
+								totalDocData),
+						currentLineNo);
 			}
 		}
 
 		if (footerTotalDocAmountLayoutConfig != null) {
-			int start = footerTotalDocAmountLayoutConfig.getStartIndex() - 1;
-			int end = (footerTotalDocAmountLayoutConfig.getStartIndex()
-					+ footerTotalDocAmountLayoutConfig.getLenght()) - 1;
-			String totalDocAmoutData = currentLine.substring(start, end).trim();
 
+			String totalDocAmoutData = getCuttedData(footerTotalDocAmountLayoutConfig,
+					currentLine);
 			try {
 
 				BigDecimal footerTotalAmount = getBigDecimalValue(
 						footerTotalDocAmountLayoutConfig, totalDocAmoutData);
 
+				if (footerTotalDocAmountLayoutConfig.getSignFlagConfig() != null) {
+
+					String signFlagData = getCuttedData(
+							footerTotalDocAmountLayoutConfig.getSignFlagConfig(),
+							currentLine);
+
+					footerTotalAmount = applySignFlag(footerTotalAmount,
+							footerTotalDocAmountLayoutConfig, signFlagData);
+
+				}
 				if (footerTotalAmount.compareTo(totalDetailAmount) != 0) {
 					throw new WrongFormatFileException(
 							MessageFormat.format(
 									CovertErrorConstant.FOOTER_TOTAL_AMOUNT_INVALIDE_LENGTH_MESSAGE,
+									footerTotalDocAmountLayoutConfig.getDisplayValue(),
 									footerTotalAmount.doubleValue(),
 									totalDetailAmount.doubleValue()),
 							currentLineNo);
@@ -323,10 +352,15 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			catch (WrongFormatFileException e) {
 				throw e;
 			}
+			catch (WrongFormatDetailException e) {
+				throw new WrongFormatFileException(e.getErrorMessage(), currentLineNo);
+			}
 			catch (Exception e) {
-				throw new WrongFormatFileException(MessageFormat.format(
-						CovertErrorConstant.FOOTER_TOTAL_AMOUNT_INVALIDE_FORMAT_MESSAGE,
-						totalDocAmoutData), currentLineNo);
+				throw new WrongFormatFileException(
+						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+								footerTotalDocAmountLayoutConfig.getDisplayValue(),
+								totalDocAmoutData),
+						currentLineNo);
 			}
 		}
 	}
@@ -359,8 +393,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 		if (lineLength != StringUtils.length(currentLine)) {
 			throw new WrongFormatFileException(
 					MessageFormat.format(CovertErrorConstant.DATA_LENGTH_OVER,
-							StringUtils.length(currentLine), lineLength),
-					currentLineNo);
+							StringUtils.length(currentLine), lineLength));
 		}
 	}
 
@@ -382,7 +415,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 	private void throwErrorByRecordType(FileLayoutConfigItem item, String errorMessage)
 			throws WrongFormatFileException {
-		if (item.getRecordType() == RecordType.DETAIL) {
+		if (RecordType.DETAIL.equals(item.getRecordType())) {
 			throw new WrongFormatDetailException(errorMessage);
 		}
 		else {
@@ -521,7 +554,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			try {
 
 				if (StringUtils.isNotBlank(config.getConstantValue())) {
-					applyObjectValue(config.getConstantValue(), config, entity);
+					applyObjectValue(entity, config, config.getConstantValue());
 					continue;
 				}
 
@@ -534,7 +567,16 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 				}
 
 				if (StringUtils.isNotBlank(config.getFieldName())) {
-					applyObjectValue(data, config, entity);
+					String signFlagData = null;
+					if (config.getSignFlagConfig() != null) {
+						FileLayoutConfigItem signFlagConfig = config.getSignFlagConfig();
+
+						int startSignFlag = signFlagConfig.getStartIndex() - 1;
+						int endSignFlag = (signFlagConfig.getStartIndex()
+								+ signFlagConfig.getLenght()) - 1;
+						signFlagData = currentLine.substring(startSignFlag, endSignFlag);
+					}
+					applyObjectValue(entity, config, data, signFlagData);
 				}
 
 			}

@@ -26,12 +26,16 @@ public interface FileLayoutConfigItem {
 
 	boolean isEntityField();
 
-	boolean isCheckAmountZero();
-
 	String getConstantValue();
 
 	boolean isUse1000Separator();
 
 	boolean isUseDecimalPlace();
+
+	PaddingType getPaddingType();
+
+	String getPaddingCharacter();
+
+	FileLayoutConfigItem getSignFlagConfig();
 
 }
