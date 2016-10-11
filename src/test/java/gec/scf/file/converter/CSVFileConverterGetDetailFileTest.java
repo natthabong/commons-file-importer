@@ -609,116 +609,116 @@ public class CSVFileConverterGetDetailFileTest {
 		DefaultFileLayoutConfigItem no = new DefaultFileLayoutConfigItem();
 		no.setStartIndex(1);
 		no.setLength(10);
-		no.setFieldName(null);
+		no.setDocFieldName(null);
 		no.setRequired(false);
 		no.setDisplayValue("No");
 
 		DefaultFileLayoutConfigItem supplierCode = new DefaultFileLayoutConfigItem();
 		supplierCode.setStartIndex(2);
 		supplierCode.setLength(20);
-		supplierCode.setFieldName("supplierCode");
+		supplierCode.setDocFieldName("supplierCode");
 		supplierCode.setRequired(true);
 		supplierCode.setDisplayValue("Payer Code");
-		supplierCode.setEntityField(true);
+		supplierCode.setTransient(false);
 
 		DefaultFileLayoutConfigItem depositBranch = new DefaultFileLayoutConfigItem();
 		depositBranch.setStartIndex(3);
 		depositBranch.setLength(20);
-		depositBranch.setFieldName(null);
+		depositBranch.setDocFieldName(null);
 		depositBranch.setRequired(false);
 		depositBranch.setDisplayValue("Deposit branch");
 
 		DefaultFileLayoutConfigItem payer = new DefaultFileLayoutConfigItem();
 		payer.setStartIndex(4);
 		payer.setLength(20);
-		payer.setFieldName("optionVarcharField1");
+		payer.setDocFieldName("optionVarcharField1");
 		payer.setRequired(true);
 		payer.setDisplayValue("Payer");
-		payer.setEntityField(true);
+		payer.setTransient(false);
 
 		DefaultFileLayoutConfigItem bankCode = new DefaultFileLayoutConfigItem();
 		bankCode.setStartIndex(5);
 		bankCode.setLength(3);
-		bankCode.setFieldName("optionVarcharField2");
+		bankCode.setDocFieldName("optionVarcharField2");
 		bankCode.setRequired(true);
 		bankCode.setDisplayValue("Bank Code");
-		bankCode.setEntityField(true);
+		bankCode.setTransient(false);
 
 		DefaultFileLayoutConfigItem bank = new DefaultFileLayoutConfigItem();
 		bank.setStartIndex(6);
 		bank.setLength(20);
-		bank.setFieldName("optionVarcharField3");
+		bank.setDocFieldName("optionVarcharField3");
 		bank.setRequired(true);
 		bank.setDisplayValue("Bank");
-		bank.setEntityField(true);
+		bank.setTransient(false);
 
 		DefaultFileLayoutConfigItem chequeBranch = new DefaultFileLayoutConfigItem();
 		chequeBranch.setStartIndex(7);
 		chequeBranch.setLength(50);
-		chequeBranch.setFieldName(null);
+		chequeBranch.setDocFieldName(null);
 		chequeBranch.setRequired(false);
 		chequeBranch.setDisplayValue("Cheque Branch");
 
 		DefaultFileLayoutConfigItem chequeNo = new DefaultFileLayoutConfigItem();
 		chequeNo.setStartIndex(8);
 		chequeNo.setLength(50);
-		chequeNo.setFieldName("documentNo");
+		chequeNo.setDocFieldName("documentNo");
 		chequeNo.setRequired(true);
 		chequeNo.setDisplayValue("Cheque No");
-		chequeNo.setEntityField(true);
+		chequeNo.setTransient(false);
 
 		DefaultFileLayoutConfigItem chequeDueDate = new DefaultFileLayoutConfigItem();
 		chequeDueDate.setStartIndex(9);
 		chequeDueDate.setLength(10);
-		chequeDueDate.setFieldName("documentDate");
+		chequeDueDate.setDocFieldName("documentDate");
 		chequeDueDate.setRequired(true);
 		chequeDueDate.setDisplayValue("Cheque Due Date");
 		chequeDueDate.setDatetimeFormat("dd/MM/yyyy");
-		chequeDueDate.setEntityField(true);
+		chequeDueDate.setTransient(false);
 
 		DefaultFileLayoutConfigItem goodFundDate = new DefaultFileLayoutConfigItem();
 		goodFundDate.setStartIndex(10);
 		goodFundDate.setLength(10);
-		goodFundDate.setFieldName("sponsorPaymentDate");
+		goodFundDate.setDocFieldName("sponsorPaymentDate");
 		goodFundDate.setRequired(true);
 		goodFundDate.setDisplayValue("Good Fund Date");
 		goodFundDate.setDatetimeFormat("dd/MM/yyyy");
-		goodFundDate.setEntityField(true);
+		goodFundDate.setTransient(false);
 
 		DefaultFileLayoutConfigItem depositDate = new DefaultFileLayoutConfigItem();
 		depositDate.setStartIndex(11);
 		depositDate.setLength(10);
-		depositDate.setFieldName("optionDateField1");
+		depositDate.setDocFieldName("optionDateField1");
 		depositDate.setRequired(true);
 		depositDate.setDisplayValue("Deposit Date");
 		depositDate.setDatetimeFormat("dd/MM/yyyy");
-		depositDate.setEntityField(true);
+		depositDate.setTransient(false);
 
 		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
 		chequeAmount.setStartIndex(12);
 		chequeAmount.setLength(10);
-		chequeAmount.setFieldName("documentAmount");
+		chequeAmount.setDocFieldName("documentAmount");
 		chequeAmount.setRequired(true);
 		chequeAmount.setDisplayValue("Cheque Amount");
 		chequeAmount.setDecimalPlace(2);
-		chequeAmount.setUse1000Separator(true);
-		chequeAmount.setUseDecimalPlace(true);
-		chequeAmount.setEntityField(true);
+		chequeAmount.setHas1000Separator(true);
+		chequeAmount.setHasDecimalPlace(true);
+		chequeAmount.setTransient(false);
 		chequeAmount.setPlusSymbol("+");
 
 		DefaultFileLayoutConfigItem clearingType = new DefaultFileLayoutConfigItem();
 		clearingType.setStartIndex(13);
 		clearingType.setLength(10);
-		clearingType.setFieldName(null);
+		clearingType.setDocFieldName(null);
 		clearingType.setRequired(false);
 		clearingType.setDisplayValue("Clearing Type");
 		
 		DefaultFileLayoutConfigItem documentType = new DefaultFileLayoutConfigItem();
 		documentType.setLength(3);
-		documentType.setFieldName("documentType");
+		documentType.setDocFieldName("documentType");
 		documentType.setRequired(false);
-		documentType.setEntityField(true);
-		documentType.setConstanceValue("CHQ");
+		documentType.setTransient(false);
+		documentType.setDefaultValue("CHQ");
 		documentType.setDisplayValue("Document Type");
 		layoutItems.add(documentType);
 
