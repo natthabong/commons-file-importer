@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -13,7 +14,10 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.Mockito;
 
 import gec.scf.file.configuration.DefaultFileLayoutConfig;
 import gec.scf.file.configuration.DefaultFileLayoutConfigItem;
@@ -24,11 +28,16 @@ import gec.scf.file.exception.WrongFormatFileException;
 
 public class CSVFileConverterCheckFileFormatTest {
 
+	private static final boolean NOT_CHECK_BINARY = false;
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+	
 	private CSVFileConverter<SponsorDocument> csvFileConverter = new CSVFileConverter<SponsorDocument>(
 			null, SponsorDocument.class);
-
+	
 	@Ignore
-	@Test(expected = WrongFormatFileException.class)
+	@Test
 	public void given_import_binary_file_when_check_file_format_should_throw_WrongFormatFileException()
 			throws WrongFormatFileException, FileNotFoundException {
 		// Arrange
@@ -36,14 +45,13 @@ public class CSVFileConverterCheckFileFormatTest {
 
 		File csvFile = new File(part.getFile());
 		InputStream csvFileContent = new FileInputStream(csvFile);
-		// Actual
-		try {
-			csvFileConverter.checkFileFormat(csvFileContent);
-		}
-		catch (WrongFormatFileException e) {
-			assertEquals("Data is binary file", e.getErrorMessage());
-			throw e;
-		}
+		
+		//Assert
+		thrown.expect(WrongFormatFileException.class);
+		thrown.expectMessage("is binary file");
+		
+		// Actual		
+		csvFileConverter.checkFileFormat(csvFileContent);		
 	}
 
 	@Ignore
@@ -68,7 +76,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554";
 		csvValidFileContent[2] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554,";
 
-		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
+		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(csvValidFileContent, NOT_CHECK_BINARY);
 		InputStream csvFileContent = new ByteArrayInputStream(
 				StringUtils.join(csvValidFileContent, System.lineSeparator()).getBytes());
 		// Actual
@@ -91,7 +99,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554,,";
 		csvValidFileContent[2] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554,";
 
-		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
+		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(csvValidFileContent, NOT_CHECK_BINARY);
 		InputStream csvFileContent = new ByteArrayInputStream(
 				StringUtils.join(csvValidFileContent, System.lineSeparator()).getBytes());
 		// Actual
@@ -104,20 +112,41 @@ public class CSVFileConverterCheckFileFormatTest {
 			throw e;
 		}
 	}
+	
+	@Test
+	public void given_config_not_check_binary_file_when_import_file_should_not_call_validate_binary_file() throws WrongFormatFileException, IOException{
+		// Arrage
+		String[] csvValidFileContent = new String[3];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554,";
+		csvValidFileContent[2] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554,";
 
-	private CSVFileConverter<SponsorDocument> mockSponsorFileLayout(String[] csvValidFileContent)
+		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(csvValidFileContent, NOT_CHECK_BINARY);
+		InputStream csvFileContent = new ByteArrayInputStream(
+				StringUtils.join(csvValidFileContent, System.lineSeparator()).getBytes());
+		
+		// Actual
+		csvFileConverter.checkFileFormat(csvFileContent);
+		
+		// Assert
+		Mockito.verify(csvFileConverter, Mockito.never()).validateBinaryFile(csvFileContent);
+		
+	}
+
+	private CSVFileConverter<SponsorDocument> mockSponsorFileLayout(String[] csvValidFileContent, boolean checkBinaryFile)
 			throws WrongFormatFileException {
 
-		DefaultFileLayoutConfig fileLayout = getLayoutConfig();
+		DefaultFileLayoutConfig fileLayout = getLayoutConfig(checkBinaryFile);
 
-		CSVFileConverter<SponsorDocument> csvFileConverter = new CSVFileConverter<SponsorDocument>(
-				fileLayout, SponsorDocument.class);
+		CSVFileConverter<SponsorDocument> csvFileConverter = Mockito.spy(new CSVFileConverter<SponsorDocument>(fileLayout, SponsorDocument.class));
 		return csvFileConverter;
 	}
 
-	private DefaultFileLayoutConfig getLayoutConfig() {
+	private DefaultFileLayoutConfig getLayoutConfig(boolean checkBinaryFile) {
 		DefaultFileLayoutConfig fileLayout = new DefaultFileLayoutConfig();
 		fileLayout.setDelimeter(",");
+		fileLayout.setCheckBinaryFile(checkBinaryFile);
+		fileLayout.setCharsetName("UTF-8");
 
 		List<FileLayoutConfigItem> layoutItems = new ArrayList<FileLayoutConfigItem>();
 

@@ -300,8 +300,9 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 		for (int i = 0; i < data.length; i++) {
 			byte b = data[i];
+			
 			if (b < 0x09) {
-				throw new WrongFormatFileException("Data is binary file");
+				throw new WrongFormatFileException("is binary file");
 			}
 
 			if (b == 0x09 || b == 0x0A || b == 0x0C || b == 0x0D) {
@@ -315,7 +316,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			}
 		}
 		if (100 * other / (ascii + other) > 95) {
-			throw new WrongFormatFileException("Data is binary file");
+			throw new WrongFormatFileException("is binary file");
 		}
 	}
 

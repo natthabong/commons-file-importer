@@ -23,7 +23,7 @@ import gec.scf.file.importer.DetailResult;
 import gec.scf.file.importer.ErrorLineDetail;
 
 public class CSVFileConverter<T> extends AbstractFileConverter<T> {
-	
+
 	private static final Logger log = Logger.getLogger(CSVFileConverter.class);
 
 	private FileLayoutConfig fileLayoutConfig;
@@ -42,13 +42,12 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 		CSVParser csvParser = null;
 		try {
 
-			// validateBinaryFile(fileContent);
+			if (fileLayoutConfig.isCheckBinaryFile()) {
+				validateBinaryFile(fileContent);
+			}
 
-//			int csvLengthConfig = fileLayoutConfig.getConfigItems().size();
-
-			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"),
-					CSVFormat.EXCEL.withSkipHeaderRecord(true)
-							.withDelimiter(fileLayoutConfig.getDelimeter().charAt(0)));
+			csvParser = new CSVParser(new InputStreamReader(fileContent, fileLayoutConfig.getCharsetName()), CSVFormat.EXCEL
+					.withSkipHeaderRecord(true).withDelimiter(fileLayoutConfig.getDelimeter().charAt(0)));
 
 			csvRecords = csvParser.getRecords();
 
@@ -67,31 +66,31 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 		}
 	}
 
-	private void validateDataLength(List<? extends FileLayoutConfigItem> layoutConfigItems) throws WrongFormatFileException {
+	private void validateDataLength(List<? extends FileLayoutConfigItem> layoutConfigItems)
+			throws WrongFormatFileException {
 		int layoutItemLength = 0;
-		for(FileLayoutConfigItem item : layoutConfigItems){
-			if(item.getStartIndex() == null)
+		for (FileLayoutConfigItem item : layoutConfigItems) {
+			if (item.getStartIndex() == null)
 				continue;
-			
-			if(layoutItemLength < item.getStartIndex()){
+
+			if (layoutItemLength < item.getStartIndex()) {
 				layoutItemLength = item.getStartIndex();
 			}
 		}
-		
+
 		for (CSVRecord record : csvRecords) {
 			Iterator<String> iterator = record.iterator();
-			
+
 			int recordLength = 0;
 			while (iterator.hasNext()) {
 				iterator.next();
 				recordLength++;
 			}
-			
+
 			if (recordLength != layoutItemLength) {
 				WrongFormatFileException error = new WrongFormatFileException();
 				error.setErrorLineNo((int) record.getRecordNumber());
-				error.setErrorMessage(MessageFormat.format(
-						CovertErrorConstant.DATA_LENGTH_OF_FIELD_OVER, recordLength,
+				error.setErrorMessage(MessageFormat.format(CovertErrorConstant.DATA_LENGTH_OF_FIELD_OVER, recordLength,
 						layoutItemLength));
 				throw error;
 			}
@@ -102,16 +101,17 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 	public DetailResult<T> getDetail() {
 
 		DetailResult<T> result = new DetailResult<T>();
-		
+
 		try {
 			CSVRecord csvRecord = csvRecords.get(currentLine++);
-			
+
 			T document = convertCSVToObject(csvRecord, fileLayoutConfig.getConfigItems());
 
 			result.setObjectValue(document);
 			result.setSuccess(true);
 			result.setLineNo(currentLine);
-		}catch (WrongFormatDetailException e) {
+		}
+		catch (WrongFormatDetailException e) {
 			result.setErrorLineDetails(e.getErrorLineDetails());
 			result.setSuccess(false);
 			result.setLineNo(currentLine);
@@ -119,13 +119,11 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 		catch (IndexOutOfBoundsException e) {
 			result = null;
 		}
-		
-		
+
 		return result;
 	}
 
-	private T convertCSVToObject(CSVRecord csvRecord,
-			List<? extends FileLayoutConfigItem> itemConfigs)
+	private T convertCSVToObject(CSVRecord csvRecord, List<? extends FileLayoutConfigItem> itemConfigs)
 			throws WrongFormatDetailException {
 
 		boolean isError = false;
@@ -146,14 +144,15 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 		for (FileLayoutConfigItem itemConf : itemConfigs) {
 			try {
 				String recordValue = "";
-				
-				if(StringUtils.isNotBlank(itemConf.getConstantValue())){
+
+				if (StringUtils.isNotBlank(itemConf.getConstantValue())) {
 					recordValue = itemConf.getConstantValue();
-				}else{
+				}
+				else {
 					int startIndex = itemConf.getStartIndex() - 1;
 					recordValue = csvRecord.get(startIndex);
 				}
-				
+
 				if (StringUtils.isNotBlank(itemConf.getFieldName())) {
 					applyObjectValue(document, itemConf, recordValue);
 				}
