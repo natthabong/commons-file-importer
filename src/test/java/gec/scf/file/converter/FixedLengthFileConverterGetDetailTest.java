@@ -261,10 +261,11 @@ public class FixedLengthFileConverterGetDetailTest {
 	@Test
 	public void given_document_amount_is_0_when_get_detail_should_status_fail() throws WrongFormatFileException {
 		// Arrage
-		String[] fixedLengthContent = new String[3];
+		String[] fixedLengthContent = new String[4];
 		fixedLengthContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
 		fixedLengthContent[1] = "DMAK  MK001               1122033             20160812201606010000000000000001                                                                                                                                                                                                                              ";
-		fixedLengthContent[2] = "T0000010000000000000000                                                                                                                                                                                                                                                                                     ";
+		fixedLengthContent[2] = "DMAK  MK001               1122033             20160812201606010000000000010001                                                                                                                                                                                                                              ";
+		fixedLengthContent[3] = "T0000020000000000010000                                                                                                                                                                                                                                                                                     ";
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
@@ -500,7 +501,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		docAmountConfig.setDecimalPlace(2);
 		docAmountConfig.setRecordType(RecordType.DETAIL);
 		docAmountConfig.setEntityField(true);
-		docAmountConfig.setCheckAmountZero(true);
+		docAmountConfig.setRequired(true);
 		docAmountConfig.setUseDecimalPlace(true);
 		docAmountConfig.setDisplayValue("Document Amount");
 
@@ -545,10 +546,12 @@ public class FixedLengthFileConverterGetDetailTest {
 
 		DefaultFileLayoutConfigItem footerDocAmountConfig = new DefaultFileLayoutConfigItem();
 		footerDocAmountConfig.setFieldName("totalDocumentAmount");
+		footerDocAmountConfig.setDisplayValue("Total Document Amount");
 		footerDocAmountConfig.setStartIndex(8);
 		footerDocAmountConfig.setLength(15);
 		footerDocAmountConfig.setDecimalPlace(2);
 		footerDocAmountConfig.setUseDecimalPlace(true);
+		footerDocAmountConfig.setRequired(true);
 		footerDocAmountConfig.setPaddingCharacter("0");
 		footerDocAmountConfig.setPaddingType(PaddingType.LEFT);
 		footerDocAmountConfig.setRecordType(RecordType.FOOTER);
