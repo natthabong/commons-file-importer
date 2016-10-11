@@ -116,4 +116,10 @@ public class DefaultFileLayoutConfig implements FileLayoutConfig {
 	public String getCharsetName() {
 		return charsetName;
 	}
+
+	@Override
+	public String getOwnerId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
