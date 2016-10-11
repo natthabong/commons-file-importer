@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -91,7 +90,7 @@ public class FixedLengthFileConverterTest {
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
 	}
-	
+
 	@Test
 	public void given_a_file_which_has_a_space_case_header_flag_when_check_file_format_should_throw_WrongFormatFileException()
 			throws WrongFormatFileException {
@@ -112,7 +111,6 @@ public class FixedLengthFileConverterTest {
 		fixLengthFileConverter.checkFileFormat(documentFile);
 	}
 
-	@Ignore
 	@Test
 	public void given_a_file_which_has_a_document_date_wrong_format_when_check_file_format_should_throw_WrongFormatFileException()
 			throws WrongFormatFileException {
@@ -163,7 +161,7 @@ public class FixedLengthFileConverterTest {
 
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
-		thrown.expectMessage("data length (301) must have 300 characters");
+		thrown.expectMessage("Data length (301) must have 300 characters");
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -181,7 +179,7 @@ public class FixedLengthFileConverterTest {
 
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
-		thrown.expectMessage("data length (300) must have 301 characters");
+		thrown.expectMessage("Data length (300) must have 301 characters");
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -305,7 +303,7 @@ public class FixedLengthFileConverterTest {
 		// Actual
 		fixLengthFileConverter.checkFileFormat(drawdownAdviceFile);
 	}
-	
+
 	@Test
 	public void given_a_file_which_has_a_space_case_footer_flag_when_check_file_format_should_throw_WrongFormatFileException()
 			throws WrongFormatFileException {
@@ -349,6 +347,66 @@ public class FixedLengthFileConverterTest {
 	}
 
 	@Test
+	public void given_total_document_in_the_footer_which_has_wrong_format_when_check_file_format_should_throw_WrongFormatFileException()
+			throws WrongFormatFileException {
+
+		// Arrange
+		String[] fixedLengthContent = new String[4];
+		fixedLengthContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
+		fixedLengthContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
+		fixedLengthContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                               ";
+		fixedLengthContent[3] = "Ttwelve0000000101000000                                                                                                                                                                                                                                                                                     ";
+		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+
+		// Assert
+		thrown.expect(WrongFormatFileException.class);
+		thrown.expectMessage("Total Document No (twelve) invalid format");
+
+		// Actual
+		fixLengthFileConverter.checkFileFormat(documentFile);
+	}
+
+	@Test
+	public void given_total_document_in_the_footer_which_has_wrong_number_format_when_check_file_format_should_throw_WrongFormatFileException()
+			throws WrongFormatFileException {
+
+		// Arrange
+		String[] fixedLengthContent = new String[4];
+		fixedLengthContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
+		fixedLengthContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
+		fixedLengthContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                               ";
+		fixedLengthContent[3] = "T001,000000000101000000                                                                                                                                                                                                                                                                                     ";
+		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+
+		// Assert
+		thrown.expect(WrongFormatFileException.class);
+		thrown.expectMessage("Total Document No (001,00) invalid format");
+
+		// Actual
+		fixLengthFileConverter.checkFileFormat(documentFile);
+	}
+
+	@Test
+	public void given_total_document_amount_in_the_footer_which_has_wrong_number_format_when_check_file_format_should_throw_WrongFormatFileException()
+			throws WrongFormatFileException {
+
+		// Arrange
+		String[] fixedLengthContent = new String[4];
+		fixedLengthContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
+		fixedLengthContent[1] = "DMAK  232112              1122031             20160910201609010000000100000000                                                                                                                                                                                                                               ";
+		fixedLengthContent[2] = "DMAK  232112              1122031             20160910201609010000000001000001                                                                                                                                                                                                                               ";
+		fixedLengthContent[3] = "T00000200000100,0000001                                                                                                                                                                                                                                                                                     ";
+		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+
+		// Assert
+		thrown.expect(WrongFormatFileException.class);
+		thrown.expectMessage("Total Document Amount (100,0000) invalid format");
+
+		// Actual
+		fixLengthFileConverter.checkFileFormat(documentFile);
+	}
+
+	@Test
 	public void given_total_document_in_the_footer_is_not_equal_to_total_of_document_in_detail_when_check_file_format_should_throw_WrongFormatFileException()
 			throws WrongFormatFileException {
 
@@ -362,12 +420,12 @@ public class FixedLengthFileConverterTest {
 
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
-		thrown.expectMessage("Total line (1) is invalid. Total detail line is 2");
+		thrown.expectMessage("Total Document No (1) is invalid. Total detail line is 2");
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
 	}
-	
+
 	private FileLayoutConfig createFixedLengthFileLayout() {
 		DefaultFileLayoutConfig fileLayout = new DefaultFileLayoutConfig();
 		fileLayout.setFileType(FileType.FIXED_LENGTH);
@@ -454,6 +512,7 @@ public class FixedLengthFileConverterTest {
 
 		DefaultFileLayoutConfigItem footerTotalDocConfig = new DefaultFileLayoutConfigItem();
 		footerTotalDocConfig.setFieldName("totalDocumentNumber");
+		footerTotalDocConfig.setDisplayValue("Total Document No");
 		footerTotalDocConfig.setStartIndex(2);
 		footerTotalDocConfig.setLength(6);
 		footerTotalDocConfig.setDecimalPlace(0);
@@ -465,6 +524,7 @@ public class FixedLengthFileConverterTest {
 
 		DefaultFileLayoutConfigItem footerDocAmountConfig = new DefaultFileLayoutConfigItem();
 		footerDocAmountConfig.setFieldName("totalDocumentAmount");
+		footerDocAmountConfig.setDisplayValue("Total Document Amount");
 		footerDocAmountConfig.setStartIndex(8);
 		footerDocAmountConfig.setLength(15);
 		footerDocAmountConfig.setDecimalPlace(2);

@@ -30,9 +30,7 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private boolean entityField;
 
-	private boolean checkAmountZero;
-
-	private String constanceValue;
+	private String defaultValue;
 
 	private boolean use1000Separator;
 
@@ -168,22 +166,13 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 		return entityField;
 	}
 
-	public void setCheckAmountZero(boolean checkAmountZero) {
-		this.checkAmountZero = checkAmountZero;
-	}
-
-	@Override
-	public boolean isCheckAmountZero() {
-		return checkAmountZero;
-	}
-
 	public void setConstanceValue(String constanceValue) {
-		this.constanceValue = constanceValue;
+		this.defaultValue = constanceValue;
 	}
 
 	@Override
 	public String getConstantValue() {
-		return constanceValue;
+		return defaultValue;
 	}
 
 	public void setUse1000Separator(boolean use1000Separator) {
@@ -202,6 +191,16 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	@Override
 	public boolean isUseDecimalPlace() {
 		return useDecimalPlace;
+	}
+
+	@Override
+	public FileLayoutConfigItem getSignFlagConfig() {
+		return null;
+	}
+
+	public void setPlusSymbol(String plusSymbol) {
+		this.plusSymbol = plusSymbol;
+
 	}
 
 }

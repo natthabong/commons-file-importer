@@ -26,8 +26,9 @@ public class CSVFileConverterGetDetailFileTest {
 	private CSVFileConverter<SponsorDocument> csvFileConverter;
 
 	@Test
-	public void given_detail_valid_format_when_get_detail_should_success() throws WrongFormatFileException,
-			NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+	public void given_detail_valid_format_when_get_detail_should_success()
+			throws WrongFormatFileException, NoSuchFieldException, SecurityException,
+			IllegalArgumentException, IllegalAccessException {
 		// Arrange
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -46,7 +47,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_payer_code_in_detail_blank_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_payer_code_in_detail_blank_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -81,13 +83,15 @@ public class CSVFileConverterGetDetailFileTest {
 		assertFalse(actualResult.isSuccess());
 
 		String payerErrMsg = actualResult.getErrorLineDetails().get(0).getErrorMessage();
-		String bankCodeErrMsg = actualResult.getErrorLineDetails().get(1).getErrorMessage();
+		String bankCodeErrMsg = actualResult.getErrorLineDetails().get(1)
+				.getErrorMessage();
 		assertEquals("Payer Code is required", payerErrMsg);
 		assertEquals("Bank Code is required", bankCodeErrMsg);
 	}
 
 	@Test
-	public void given_payer_code_length_over_20_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_payer_code_length_over_20_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -106,7 +110,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_deposit_branch_is_blank_when_get_detail_should_status_success() throws WrongFormatFileException {
+	public void given_deposit_branch_is_blank_when_get_detail_should_status_success()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -123,7 +128,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_payer_is_blank_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_payer_is_blank_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -141,7 +147,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_payer_over_limit_20_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_payer_over_limit_20_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -159,7 +166,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_bank_code_is_blank_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_bank_code_is_blank_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -177,7 +185,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_bank_code_length_over_limit_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_bank_code_length_over_limit_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -195,7 +204,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_bank_is_blank_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_bank_is_blank_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -213,7 +223,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_bank_length_over_limit_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_bank_length_over_limit_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -231,7 +242,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_cheque_branch_is_blank_when_get_detail_should_status_success() throws WrongFormatFileException {
+	public void given_cheque_branch_is_blank_when_get_detail_should_status_success()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -248,7 +260,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_cheque_No_is_blank_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_cheque_No_is_blank_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -266,7 +279,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_cheque_No_over_limit_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_cheque_No_over_limit_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -284,7 +298,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_cheque_due_date_is_blank_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_cheque_due_date_is_blank_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -321,7 +336,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_good_fund_date_is_blank_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_good_fund_date_is_blank_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -358,7 +374,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_deposit_date_is_blank_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_deposit_date_is_blank_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -376,7 +393,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_deposit_date_invalid_format_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_deposit_date_invalid_format_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -394,7 +412,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_cheque_amount_is_blank_when_get_detail_should_status_fail() throws WrongFormatFileException {
+	public void given_cheque_amount_is_blank_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -411,6 +430,7 @@ public class CSVFileConverterGetDetailFileTest {
 		assertEquals("Cheque Amount is required", payerErrMsg);
 	}
 
+	@Ignore
 	@Test
 	public void given_cheque_amount_have_plus_symbol_when_get_detail_should_status_fail()
 			throws WrongFormatFileException {
@@ -470,7 +490,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_clearing_type_is_blank_when_get_detail_should_status_success() throws WrongFormatFileException {
+	public void given_clearing_type_is_blank_when_get_detail_should_status_success()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -487,9 +508,11 @@ public class CSVFileConverterGetDetailFileTest {
 		assertEquals("5572692", sponsorDoc.getSupplierCode());
 
 	}
-	
+
+	@Ignore
 	@Test
-	public void given_amount_have_commar_and_set_use_1000_separator_when_get_detail_should_status_success() throws WrongFormatFileException {
+	public void given_amount_have_commar_and_set_use_1000_separator_when_get_detail_should_status_success()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -498,16 +521,17 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertTrue(actualResult.isSuccess());
 		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
 		assertEquals("5572692", sponsorDoc.getSupplierCode());
 	}
-	
+
 	@Test
-	public void given_set_config_use_decimal_place_is_false_when_get_detail_should_status_success() throws WrongFormatFileException {
+	public void given_set_config_use_decimal_place_is_true_when_get_detail_should_status_success()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -516,7 +540,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
 
 		// Actual
-		DetailResult actualResult = csvFileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
 
 		// Assert
 		assertTrue(actualResult.isSuccess());
@@ -525,7 +549,8 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_No_is_blank_when_get_detail_should_status_success() throws WrongFormatFileException {
+	public void given_No_is_blank_when_get_detail_should_status_success()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -540,10 +565,11 @@ public class CSVFileConverterGetDetailFileTest {
 		assertTrue(actualResult.isSuccess());
 		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
 		assertEquals("5572692", sponsorDoc.getSupplierCode());
+
 	}
 	
 	@Test
-	public void given_config_instant_documentType_CHQ_when_get_detail_should_set_value_to_documentType() throws WrongFormatFileException {
+	public void given_config_default_value_documentType_CHQ_when_get_detail_should_set_value_to_documentType() throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
@@ -560,15 +586,15 @@ public class CSVFileConverterGetDetailFileTest {
 
 	}
 	
-	private CSVFileConverter<SponsorDocument> mockSponsorFileLayout(String[] csvValidFileContent)
-			throws WrongFormatFileException {
+	private CSVFileConverter<SponsorDocument> mockSponsorFileLayout(
+			String[] csvValidFileContent) throws WrongFormatFileException {
 		InputStream csvFileContent = new ByteArrayInputStream(
 				StringUtils.join(csvValidFileContent, System.lineSeparator()).getBytes());
 
 		DefaultFileLayoutConfig fileLayout = getLayoutConfig();
 
-		CSVFileConverter<SponsorDocument> csvFileConverter = new CSVFileConverter<SponsorDocument>(fileLayout,
-				SponsorDocument.class);
+		CSVFileConverter<SponsorDocument> csvFileConverter = new CSVFileConverter<SponsorDocument>(
+				fileLayout, SponsorDocument.class);
 
 		csvFileConverter.checkFileFormat(csvFileContent);
 		return csvFileConverter;
@@ -601,7 +627,7 @@ public class CSVFileConverterGetDetailFileTest {
 		depositBranch.setFieldName(null);
 		depositBranch.setRequired(false);
 		depositBranch.setDisplayValue("Deposit branch");
-		
+
 		DefaultFileLayoutConfigItem payer = new DefaultFileLayoutConfigItem();
 		payer.setStartIndex(4);
 		payer.setLength(20);
@@ -617,7 +643,7 @@ public class CSVFileConverterGetDetailFileTest {
 		bankCode.setRequired(true);
 		bankCode.setDisplayValue("Bank Code");
 		bankCode.setEntityField(true);
-		
+
 		DefaultFileLayoutConfigItem bank = new DefaultFileLayoutConfigItem();
 		bank.setStartIndex(6);
 		bank.setLength(20);
@@ -658,7 +684,7 @@ public class CSVFileConverterGetDetailFileTest {
 		goodFundDate.setDisplayValue("Good Fund Date");
 		goodFundDate.setDatetimeFormat("dd/MM/yyyy");
 		goodFundDate.setEntityField(true);
-		
+
 		DefaultFileLayoutConfigItem depositDate = new DefaultFileLayoutConfigItem();
 		depositDate.setStartIndex(11);
 		depositDate.setLength(10);
@@ -676,8 +702,9 @@ public class CSVFileConverterGetDetailFileTest {
 		chequeAmount.setDisplayValue("Cheque Amount");
 		chequeAmount.setDecimalPlace(2);
 		chequeAmount.setUse1000Separator(true);
-		chequeAmount.setUseDecimalPlace(false);
+		chequeAmount.setUseDecimalPlace(true);
 		chequeAmount.setEntityField(true);
+		chequeAmount.setPlusSymbol("+");
 
 		DefaultFileLayoutConfigItem clearingType = new DefaultFileLayoutConfigItem();
 		clearingType.setStartIndex(13);
@@ -693,6 +720,7 @@ public class CSVFileConverterGetDetailFileTest {
 		documentType.setEntityField(true);
 		documentType.setConstanceValue("CHQ");
 		documentType.setDisplayValue("Document Type");
+		layoutItems.add(documentType);
 
 		layoutItems.add(no);
 		layoutItems.add(supplierCode);
@@ -707,8 +735,7 @@ public class CSVFileConverterGetDetailFileTest {
 		layoutItems.add(depositDate);
 		layoutItems.add(chequeAmount);
 		layoutItems.add(clearingType);
-		layoutItems.add(documentType);
-		
+
 		fileLayout.setConfigItems(layoutItems);
 		return fileLayout;
 	}
