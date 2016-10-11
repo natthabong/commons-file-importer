@@ -5,6 +5,7 @@ public class DataCondition {
 	private ConditionType conditionType;
 	private String notExistErrorMessage;
 	private String inactiveErrorMessage;
+	private String errorMessage;
 
 	public void setConditionType(ConditionType conditionType) {
 		this.conditionType = conditionType;
@@ -30,4 +31,11 @@ public class DataCondition {
 		this.inactiveErrorMessage = inactiveErrorMessage;
 	}
 
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
 }
