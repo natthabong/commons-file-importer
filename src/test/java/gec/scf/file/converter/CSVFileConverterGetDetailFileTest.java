@@ -603,6 +603,8 @@ public class CSVFileConverterGetDetailFileTest {
 	private DefaultFileLayoutConfig getLayoutConfig() {
 		DefaultFileLayoutConfig fileLayout = new DefaultFileLayoutConfig();
 		fileLayout.setDelimeter(",");
+		fileLayout.setCharsetName("UTF-8");
+		
 
 		List<FileLayoutConfigItem> layoutItems = new ArrayList<FileLayoutConfigItem>();
 

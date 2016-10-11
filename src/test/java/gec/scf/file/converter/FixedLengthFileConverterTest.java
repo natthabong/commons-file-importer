@@ -450,6 +450,7 @@ public class FixedLengthFileConverterTest {
 		documentDateConfig.setLength(8);
 		documentDateConfig.setDisplayValue("Send Date");
 		documentDateConfig.setDatetimeFormat("yyyyMMdd");
+		documentDateConfig.setTransient(true);
 		documentDateConfig.setRecordType(RecordType.HEADER);
 
 		configItems.add(documentDateConfig);

@@ -42,12 +42,13 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 		CSVParser csvParser = null;
 		try {
 
-			// validateBinaryFile(fileContent);
+			if (fileLayoutConfig.isCheckBinaryFile()) {
+				validateBinaryFile(fileContent);
+			}
+			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"),
+					CSVFormat.EXCEL.withSkipHeaderRecord(true)
+							.withDelimiter(fileLayoutConfig.getDelimeter().charAt(0)));
 
-			// int csvLengthConfig = fileLayoutConfig.getConfigItems().size();
-
-			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"), CSVFormat.EXCEL
-					.withSkipHeaderRecord(true).withDelimiter(fileLayoutConfig.getDelimeter().charAt(0)));
 
 			csvRecords = csvParser.getRecords();
 
@@ -137,14 +138,14 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 		for (FileLayoutConfigItem itemConf : itemConfigs) {
 			try {
 				String recordValue = "";
-
-				if (StringUtils.isNotBlank(itemConf.getDefaultValue())) {
+				
+				if(StringUtils.isNotBlank(itemConf.getDefaultValue())){
 					recordValue = itemConf.getDefaultValue();
-				} else {
+				}else{
 					int startIndex = itemConf.getStartIndex() - 1;
 					recordValue = csvRecord.get(startIndex);
 				}
-
+				
 				if (StringUtils.isNotBlank(itemConf.getDocFieldName())) {
 					applyObjectValue(document, itemConf, recordValue);
 				}

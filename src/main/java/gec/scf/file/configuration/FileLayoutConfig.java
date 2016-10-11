@@ -16,4 +16,8 @@ public interface FileLayoutConfig {
 
 	public String getDelimeter();
 
+	public boolean isCheckBinaryFile();
+
+	public String getCharsetName();
+
 }

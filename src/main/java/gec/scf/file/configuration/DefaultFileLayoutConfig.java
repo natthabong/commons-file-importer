@@ -16,7 +16,11 @@ public class DefaultFileLayoutConfig implements FileLayoutConfig {
 
 	private String footerFlag;
 
-	private String delimeter;	
+	private String delimeter;
+
+	private boolean checkBinaryFile;
+
+	private String charsetName;	
 
 	public Integer getStartIndex() {
 		return startIndex;
@@ -95,4 +99,21 @@ public class DefaultFileLayoutConfig implements FileLayoutConfig {
 		this.delimeter = delimeter;
 	}
 
+	public void setCheckBinaryFile(boolean checkBinaryFile) {
+		this.checkBinaryFile = checkBinaryFile;
+	}
+
+	@Override
+	public boolean isCheckBinaryFile() {
+		return checkBinaryFile;
+	}
+
+	public void setCharsetName(String charsetName) {
+		this.charsetName = charsetName;		
+	}
+
+	@Override
+	public String getCharsetName() {
+		return charsetName;
+	}
 }
