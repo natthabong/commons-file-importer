@@ -8,13 +8,13 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private RecordType recordType;
 
-	private String fieldName;
+	private String docFieldName;
 
 	private String displayValue;
 
-	private String expectValue;
+	private String expectedValue;
 
-	private boolean required;
+	private boolean isRequired;
 
 	private String datetimeFormat;
 
@@ -28,17 +28,17 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private Integer decimalPlace;
 
-	private boolean entityField;
-
+	private boolean isTransient;
+	
+	private boolean hasDecimalPlace;
+	
+	private boolean has1000Separator;
+	
 	private String defaultValue;
 
-	private boolean use1000Separator;
-
-	private boolean useDecimalPlace;
-
 	@Override
-	public String getFieldName() {
-		return fieldName;
+	public String getDocFieldName() {
+		return docFieldName;
 	}
 
 	@Override
@@ -90,9 +90,8 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	}
 
-	public void setFieldName(String fieldName) {
-		this.fieldName = fieldName;
-
+	public void setDocFieldName(String docFieldName) {
+		this.docFieldName = docFieldName;
 	}
 
 	@Override
@@ -101,17 +100,17 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	}
 
 	@Override
-	public String getExpectValue() {
-		return expectValue;
+	public String getExpectedValue() {
+		return expectedValue;
 	}
 
-	public void setRequired(boolean required) {
-		this.required = required;
+	public void setRequired(boolean isRequired) {
+		this.isRequired = isRequired;
 	}
 
 	@Override
 	public boolean isRequired() {
-		return required;
+		return isRequired;
 	}
 
 	public void setDisplayValue(String displayValue) {
@@ -127,8 +126,8 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 		return length;
 	}
 
-	public void setExpectValue(String expectValue) {
-		this.expectValue = expectValue;
+	public void setExpectedValue(String expectedValue) {
+		this.expectedValue = expectedValue;
 
 	}
 
@@ -157,42 +156,45 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 		this.decimalPlace = decimalPlace;
 	}
 
-	public void setEntityField(boolean entityField) {
-		this.entityField = entityField;
+	public void setMinusSymbol(String minusSymbol) {
+		this.minusSymbol = minusSymbol;
 	}
 
 	@Override
-	public boolean isEntityField() {
-		return entityField;
-	}
-
-	public void setConstanceValue(String constanceValue) {
-		this.defaultValue = constanceValue;
+	public boolean isTransient() {
+		return isTransient;
 	}
 
 	@Override
-	public String getConstantValue() {
+	public String getDefaultValue() {
 		return defaultValue;
 	}
 
-	public void setUse1000Separator(boolean use1000Separator) {
-		this.use1000Separator = use1000Separator;
+	@Override
+	public boolean has1000Separator() {
+		return has1000Separator;
 	}
 
 	@Override
-	public boolean isUse1000Separator() {
-		return use1000Separator;
+	public boolean hasDecimalPlace() {
+		return hasDecimalPlace;
 	}
 
-	public void setUseDecimalPlace(boolean useDecimalPlace) {
-		this.useDecimalPlace = useDecimalPlace;
+	public void setHasDecimalPlace(boolean hasDecimalPlace) {
+		this.hasDecimalPlace = hasDecimalPlace;
 	}
 
-	@Override
-	public boolean isUseDecimalPlace() {
-		return useDecimalPlace;
+	public void setHas1000Separator(boolean has1000Separator) {
+		this.has1000Separator = has1000Separator;
 	}
 
+	public void setTransient(boolean isTransient) {
+		this.isTransient = isTransient;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
 	@Override
 	public FileLayoutConfigItem getSignFlagConfig() {
 		return null;

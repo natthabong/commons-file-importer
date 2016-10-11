@@ -45,23 +45,20 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 			if (fileLayoutConfig.isCheckBinaryFile()) {
 				validateBinaryFile(fileContent);
 			}
-
-			csvParser = new CSVParser(new InputStreamReader(fileContent, fileLayoutConfig.getCharsetName()), CSVFormat.EXCEL
-					.withSkipHeaderRecord(true).withDelimiter(fileLayoutConfig.getDelimeter().charAt(0)));
+			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"),
+					CSVFormat.EXCEL.withSkipHeaderRecord(true)
+							.withDelimiter(fileLayoutConfig.getDelimeter().charAt(0)));
 
 			csvRecords = csvParser.getRecords();
 
 			validateDataLength(fileLayoutConfig.getConfigItems());
 
 			currentLine = 1;
-		}
-		catch (WrongFormatFileException e) {
+		} catch (WrongFormatFileException e) {
 			throw e;
-		}
-		catch (UnsupportedEncodingException e) {
+		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -110,13 +107,11 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 			result.setObjectValue(document);
 			result.setSuccess(true);
 			result.setLineNo(currentLine);
-		}
-		catch (WrongFormatDetailException e) {
+		}catch (WrongFormatDetailException e) {
 			result.setErrorLineDetails(e.getErrorLineDetails());
 			result.setSuccess(false);
 			result.setLineNo(currentLine);
-		}
-		catch (IndexOutOfBoundsException e) {
+		} catch (IndexOutOfBoundsException e) {
 			result = null;
 		}
 
@@ -133,39 +128,34 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 		T document = null;
 		try {
 			document = (T) getEntityClass().newInstance();
-		}
-		catch (InstantiationException e1) {
+		} catch (InstantiationException e1) {
 			e1.printStackTrace();
-		}
-		catch (IllegalAccessException e1) {
+		} catch (IllegalAccessException e1) {
 			e1.printStackTrace();
 		}
 
 		for (FileLayoutConfigItem itemConf : itemConfigs) {
 			try {
 				String recordValue = "";
-
-				if (StringUtils.isNotBlank(itemConf.getConstantValue())) {
-					recordValue = itemConf.getConstantValue();
-				}
-				else {
+				
+				if(StringUtils.isNotBlank(itemConf.getDefaultValue())){
+					recordValue = itemConf.getDefaultValue();
+				}else{
 					int startIndex = itemConf.getStartIndex() - 1;
 					recordValue = csvRecord.get(startIndex);
 				}
-
-				if (StringUtils.isNotBlank(itemConf.getFieldName())) {
+				
+				if (StringUtils.isNotBlank(itemConf.getDocFieldName())) {
 					applyObjectValue(document, itemConf, recordValue);
 				}
 
-			}
-			catch (WrongFormatDetailException e) {
+			} catch (WrongFormatDetailException e) {
 				ErrorLineDetail errorLineDetail = new ErrorLineDetail();
 				errorLineDetail.setErrorLineNo(currentLine);
 				errorLineDetail.setErrorMessage(e.getErrorMessage());
 				errorLineDetails.add(errorLineDetail);
 				isError = true;
-			}
-			catch (Exception e) {
+			} catch (Exception e) {
 				// TODO manage error message
 				e.printStackTrace();
 			}

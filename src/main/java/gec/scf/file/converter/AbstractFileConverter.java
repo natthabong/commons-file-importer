@@ -35,9 +35,9 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			throws NoSuchFieldException, SecurityException, WrongFormatDetailException,
 			WrongFormatFileException, IllegalAccessException, ParseException {
 
-		if (itemConf.isEntityField()) {
+		if (!itemConf.isTransient()) {
 			Field field = null;
-			field = entityClass.getDeclaredField(itemConf.getFieldName());
+			field = entityClass.getDeclaredField(itemConf.getDocFieldName());
 			field.setAccessible(true);
 			Class<?> classType = field.getType();
 
@@ -99,7 +99,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 		if (!dateValidator.isValid(data.trim(), configItem.getDatetimeFormat(),
 				Locale.US)) {
-			if (configItem.isEntityField()) {
+			if (!configItem.isTransient()) {
 				throw new WrongFormatDetailException(
 						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
 								configItem.getDisplayValue(), data));
@@ -134,7 +134,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 		String normalNumber = data;
 
-		if (configItem.isUseDecimalPlace()) {
+		if (configItem.hasDecimalPlace()) {
 			validateDecimalPlace(configItem, normalNumber);
 
 			normalNumber = data.substring(0,
@@ -149,7 +149,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			}
 		}
 
-		if (configItem.isUse1000Separator()) {
+		if (configItem.has1000Separator()) {
 			try {
 				validate1000Seperator(normalNumber);
 				normalNumber = normalNumber.replaceAll(",", "");
@@ -222,7 +222,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 			}
 
-			if (configItem.isUse1000Separator()) {
+			if (configItem.has1000Separator()) {
 				normalNumber = normalNumber.replaceAll(",", "");
 
 			}
