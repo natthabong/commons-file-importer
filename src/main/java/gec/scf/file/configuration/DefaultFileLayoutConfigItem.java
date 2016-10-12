@@ -29,12 +29,14 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	private Integer decimalPlace;
 
 	private boolean isTransient;
-	
+
 	private boolean hasDecimalPlace;
-	
+
 	private boolean has1000Separator;
-	
+
 	private String defaultValue;
+
+	private FileLayoutConfigItem signFlagConfig;
 
 	@Override
 	public String getDocFieldName() {
@@ -195,14 +197,19 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue = defaultValue;
 	}
+
 	@Override
 	public FileLayoutConfigItem getSignFlagConfig() {
-		return null;
+		return signFlagConfig;
 	}
 
 	public void setPlusSymbol(String plusSymbol) {
 		this.plusSymbol = plusSymbol;
 
+	}
+
+	public void setSignFlagConfig(FileLayoutConfigItem signFlagConfig) {
+		this.signFlagConfig = signFlagConfig;
 	}
 
 }
