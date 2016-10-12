@@ -96,14 +96,16 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 					// Found a blank line on the end of file, do nothing
 					if (hasCheckedHeader && hasCheckedFooter) {
 						continue;
-					} else if (!hasCheckedHeader) {
+					}
+					else if (!hasCheckedHeader) {
 
 						// Found a blank line on top of file, throw an error
 						FileLayoutConfigItem headerRecordType = headerRecordTypeExtractor.getConfig();
 						throw new WrongFormatFileException(
 								MessageFormat.format(CovertErrorConstant.HEADER_NOT_FIRST_LINE_OF_FILE,
 										headerRecordType.getDisplayValue(), fileLayoutConfig.getHeaderFlag()));
-					} else if (!hasCheckedFooter) {
+					}
+					else if (!hasCheckedFooter) {
 
 						// Found a blank line between header and detail, throw
 						// an error
@@ -121,13 +123,15 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 						throw new WrongFormatFileException(
 								MessageFormat.format(CovertErrorConstant.HEADER_NOT_FIRST_LINE_OF_FILE,
 										headerRecordType.getDisplayValue(), fileLayoutConfig.getHeaderFlag()));
-					} else if (fileLayoutConfig.getHeaderFlag().equals(recordType)) {
+					}
+					else if (fileLayoutConfig.getHeaderFlag().equals(recordType)) {
 						List<FileLayoutConfigItem> headerConfigItems = fileConfigItems.get(RecordType.HEADER);
 
 						validateLineDataFormat(currentLine, headerConfigItems);
 						hasCheckedHeader = true;
 						continue;
-					} else {
+					}
+					else {
 
 						FileLayoutConfigItem recordTypeLayoutCofig = headerRecordTypeExtractor.getConfig();
 
@@ -147,7 +151,8 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 								MessageFormat.format(CovertErrorConstant.FOOTER_NOT_LAST_LINE_OF_FILE,
 										footerRecordType.getDisplayValue(), fileLayoutConfig.getFooterFlag()),
 								currentLineNo);
-					} else if (fileLayoutConfig.getFooterFlag().equals(recordType)) {
+					}
+					else if (fileLayoutConfig.getFooterFlag().equals(recordType)) {
 						List<FileLayoutConfigItem> footerConfigItems = fileConfigItems.get(RecordType.FOOTER);
 
 						validateFooter(currentLine, footerConfigItems);
@@ -178,7 +183,8 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 					try {
 						bufferedWriter.write(currentLine);
 						bufferedWriter.newLine();
-					} catch (IOException e) {
+					}
+					catch (IOException e) {
 						log.error(e.getMessage(), e);
 					}
 
@@ -199,16 +205,16 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 							}
 							totalDetailAmount = totalDetailAmount.add(docAmount);
-}
+						}
 						catch (WrongFormatDetailException e) {
-							totalDetailAmount = totalDetailAmount
-									.add(new BigDecimal("0.0"));
+							totalDetailAmount = totalDetailAmount.add(new BigDecimal("0.0"));
 						}
 						catch (Exception e) {
 							log.warn(e.getMessage(), e);
 						}
 					}
-				} else {
+				}
+				else {
 					FileLayoutConfigItem recordTypeLayoutCofig = detailRecordTypeExtractor.getConfig();
 					throw new WrongFormatFileException(MessageFormat.format(CovertErrorConstant.RECORD_ID_MISS_MATCH,
 							recordTypeLayoutCofig.getDisplayValue(), recordType));
@@ -222,12 +228,15 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 				throw new WrongFormatFileException(MessageFormat.format(CovertErrorConstant.FOOTER_NOT_LAST_FILE,
 						recordTypeLayoutCofig.getDisplayValue(), fileLayoutConfig.getFooterFlag()));
 			}
-		} catch (WrongFormatFileException e) {
+		}
+		catch (WrongFormatFileException e) {
 			e.setErrorLineNo(null);
 			throw e;
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new WrongFormatFileException("File read error occurred", null);
-		} finally {
+		}
+		finally {
 			currentLineNo = 1;
 			try {
 				if (bufferedWriter != null) {
@@ -236,7 +245,8 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 				if (bufferReader != null) {
 					bufferReader.close();
 				}
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				log.error(e.getMessage(), e);
 			}
 
@@ -272,9 +282,11 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 									totalDetailRecord),
 							currentLineNo);
 				}
-			} catch (WrongFormatFileException e) {
+			}
+			catch (WrongFormatFileException e) {
 				throw e;
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				throw new WrongFormatFileException(MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
 						footerTotalDocLayoutConfig.getDisplayValue(), totalDocData), currentLineNo);
 			}
@@ -303,11 +315,14 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 									totalDetailAmount.doubleValue()),
 							currentLineNo);
 				}
-			} catch (WrongFormatFileException e) {
+			}
+			catch (WrongFormatFileException e) {
 				throw e;
-			} catch (WrongFormatDetailException e) {
+			}
+			catch (WrongFormatDetailException e) {
 				throw new WrongFormatFileException(e.getErrorMessage(), currentLineNo);
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				throw new WrongFormatFileException(MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
 						footerTotalDocAmountLayoutConfig.getDisplayValue(), totalDocAmoutData), currentLineNo);
 			}
@@ -367,7 +382,8 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			throws WrongFormatFileException {
 		if (RecordType.DETAIL.equals(item.getRecordType())) {
 			throw new WrongFormatDetailException(errorMessage);
-		} else {
+		}
+		else {
 			throw new WrongFormatFileException(errorMessage, currentLineNo);
 		}
 	}
@@ -398,7 +414,8 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			if ("recordId".equals(fileLayoutConfig.getDocFieldName())) {
 				RecordTypeExtractor extractor = new RecordTypeExtractor(fileLayoutConfig);
 				extractors.put(fileLayoutConfig.getRecordType(), extractor);
-			} else {
+			}
+			else {
 				switch (fileLayoutConfig.getRecordType()) {
 				case HEADER:
 					headerList.add(fileLayoutConfig);
@@ -446,15 +463,18 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 				T detailObject = convertDetail(currentLine);
 				detailResult.setSuccess(true);
 				detailResult.setObjectValue(detailObject);
-			} else {
+			}
+			else {
 				detailResult = null;
 				tempFileReader.close();
 				tempFile.delete();
 			}
-		} catch (WrongFormatDetailException e) {
+		}
+		catch (WrongFormatDetailException e) {
 			detailResult.setErrorLineDetails(e.getErrorLineDetails());
 			detailResult.setSuccess(false);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}
 		return detailResult;
@@ -467,9 +487,11 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 		T entity = null;
 		try {
 			entity = (T) getEntityClass().newInstance();
-		} catch (InstantiationException e1) {
+		}
+		catch (InstantiationException e1) {
 			e1.printStackTrace();
-		} catch (IllegalAccessException e1) {
+		}
+		catch (IllegalAccessException e1) {
 			e1.printStackTrace();
 		}
 
@@ -508,13 +530,15 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 					applyObjectValue(entity, config, data, signFlagData);
 				}
 
-			} catch (WrongFormatDetailException e) {
+			}
+			catch (WrongFormatDetailException e) {
 				ErrorLineDetail errorLineDetail = new ErrorLineDetail();
 				errorLineDetail.setErrorLineNo(currentLineNo);
 				errorLineDetail.setErrorMessage(e.getErrorMessage());
 				errorLineDetails.add(errorLineDetail);
 				isError = true;
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				// TODO manage error message
 				e.printStackTrace();
 			}
@@ -558,7 +582,8 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			String recordType = null;
 			try {
 				recordType = currentLine.substring(beginIndex, beginIndex + configItem.getLenght());
-			} catch (IndexOutOfBoundsException e) {
+			}
+			catch (IndexOutOfBoundsException e) {
 				log.debug(e.getMessage());
 			}
 			return recordType;
