@@ -37,9 +37,9 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			throws NoSuchFieldException, SecurityException, WrongFormatDetailException,
 			WrongFormatFileException, IllegalAccessException, ParseException {
 
-		if (itemConf.isEntityField()) {
+		if (!itemConf.isTransient()) {
 			Field field = null;
-			field = entityClass.getDeclaredField(itemConf.getFieldName());
+			field = entityClass.getDeclaredField(itemConf.getDocFieldName());
 			field.setAccessible(true);
 			Class<?> classType = field.getType();
 
@@ -102,7 +102,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 		if (!dateValidator.isValid(data.trim(), configItem.getDatetimeFormat(),
 				Locale.US)) {
-			if (configItem.isEntityField()) {
+			if (!configItem.isTransient()) {
 				throw new WrongFormatDetailException(
 						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
 								configItem.getDisplayValue(), data));
@@ -163,6 +163,11 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 				if (StringUtils.isEmpty(number)) {
 					number = "0";
 				}
+
+				if (configItem.has1000Separator()) {
+					number = number.replaceAll(",", "");
+				}
+
 				BigDecimal amount = new BigDecimal(number);
 				if (StringUtils.isEmpty(number) || amount.intValue() == 0) {
 					throw new WrongFormatDetailException(MessageFormat.format(
@@ -178,7 +183,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 
 		// Check decimal place
-		if (configItem.isUseDecimalPlace()) {
+		if (configItem.hasDecimalPlace()) {
 			String dataToCheck = data;
 			validateDecimalPlace(configItem, dataToCheck);
 		}
@@ -189,7 +194,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 
 		// Check decimal place
-		if (configItem.isUse1000Separator()) {
+		if (configItem.has1000Separator()) {
 			String dataToCheck = data;
 			validate1000Seperator(configItem, dataToCheck);
 		}
@@ -221,66 +226,6 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 	}
 
-	// private void validateBigDecimalFormat(FileLayoutConfigItem configItem, String data)
-	// {
-	//
-	// validateRequiredField(configItem, data);
-	//
-	// String normalNumber = data;
-	//
-	// if (configItem.isUseDecimalPlace()) {
-	// validateDecimalPlace(configItem, normalNumber);
-	//
-	// normalNumber = data.substring(0,
-	// (data.length() - configItem.getDecimalPlace()));
-	// normalNumber = normalNumber.replaceAll("\\.", "");
-	// }
-	// else {
-	// if (normalNumber.contains(".")) {
-	// throw new WrongFormatDetailException(
-	// MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
-	// configItem.getDisplayValue(), normalNumber));
-	// }
-	// }
-	//
-	// if (configItem.isUse1000Separator()) {
-	// try {
-	// validate1000Seperator(normalNumber);
-	// normalNumber = normalNumber.replaceAll(",", "");
-	// }
-	// catch (IllegalArgumentException e) {
-	// throw new WrongFormatDetailException(
-	// MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
-	// configItem.getDisplayValue(), data));
-	// }
-	// }
-	// else {
-	// if (normalNumber.indexOf(",") >= 0) {
-	// throw new WrongFormatDetailException(
-	// MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
-	// configItem.getDisplayValue(), normalNumber));
-	// }
-	// }
-	//
-	// if (configItem.isRequired()) {
-	// try {
-	// BigDecimal amount = new BigDecimal(
-	// StringUtils.defaultString(normalNumber, "0"));
-	// if (amount.intValue() == 0) {
-	// throw new WrongFormatDetailException(MessageFormat.format(
-	// CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
-	// configItem.getDisplayValue()));
-	// }
-	// }
-	// catch (NumberFormatException e) {
-	// throw new WrongFormatDetailException(
-	// MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
-	// configItem.getDisplayValue(), data));
-	// }
-	// }
-	//
-	// }
-
 	protected BigDecimal getBigDecimalValue(FileLayoutConfigItem configItem, String data)
 			throws IllegalAccessException {
 
@@ -291,6 +236,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		if (PaddingType.LEFT.equals(configItem.getPaddingType())) {
 			data = StringUtils.stripStart(data, configItem.getPaddingCharacter());
 		}
+
+		validateBigDecimalFormat(configItem, data);
 
 		BigDecimal valueAmount = null;
 		try {
@@ -317,7 +264,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 			}
 
-			if (configItem.isUse1000Separator()) {
+			if (configItem.has1000Separator()) {
 				normalNumber = normalNumber.replaceAll(",", "");
 
 			}
@@ -337,9 +284,6 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 	protected void validateDecimalPlace(FileLayoutConfigItem itemConf,
 			String dataToCheck) {
-
-		dataToCheck = dataToCheck.replaceAll(",", "");
-
 		String[] splitter = dataToCheck.toString().split("\\.");
 		if (splitter.length > 1) {
 			int decimalLength = splitter[1].length();
@@ -385,8 +329,9 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 		for (int i = 0; i < data.length; i++) {
 			byte b = data[i];
+
 			if (b < 0x09) {
-				throw new WrongFormatFileException("Data is binary file");
+				throw new WrongFormatFileException("is binary file");
 			}
 
 			if (b == 0x09 || b == 0x0A || b == 0x0C || b == 0x0D) {
@@ -400,7 +345,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			}
 		}
 		if (100 * other / (ascii + other) > 95) {
-			throw new WrongFormatFileException("Data is binary file");
+			throw new WrongFormatFileException("is binary file");
 		}
 	}
 

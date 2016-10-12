@@ -1,6 +1,6 @@
 package gec.scf.file.importer;
 
 public enum ResultType {
-	SUCCESS, FAIL, INCOMPLETE
+	SUCCESS, FAILED, INCOMPLETE
 
 }

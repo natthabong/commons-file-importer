@@ -2,7 +2,7 @@ package gec.scf.file.configuration;
 
 public interface FileLayoutConfigItem {
 
-	String getFieldName();
+	String getDocFieldName();
 
 	RecordType getRecordType();
 
@@ -20,17 +20,17 @@ public interface FileLayoutConfigItem {
 
 	String getDisplayValue();
 
-	String getExpectValue();
+	String getExpectedValue();
 
 	boolean isRequired();
 
-	boolean isEntityField();
+	boolean isTransient();
 
-	String getConstantValue();
+	String getDefaultValue();
 
-	boolean isUse1000Separator();
+	boolean has1000Separator();
 
-	boolean isUseDecimalPlace();
+	boolean hasDecimalPlace();
 
 	PaddingType getPaddingType();
 

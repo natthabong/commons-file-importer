@@ -436,7 +436,7 @@ public class FixedLengthFileConverterTest {
 		List<FileLayoutConfigItem> configItems = new ArrayList<FileLayoutConfigItem>();
 
 		DefaultFileLayoutConfigItem headerRecordTypeConfig = new DefaultFileLayoutConfigItem();
-		headerRecordTypeConfig.setFieldName("recordId");
+		headerRecordTypeConfig.setDocFieldName("recordId");
 		headerRecordTypeConfig.setStartIndex(1);
 		headerRecordTypeConfig.setLength(1);
 		headerRecordTypeConfig.setDisplayValue("Record Type");
@@ -445,27 +445,28 @@ public class FixedLengthFileConverterTest {
 		configItems.add(headerRecordTypeConfig);
 
 		DefaultFileLayoutConfigItem documentDateConfig = new DefaultFileLayoutConfigItem();
-		documentDateConfig.setFieldName("documentDate");
+		documentDateConfig.setDocFieldName("documentDate");
 		documentDateConfig.setStartIndex(2);
 		documentDateConfig.setLength(8);
 		documentDateConfig.setDisplayValue("Send Date");
 		documentDateConfig.setDatetimeFormat("yyyyMMdd");
+		documentDateConfig.setTransient(true);
 		documentDateConfig.setRecordType(RecordType.HEADER);
 
 		configItems.add(documentDateConfig);
 
 		DefaultFileLayoutConfigItem corporateNameConfig = new DefaultFileLayoutConfigItem();
-		corporateNameConfig.setFieldName("corporateName");
+		corporateNameConfig.setDocFieldName("corporateName");
 		corporateNameConfig.setStartIndex(16);
 		corporateNameConfig.setLength(30);
-		corporateNameConfig.setExpectValue("Siam Makro Plc.");
+		corporateNameConfig.setExpectedValue("Siam Makro Plc.");
 		corporateNameConfig.setDisplayValue("Corporate Name");
 		corporateNameConfig.setRecordType(RecordType.HEADER);
 
 		configItems.add(corporateNameConfig);
 
 		DefaultFileLayoutConfigItem filterConfig = new DefaultFileLayoutConfigItem();
-		filterConfig.setFieldName("filter");
+		filterConfig.setDocFieldName("filter");
 		filterConfig.setStartIndex(54);
 		filterConfig.setLength(247);
 		filterConfig.setRecordType(RecordType.HEADER);
@@ -473,7 +474,7 @@ public class FixedLengthFileConverterTest {
 		configItems.add(filterConfig);
 
 		DefaultFileLayoutConfigItem detailRecordTypeConfig = new DefaultFileLayoutConfigItem();
-		detailRecordTypeConfig.setFieldName("recordId");
+		detailRecordTypeConfig.setDocFieldName("recordId");
 		detailRecordTypeConfig.setDisplayValue("Record Type");
 		detailRecordTypeConfig.setStartIndex(1);
 		detailRecordTypeConfig.setLength(1);
@@ -482,19 +483,19 @@ public class FixedLengthFileConverterTest {
 		configItems.add(detailRecordTypeConfig);
 
 		DefaultFileLayoutConfigItem docAmountConfig = new DefaultFileLayoutConfigItem();
-		docAmountConfig.setFieldName("documentAmount");
+		docAmountConfig.setDocFieldName("documentAmount");
 		docAmountConfig.setStartIndex(63);
 		docAmountConfig.setLength(15);
 		docAmountConfig.setPaddingCharacter("0");
 		docAmountConfig.setPaddingType(PaddingType.LEFT);
 		docAmountConfig.setDecimalPlace(2);
-		docAmountConfig.setUseDecimalPlace(false);
+		docAmountConfig.setHasDecimalPlace(true);
 		docAmountConfig.setRecordType(RecordType.DETAIL);
 
 		configItems.add(docAmountConfig);
 
 		DefaultFileLayoutConfigItem detailFilterConfig = new DefaultFileLayoutConfigItem();
-		detailFilterConfig.setFieldName("filter");
+		detailFilterConfig.setDocFieldName("filter");
 		detailFilterConfig.setStartIndex(54);
 		detailFilterConfig.setLength(248);
 		detailFilterConfig.setRecordType(RecordType.DETAIL);
@@ -502,7 +503,7 @@ public class FixedLengthFileConverterTest {
 		configItems.add(detailFilterConfig);
 
 		DefaultFileLayoutConfigItem footerRecordTypeConfig = new DefaultFileLayoutConfigItem();
-		footerRecordTypeConfig.setFieldName("recordId");
+		footerRecordTypeConfig.setDocFieldName("recordId");
 		footerRecordTypeConfig.setDisplayValue("Record Type");
 		footerRecordTypeConfig.setStartIndex(1);
 		footerRecordTypeConfig.setLength(1);
@@ -511,7 +512,7 @@ public class FixedLengthFileConverterTest {
 		configItems.add(footerRecordTypeConfig);
 
 		DefaultFileLayoutConfigItem footerTotalDocConfig = new DefaultFileLayoutConfigItem();
-		footerTotalDocConfig.setFieldName("totalDocumentNumber");
+		footerTotalDocConfig.setDocFieldName("totalDocumentNumber");
 		footerTotalDocConfig.setDisplayValue("Total Document No");
 		footerTotalDocConfig.setStartIndex(2);
 		footerTotalDocConfig.setLength(6);
@@ -523,12 +524,12 @@ public class FixedLengthFileConverterTest {
 		configItems.add(footerTotalDocConfig);
 
 		DefaultFileLayoutConfigItem footerDocAmountConfig = new DefaultFileLayoutConfigItem();
-		footerDocAmountConfig.setFieldName("totalDocumentAmount");
+		footerDocAmountConfig.setDocFieldName("totalDocumentAmount");
 		footerDocAmountConfig.setDisplayValue("Total Document Amount");
 		footerDocAmountConfig.setStartIndex(8);
 		footerDocAmountConfig.setLength(15);
 		footerDocAmountConfig.setDecimalPlace(2);
-		footerDocAmountConfig.setUseDecimalPlace(false);
+		footerDocAmountConfig.setHasDecimalPlace(true);
 		footerDocAmountConfig.setPaddingCharacter("0");
 		footerDocAmountConfig.setPaddingType(PaddingType.LEFT);
 		footerDocAmountConfig.setRecordType(RecordType.FOOTER);
@@ -536,7 +537,7 @@ public class FixedLengthFileConverterTest {
 		configItems.add(footerDocAmountConfig);
 
 		DefaultFileLayoutConfigItem footerFilterConfig = new DefaultFileLayoutConfigItem();
-		footerFilterConfig.setFieldName("filter");
+		footerFilterConfig.setDocFieldName("filter");
 		footerFilterConfig.setStartIndex(54);
 		footerFilterConfig.setLength(247);
 		footerFilterConfig.setRecordType(RecordType.FOOTER);

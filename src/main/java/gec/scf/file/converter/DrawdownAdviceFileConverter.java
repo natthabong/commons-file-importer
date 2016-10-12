@@ -2,14 +2,12 @@ package gec.scf.file.converter;
 
 import java.io.InputStream;
 
-import org.apache.log4j.Logger;
-
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.exception.WrongFormatFileException;
 
 public class DrawdownAdviceFileConverter<T> extends FixedLengthFileConverter<T> {
 
-	private static final Logger log = Logger.getLogger(DrawdownAdviceFileConverter.class);
+//	private static final Logger log = Logger.getLogger(DrawdownAdviceFileConverter.class);
 
 	private Long lastDocumentNo;
 
