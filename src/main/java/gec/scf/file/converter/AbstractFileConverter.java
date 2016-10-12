@@ -210,9 +210,9 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			String dataToCheck) {
 
 		// Remove
-		dataToCheck = dataToCheck.replaceAll(".", "");
+		dataToCheck = dataToCheck.replaceAll("\\.[0-9]+", "");
 
-		String[] splitter = dataToCheck.toString().split("\\,");
+		String[] splitter = dataToCheck.toString().split(",");
 
 		if (splitter.length > 1) {
 			for (int index = 1; index < splitter.length; index++) {
