@@ -28,9 +28,9 @@ public interface FileLayoutConfigItem {
 
 	String getDefaultValue();
 
-	boolean has1000Separator();
+	Boolean has1000Separator();
 
-	boolean hasDecimalPlace();
+	Boolean hasDecimalPlace();
 
 	PaddingType getPaddingType();
 

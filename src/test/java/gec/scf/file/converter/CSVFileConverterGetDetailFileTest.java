@@ -7,11 +7,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import gec.scf.file.configuration.DefaultFileLayoutConfig;
@@ -431,16 +432,56 @@ public class CSVFileConverterGetDetailFileTest {
 		assertEquals("Cheque Amount is required", payerErrMsg);
 	}
 
-	@Ignore
 	@Test
-	public void given_cheque_amount_have_plus_symbol_when_get_detail_should_status_fail()
+	public void given_cheque_amount_have_plus_symbol_but_has_no_config_when_get_detail_should_status_success()
 			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
 		csvValidFileContent[1] = "18,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,7,SCB,พระประแดง,100093231,22/02/2015,22/02/2015,29/10/2015,+100,BCOB";
 
-		csvFileConverter = mockSponsorFileLayout(csvValidFileContent);
+		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setStartIndex(12);
+		chequeAmount.setLength(10);
+		chequeAmount.setDocFieldName("documentAmount");
+		chequeAmount.setRequired(true);
+		chequeAmount.setDisplayValue("Cheque Amount");
+		chequeAmount.setDecimalPlace(2);
+		chequeAmount.setHas1000Separator(null);
+		chequeAmount.setHasDecimalPlace(null);
+		chequeAmount.setTransient(false);
+		chequeAmount.setPlusSymbol(null);
+
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent, chequeAmount);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+	}
+
+	@Test
+	public void given_cheque_amount_have_plus_symbol_but_in_config_is_0_when_get_detail_should_status_fail()
+			throws WrongFormatFileException {
+		// Arrage
+		String[] csvValidFileContent = new String[2];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = "18,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,7,SCB,พระประแดง,100093231,22/02/2015,22/02/2015,29/10/2015,+100,BCOB";
+
+		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setStartIndex(12);
+		chequeAmount.setLength(10);
+		chequeAmount.setDocFieldName("documentAmount");
+		chequeAmount.setRequired(true);
+		chequeAmount.setDisplayValue("Cheque Amount");
+		chequeAmount.setDecimalPlace(2);
+		chequeAmount.setHas1000Separator(true);
+		chequeAmount.setHasDecimalPlace(true);
+		chequeAmount.setTransient(false);
+		chequeAmount.setPlusSymbol("0");
+
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent, chequeAmount);
 
 		// Actual
 		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
@@ -449,6 +490,35 @@ public class CSVFileConverterGetDetailFileTest {
 		assertFalse(actualResult.isSuccess());
 		String payerErrMsg = actualResult.getErrorLineDetails().get(0).getErrorMessage();
 		assertEquals("Cheque Amount (+100) invalid format", payerErrMsg);
+	}
+
+	@Test
+	public void given_cheque_amount_have_plus_symbol_and_has_config_plus_symbol_when_get_detail_should_success()
+			throws WrongFormatFileException {
+		// Arrange
+		String[] csvValidFileContent = new String[2];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = "18,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,7,SCB,พระประแดง,100093231,22/02/2015,22/02/2015,29/10/2015,+100,BCOB";
+
+		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setStartIndex(12);
+		chequeAmount.setLength(10);
+		chequeAmount.setDocFieldName("documentAmount");
+		chequeAmount.setRequired(true);
+		chequeAmount.setDisplayValue("Cheque Amount");
+		chequeAmount.setDecimalPlace(2);
+		chequeAmount.setHas1000Separator(true);
+		chequeAmount.setHasDecimalPlace(true);
+		chequeAmount.setTransient(false);
+		chequeAmount.setPlusSymbol("+");
+
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent, chequeAmount);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
 	}
 
 	@Test
@@ -473,7 +543,7 @@ public class CSVFileConverterGetDetailFileTest {
 	@Test
 	public void given_cheque_amount_have_dot_invalid_format_when_get_detail_should_status_fail()
 			throws WrongFormatFileException {
-		// Arrage
+		// Arrange
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
 		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000.554,BCOB";
@@ -509,11 +579,10 @@ public class CSVFileConverterGetDetailFileTest {
 
 	}
 
-	@Ignore
 	@Test
 	public void given_amount_have_commar_and_set_use_1000_separator_when_get_detail_should_status_success()
 			throws WrongFormatFileException {
-		// Arrage
+		// Arrange
 		String[] csvValidFileContent = new String[2];
 		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
 		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,\"100,554.00\",";
@@ -587,6 +656,119 @@ public class CSVFileConverterGetDetailFileTest {
 
 	}
 
+	@Test
+	public void given_config_has_decimal_is_false_place_and_cheque_amount_is_100554_when_get_detail_cheque_amount_should_is_100554_00()
+			throws WrongFormatFileException {
+		// Arrange
+		String[] csvValidFileContent = new String[2];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,\"100554\",";
+
+		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setStartIndex(12);
+		chequeAmount.setLength(10);
+		chequeAmount.setDocFieldName("documentAmount");
+		chequeAmount.setRequired(true);
+		chequeAmount.setDisplayValue("Cheque Amount");
+		chequeAmount.setDecimalPlace(0);
+		chequeAmount.setHas1000Separator(true);
+		chequeAmount.setHasDecimalPlace(false);
+		chequeAmount.setTransient(false);
+		chequeAmount.setPlusSymbol("+");
+
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent, chequeAmount);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
+
+		BigDecimal expected = new BigDecimal("100554.00");
+		assertTrue("Sponsor document amount should be 100554.00",
+				sponsorDoc.getDocumentAmount().compareTo(expected) == 0);
+	}
+
+	@Test
+	public void given_config_has_decimal_place_is_true_and_cheque_amount_is_100554_when_get_detail_cheque_amount_should_is_100554()
+			throws WrongFormatFileException {
+		// Arrange
+		String[] csvValidFileContent = new String[2];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,\"100554.00\",";
+
+		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setStartIndex(12);
+		chequeAmount.setLength(10);
+		chequeAmount.setDocFieldName("documentAmount");
+		chequeAmount.setRequired(true);
+		chequeAmount.setDisplayValue("Cheque Amount");
+		chequeAmount.setDecimalPlace(2);
+		chequeAmount.setHas1000Separator(null);
+		chequeAmount.setHasDecimalPlace(null);
+		chequeAmount.setTransient(false);
+		chequeAmount.setPlusSymbol(null);
+
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent, chequeAmount);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
+
+		BigDecimal expected = new BigDecimal("100554.00");
+		assertTrue("Sponsor document amount should be 100554.00",
+				sponsorDoc.getDocumentAmount().compareTo(expected) == 0);
+	}
+
+	@Test
+	public void given_not_set_config_has_decimal_place_and_set_config_decimal_place_is_2_and_cheque_amount_is_100554_003_when_get_detail_cheque_amount_should_is_100554_00()
+			throws WrongFormatFileException {
+		// Arrange
+		String[] csvValidFileContent = new String[2];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,\"100554.003\",";
+
+		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setStartIndex(12);
+		chequeAmount.setLength(10);
+		chequeAmount.setDocFieldName("documentAmount");
+		chequeAmount.setRequired(true);
+		chequeAmount.setDisplayValue("Cheque Amount");
+		chequeAmount.setDecimalPlace(2);
+		chequeAmount.setHas1000Separator(null);
+		chequeAmount.setHasDecimalPlace(null);
+		chequeAmount.setTransient(false);
+		chequeAmount.setPlusSymbol(null);
+
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent, chequeAmount);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
+
+		BigDecimal expected = new BigDecimal("100554.00");
+		assertTrue(
+				MessageFormat.format("Sponsor document amount should be {0} but {1}",
+						expected, sponsorDoc.getDocumentAmount()),
+				sponsorDoc.getDocumentAmount().compareTo(expected) == 0);
+	}
+
+	private CSVFileConverter<SponsorDocument> mockSponsorFileLayout(
+			String[] csvValidFileContent, DefaultFileLayoutConfigItem chequeAmount)
+			throws WrongFormatFileException {
+
+		DefaultFileLayoutConfig fileLayout = getLayoutConfig(chequeAmount);
+
+		return mockSponsorFileLayout(csvValidFileContent, fileLayout);
+	}
+
 	private CSVFileConverter<SponsorDocument> mockSponsorFileLayout(
 			String[] csvValidFileContent) throws WrongFormatFileException {
 
@@ -599,6 +781,7 @@ public class CSVFileConverterGetDetailFileTest {
 			String[] csvValidFileContent, FileLayoutConfig fileLayout)
 
 			throws WrongFormatFileException {
+
 		InputStream csvFileContent = new ByteArrayInputStream(
 				StringUtils.join(csvValidFileContent, System.lineSeparator()).getBytes());
 
@@ -611,113 +794,145 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	private DefaultFileLayoutConfig getLayoutConfig() {
+
+		return getLayoutConfig(null);
+	}
+
+	private DefaultFileLayoutConfig getLayoutConfig(
+			DefaultFileLayoutConfigItem otheItem) {
 		DefaultFileLayoutConfig fileLayout = new DefaultFileLayoutConfig();
 		fileLayout.setDelimeter(",");
 		fileLayout.setCharsetName("UTF-8");
-		
 
 		List<FileLayoutConfigItem> layoutItems = new ArrayList<FileLayoutConfigItem>();
 
-		DefaultFileLayoutConfigItem no = new DefaultFileLayoutConfigItem();
-		no.setStartIndex(1);
-		no.setLength(10);
-		no.setDocFieldName(null);
-		no.setRequired(false);
-		no.setDisplayValue("No");
+		if (otheItem != null) {
+			layoutItems.add(otheItem);
+		}
+		else {
+			DefaultFileLayoutConfigItem no = new DefaultFileLayoutConfigItem();
+			no.setStartIndex(1);
+			no.setLength(10);
+			no.setDocFieldName(null);
+			no.setRequired(false);
+			no.setDisplayValue("No");
 
-		DefaultFileLayoutConfigItem supplierCode = new DefaultFileLayoutConfigItem();
-		supplierCode.setStartIndex(2);
-		supplierCode.setLength(20);
-		supplierCode.setDocFieldName("supplierCode");
-		supplierCode.setRequired(true);
-		supplierCode.setDisplayValue("Payer Code");
-		supplierCode.setTransient(false);
+			DefaultFileLayoutConfigItem supplierCode = new DefaultFileLayoutConfigItem();
+			supplierCode.setStartIndex(2);
+			supplierCode.setLength(20);
+			supplierCode.setDocFieldName("supplierCode");
+			supplierCode.setRequired(true);
+			supplierCode.setDisplayValue("Payer Code");
+			supplierCode.setTransient(false);
 
-		DefaultFileLayoutConfigItem depositBranch = new DefaultFileLayoutConfigItem();
-		depositBranch.setStartIndex(3);
-		depositBranch.setLength(20);
-		depositBranch.setDocFieldName(null);
-		depositBranch.setRequired(false);
-		depositBranch.setDisplayValue("Deposit branch");
+			DefaultFileLayoutConfigItem depositBranch = new DefaultFileLayoutConfigItem();
+			depositBranch.setStartIndex(3);
+			depositBranch.setLength(20);
+			depositBranch.setDocFieldName(null);
+			depositBranch.setRequired(false);
+			depositBranch.setDisplayValue("Deposit branch");
 
-		DefaultFileLayoutConfigItem payer = new DefaultFileLayoutConfigItem();
-		payer.setStartIndex(4);
-		payer.setLength(20);
-		payer.setDocFieldName("optionVarcharField1");
-		payer.setRequired(true);
-		payer.setDisplayValue("Payer");
-		payer.setTransient(false);
+			DefaultFileLayoutConfigItem payer = new DefaultFileLayoutConfigItem();
+			payer.setStartIndex(4);
+			payer.setLength(20);
+			payer.setDocFieldName("optionVarcharField1");
+			payer.setRequired(true);
+			payer.setDisplayValue("Payer");
+			payer.setTransient(false);
 
-		DefaultFileLayoutConfigItem bankCode = new DefaultFileLayoutConfigItem();
-		bankCode.setStartIndex(5);
-		bankCode.setLength(3);
-		bankCode.setDocFieldName("optionVarcharField2");
-		bankCode.setRequired(true);
-		bankCode.setDisplayValue("Bank Code");
-		bankCode.setTransient(false);
+			DefaultFileLayoutConfigItem bankCode = new DefaultFileLayoutConfigItem();
+			bankCode.setStartIndex(5);
+			bankCode.setLength(3);
+			bankCode.setDocFieldName("optionVarcharField2");
+			bankCode.setRequired(true);
+			bankCode.setDisplayValue("Bank Code");
+			bankCode.setTransient(false);
 
-		DefaultFileLayoutConfigItem bank = new DefaultFileLayoutConfigItem();
-		bank.setStartIndex(6);
-		bank.setLength(20);
-		bank.setDocFieldName("optionVarcharField3");
-		bank.setRequired(true);
-		bank.setDisplayValue("Bank");
-		bank.setTransient(false);
+			DefaultFileLayoutConfigItem bank = new DefaultFileLayoutConfigItem();
+			bank.setStartIndex(6);
+			bank.setLength(20);
+			bank.setDocFieldName("optionVarcharField3");
+			bank.setRequired(true);
+			bank.setDisplayValue("Bank");
+			bank.setTransient(false);
 
-		DefaultFileLayoutConfigItem chequeBranch = new DefaultFileLayoutConfigItem();
-		chequeBranch.setStartIndex(7);
-		chequeBranch.setLength(50);
-		chequeBranch.setDocFieldName(null);
-		chequeBranch.setRequired(false);
-		chequeBranch.setDisplayValue("Cheque Branch");
+			DefaultFileLayoutConfigItem chequeBranch = new DefaultFileLayoutConfigItem();
+			chequeBranch.setStartIndex(7);
+			chequeBranch.setLength(50);
+			chequeBranch.setDocFieldName(null);
+			chequeBranch.setRequired(false);
+			chequeBranch.setDisplayValue("Cheque Branch");
 
-		DefaultFileLayoutConfigItem chequeNo = new DefaultFileLayoutConfigItem();
-		chequeNo.setStartIndex(8);
-		chequeNo.setLength(50);
-		chequeNo.setDocFieldName("documentNo");
-		chequeNo.setRequired(true);
-		chequeNo.setDisplayValue("Cheque No");
-		chequeNo.setTransient(false);
+			DefaultFileLayoutConfigItem chequeNo = new DefaultFileLayoutConfigItem();
+			chequeNo.setStartIndex(8);
+			chequeNo.setLength(50);
+			chequeNo.setDocFieldName("documentNo");
+			chequeNo.setRequired(true);
+			chequeNo.setDisplayValue("Cheque No");
+			chequeNo.setTransient(false);
 
-		DefaultFileLayoutConfigItem chequeDueDate = new DefaultFileLayoutConfigItem();
-		chequeDueDate.setStartIndex(9);
-		chequeDueDate.setLength(10);
-		chequeDueDate.setDocFieldName("documentDate");
-		chequeDueDate.setRequired(true);
-		chequeDueDate.setDisplayValue("Cheque Due Date");
-		chequeDueDate.setDatetimeFormat("dd/MM/yyyy");
-		chequeDueDate.setTransient(false);
+			DefaultFileLayoutConfigItem chequeDueDate = new DefaultFileLayoutConfigItem();
+			chequeDueDate.setStartIndex(9);
+			chequeDueDate.setLength(10);
+			chequeDueDate.setDocFieldName("documentDate");
+			chequeDueDate.setRequired(true);
+			chequeDueDate.setDisplayValue("Cheque Due Date");
+			chequeDueDate.setDatetimeFormat("dd/MM/yyyy");
+			chequeDueDate.setTransient(false);
 
-		DefaultFileLayoutConfigItem goodFundDate = new DefaultFileLayoutConfigItem();
-		goodFundDate.setStartIndex(10);
-		goodFundDate.setLength(10);
-		goodFundDate.setDocFieldName("sponsorPaymentDate");
-		goodFundDate.setRequired(true);
-		goodFundDate.setDisplayValue("Good Fund Date");
-		goodFundDate.setDatetimeFormat("dd/MM/yyyy");
-		goodFundDate.setTransient(false);
+			DefaultFileLayoutConfigItem goodFundDate = new DefaultFileLayoutConfigItem();
+			goodFundDate.setStartIndex(10);
+			goodFundDate.setLength(10);
+			goodFundDate.setDocFieldName("sponsorPaymentDate");
+			goodFundDate.setRequired(true);
+			goodFundDate.setDisplayValue("Good Fund Date");
+			goodFundDate.setDatetimeFormat("dd/MM/yyyy");
+			goodFundDate.setTransient(false);
 
-		DefaultFileLayoutConfigItem depositDate = new DefaultFileLayoutConfigItem();
-		depositDate.setStartIndex(11);
-		depositDate.setLength(10);
-		depositDate.setDocFieldName("optionDateField1");
-		depositDate.setRequired(true);
-		depositDate.setDisplayValue("Deposit Date");
-		depositDate.setDatetimeFormat("dd/MM/yyyy");
-		depositDate.setTransient(false);
+			DefaultFileLayoutConfigItem depositDate = new DefaultFileLayoutConfigItem();
+			depositDate.setStartIndex(11);
+			depositDate.setLength(10);
+			depositDate.setDocFieldName("optionDateField1");
+			depositDate.setRequired(true);
+			depositDate.setDisplayValue("Deposit Date");
+			depositDate.setDatetimeFormat("dd/MM/yyyy");
+			depositDate.setTransient(false);
 
-		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
-		chequeAmount.setStartIndex(12);
-		chequeAmount.setLength(10);
-		chequeAmount.setDocFieldName("documentAmount");
-		chequeAmount.setRequired(true);
-		chequeAmount.setDisplayValue("Cheque Amount");
-		chequeAmount.setDecimalPlace(2);
-		chequeAmount.setHas1000Separator(true);
-		chequeAmount.setHasDecimalPlace(true);
-		chequeAmount.setTransient(false);
-		chequeAmount.setPlusSymbol("+");
-		layoutItems.add(chequeAmount);
+			DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+			chequeAmount.setStartIndex(12);
+			chequeAmount.setLength(10);
+			chequeAmount.setDocFieldName("documentAmount");
+			chequeAmount.setRequired(true);
+			chequeAmount.setDisplayValue("Cheque Amount");
+			chequeAmount.setDecimalPlace(2);
+			chequeAmount.setHas1000Separator(true);
+			chequeAmount.setHasDecimalPlace(true);
+			chequeAmount.setTransient(false);
+			chequeAmount.setPlusSymbol("+");
+			layoutItems.add(chequeAmount);
+
+			DefaultFileLayoutConfigItem documentType = new DefaultFileLayoutConfigItem();
+			documentType.setLength(3);
+			documentType.setDocFieldName("documentType");
+			documentType.setRequired(false);
+			documentType.setTransient(false);
+			documentType.setDefaultValue("CHQ");
+			documentType.setDisplayValue("Document Type");
+			layoutItems.add(documentType);
+
+			layoutItems.add(no);
+			layoutItems.add(supplierCode);
+			layoutItems.add(depositBranch);
+			layoutItems.add(bankCode);
+			layoutItems.add(payer);
+			layoutItems.add(bank);
+			layoutItems.add(chequeBranch);
+			layoutItems.add(chequeNo);
+			layoutItems.add(chequeDueDate);
+			layoutItems.add(goodFundDate);
+			layoutItems.add(depositDate);
+
+		}
 
 		DefaultFileLayoutConfigItem clearingType = new DefaultFileLayoutConfigItem();
 		clearingType.setStartIndex(13);
@@ -726,27 +941,6 @@ public class CSVFileConverterGetDetailFileTest {
 		clearingType.setRequired(false);
 		clearingType.setDisplayValue("Clearing Type");
 
-		DefaultFileLayoutConfigItem documentType = new DefaultFileLayoutConfigItem();
-		documentType.setLength(3);
-		documentType.setDocFieldName("documentType");
-		documentType.setRequired(false);
-		documentType.setTransient(false);
-		documentType.setDefaultValue("CHQ");
-		documentType.setDisplayValue("Document Type");
-		layoutItems.add(documentType);
-
-		layoutItems.add(no);
-		layoutItems.add(supplierCode);
-		layoutItems.add(depositBranch);
-		layoutItems.add(bankCode);
-		layoutItems.add(payer);
-		layoutItems.add(bank);
-		layoutItems.add(chequeBranch);
-		layoutItems.add(chequeNo);
-		layoutItems.add(chequeDueDate);
-		layoutItems.add(goodFundDate);
-		layoutItems.add(depositDate);
-	
 		layoutItems.add(clearingType);
 
 		fileLayout.setConfigItems(layoutItems);

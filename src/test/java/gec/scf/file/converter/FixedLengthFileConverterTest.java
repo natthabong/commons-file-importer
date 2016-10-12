@@ -489,7 +489,8 @@ public class FixedLengthFileConverterTest {
 		docAmountConfig.setPaddingCharacter("0");
 		docAmountConfig.setPaddingType(PaddingType.LEFT);
 		docAmountConfig.setDecimalPlace(2);
-		docAmountConfig.setHasDecimalPlace(true);
+		docAmountConfig.setHasDecimalPlace(false);
+		docAmountConfig.setHas1000Separator(false);
 		docAmountConfig.setRecordType(RecordType.DETAIL);
 
 		configItems.add(docAmountConfig);
@@ -516,7 +517,6 @@ public class FixedLengthFileConverterTest {
 		footerTotalDocConfig.setDisplayValue("Total Document No");
 		footerTotalDocConfig.setStartIndex(2);
 		footerTotalDocConfig.setLength(6);
-		footerTotalDocConfig.setDecimalPlace(0);
 		footerTotalDocConfig.setPaddingCharacter("0");
 		footerTotalDocConfig.setPaddingType(PaddingType.LEFT);
 		footerTotalDocConfig.setRecordType(RecordType.FOOTER);
@@ -529,7 +529,8 @@ public class FixedLengthFileConverterTest {
 		footerDocAmountConfig.setStartIndex(8);
 		footerDocAmountConfig.setLength(15);
 		footerDocAmountConfig.setDecimalPlace(2);
-		footerDocAmountConfig.setHasDecimalPlace(true);
+		footerDocAmountConfig.setHasDecimalPlace(false);
+		footerDocAmountConfig.setHas1000Separator(false);
 		footerDocAmountConfig.setPaddingCharacter("0");
 		footerDocAmountConfig.setPaddingType(PaddingType.LEFT);
 		footerDocAmountConfig.setRecordType(RecordType.FOOTER);

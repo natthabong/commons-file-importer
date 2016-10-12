@@ -1,17 +1,22 @@
 package gec.scf.file.converter;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.DateValidator;
 
@@ -155,6 +160,11 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 				number = StringUtils.stripStart(data, configItem.getPaddingCharacter());
 			}
 		}
+
+		if (configItem.getMinusSymbol() != null || configItem.getPlusSymbol() != null) {
+			validateSignFlag(configItem, data);
+		}
+
 		// Validate require field
 		validateRequiredField(configItem, data);
 
@@ -164,7 +174,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 					number = "0";
 				}
 
-				if (configItem.has1000Separator()) {
+				if (Boolean.TRUE.equals(configItem.hasDecimalPlace())) {
 					number = number.replaceAll(",", "");
 				}
 
@@ -183,27 +193,52 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 
 		// Check decimal place
-		if (configItem.hasDecimalPlace()) {
+		if (Boolean.TRUE.equals(configItem.hasDecimalPlace())) {
+
 			String dataToCheck = data;
 			validateDecimalPlace(configItem, dataToCheck);
 		}
-		else if (data.contains(".")) {
+		else if (Boolean.FALSE.equals(configItem.hasDecimalPlace())
+				&& data.contains(".")) {
+
 			throw new WrongFormatDetailException(
 					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
 							configItem.getDisplayValue(), data));
 		}
 
-		// Check decimal place
-		if (configItem.has1000Separator()) {
+		// Check 1000 separator place
+		if (Boolean.TRUE.equals(configItem.has1000Separator())) {
 			String dataToCheck = data;
 			validate1000Seperator(configItem, dataToCheck);
 		}
-		else if (data.contains(",")) {
+		else if (Boolean.FALSE.equals(configItem.has1000Separator())
+				&& data.contains(",")) {
 			throw new WrongFormatDetailException(
 					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
 							configItem.getDisplayValue(), data));
 		}
 
+	}
+
+	private void validateSignFlag(FileLayoutConfigItem configItem, String dataToCheck) {
+
+		String plusSymbol = StringUtils.defaultString(configItem.getPlusSymbol(),
+				StringUtils.EMPTY);
+
+		String minusSymbol = StringUtils.defaultString(configItem.getMinusSymbol(),
+				StringUtils.EMPTY);
+
+		String pattern = "^[" + plusSymbol + minusSymbol + "0-9,._]*$";
+
+		Pattern r = Pattern.compile(pattern);
+
+		// Now create matcher object
+		Matcher m = r.matcher(dataToCheck);
+		if (!m.matches()) {
+			throw new WrongFormatDetailException(
+					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+							configItem.getDisplayValue(), dataToCheck));
+		}
 	}
 
 	private void validate1000Seperator(FileLayoutConfigItem configItem,
@@ -229,8 +264,6 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 	protected BigDecimal getBigDecimalValue(FileLayoutConfigItem configItem, String data)
 			throws IllegalAccessException {
 
-		// data = data.trim();
-
 		validateBigDecimalFormat(configItem, data);
 
 		if (PaddingType.LEFT.equals(configItem.getPaddingType())) {
@@ -253,24 +286,21 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			}
 
 			String normalNumber = data;
-			String degitNumber = "00";
 
-			if (configItem.getDecimalPlace() != null) {
+			if (configItem.getDecimalPlace() != null && !normalNumber.contains(".")) {
 				normalNumber = data.substring(0,
 						(data.length() - configItem.getDecimalPlace()));
-				degitNumber = data
+				String degitNumber = data
 						.substring(data.length() - configItem.getDecimalPlace());
-				normalNumber = normalNumber.replaceAll("\\.", "");
-
+				normalNumber = normalNumber + "." + degitNumber;
 			}
 
-			if (configItem.has1000Separator()) {
+			if (Boolean.TRUE.equals(configItem.has1000Separator())) {
 				normalNumber = normalNumber.replaceAll(",", "");
-
 			}
 
-			valueAmount = new BigDecimal(normalNumber + "." + degitNumber)
-					.setScale(configItem.getDecimalPlace());
+			valueAmount = new BigDecimal(normalNumber)
+					.setScale(configItem.getDecimalPlace(), RoundingMode.HALF_UP);
 
 		}
 		catch (NumberFormatException e) {
@@ -314,39 +344,73 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		return valueAmount;
 	}
 
-	protected void validateBinaryFile(InputStream fileContent)
+	protected InputStream validateBinaryFile(InputStream fileContent)
 			throws IOException, WrongFormatFileException {
-		int size = fileContent.available();
-		if (size > 1024) {
-			size = 1024;
-		}
-		byte[] data = new byte[size];
-		fileContent.read(data);
-		fileContent.close();
+		File tempSourcFile = null;
+		File tempCheckFile = null;
+		InputStream targetStream = null;
+		try {
+			String uuid = UUID.randomUUID().toString();
+			tempSourcFile = File.createTempFile("temp-source-file-" + uuid, ".txt");
+			String absolutePath = tempSourcFile.getAbsolutePath();
+			String filePath = absolutePath.substring(0,
+					absolutePath.lastIndexOf(File.separator));
+			tempCheckFile = new File(filePath,
+					"temp-for-check-binary-file-" + uuid + ".txt");
 
-		int ascii = 0;
-		int other = 0;
+			FileUtils.copyInputStreamToFile(fileContent, tempSourcFile);
+			Files.copy(tempSourcFile.toPath(), tempCheckFile.toPath());
+			targetStream = FileUtils.openInputStream(tempCheckFile);
 
-		for (int i = 0; i < data.length; i++) {
-			byte b = data[i];
+			int size = targetStream.available();
+			if (size > 1024) {
+				size = 1024;
+			}
+			byte[] data = new byte[size];
+			targetStream.read(data);
+			targetStream.close();
 
-			if (b < 0x09) {
+			int ascii = 0;
+			int other = 0;
+
+			for (int i = 0; i < data.length; i++) {
+				byte b = data[i];
+
+				if (b < 0x09) {
+					throw new WrongFormatFileException("is binary file");
+				}
+
+				if (b == 0x09 || b == 0x0A || b == 0x0C || b == 0x0D) {
+					ascii++;
+				}
+				else if (b >= 0x20 && b <= 0x7E) {
+					ascii++;
+				}
+				else {
+					other++;
+				}
+			}
+			if (100 * other / (ascii + other) > 95) {
 				throw new WrongFormatFileException("is binary file");
 			}
 
-			if (b == 0x09 || b == 0x0A || b == 0x0C || b == 0x0D) {
-				ascii++;
+		}
+		catch (WrongFormatFileException e) {
+			throw e;
+		}
+		finally {
+			if (targetStream != null) {
+				targetStream.close();
 			}
-			else if (b >= 0x20 && b <= 0x7E) {
-				ascii++;
+			if (tempSourcFile != null && tempSourcFile.exists()) {
+				fileContent = FileUtils.openInputStream(tempSourcFile);
+				tempSourcFile.delete();
 			}
-			else {
-				other++;
+			if (tempCheckFile != null && tempCheckFile.exists()) {
+				tempCheckFile.delete();
 			}
 		}
-		if (100 * other / (ascii + other) > 95) {
-			throw new WrongFormatFileException("is binary file");
-		}
+		return fileContent;
 	}
 
 	public FileLayoutConfig getFileLayoutConfig() {

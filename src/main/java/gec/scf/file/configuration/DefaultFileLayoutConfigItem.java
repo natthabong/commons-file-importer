@@ -30,11 +30,13 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private boolean isTransient;
 	
-	private boolean hasDecimalPlace;
+	private Boolean hasDecimalPlace;
 	
-	private boolean has1000Separator;
+	private Boolean has1000Separator;
 	
 	private String defaultValue;
+
+	private FileLayoutConfigItem signFlagConfig;
 
 	@Override
 	public String getDocFieldName() {
@@ -171,20 +173,20 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	}
 
 	@Override
-	public boolean has1000Separator() {
+	public Boolean has1000Separator() {
 		return has1000Separator;
 	}
 
 	@Override
-	public boolean hasDecimalPlace() {
+	public Boolean hasDecimalPlace() {
 		return hasDecimalPlace;
 	}
 
-	public void setHasDecimalPlace(boolean hasDecimalPlace) {
+	public void setHasDecimalPlace(Boolean hasDecimalPlace) {
 		this.hasDecimalPlace = hasDecimalPlace;
 	}
 
-	public void setHas1000Separator(boolean has1000Separator) {
+	public void setHas1000Separator(Boolean has1000Separator) {
 		this.has1000Separator = has1000Separator;
 	}
 
@@ -195,14 +197,19 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	public void setDefaultValue(String defaultValue) {
 		this.defaultValue = defaultValue;
 	}
+
 	@Override
 	public FileLayoutConfigItem getSignFlagConfig() {
-		return null;
+		return signFlagConfig;
 	}
 
 	public void setPlusSymbol(String plusSymbol) {
 		this.plusSymbol = plusSymbol;
 
+	}
+
+	public void setSignFlagConfig(FileLayoutConfigItem signFlagConfig) {
+		this.signFlagConfig = signFlagConfig;
 	}
 
 }
