@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -155,6 +156,11 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 				number = StringUtils.stripStart(data, configItem.getPaddingCharacter());
 			}
 		}
+
+		if (configItem.getMinusSymbol() != null || configItem.getPlusSymbol() != null) {
+			validateSignFlag(configItem, data);
+		}
+
 		// Validate require field
 		validateRequiredField(configItem, data);
 
@@ -164,7 +170,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 					number = "0";
 				}
 
-				if (configItem.has1000Separator()) {
+				if (Boolean.TRUE.equals(configItem.hasDecimalPlace())) {
 					number = number.replaceAll(",", "");
 				}
 
@@ -183,27 +189,52 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 
 		// Check decimal place
-		if (configItem.hasDecimalPlace()) {
+		if (Boolean.TRUE.equals(configItem.hasDecimalPlace())) {
+
 			String dataToCheck = data;
 			validateDecimalPlace(configItem, dataToCheck);
 		}
-		else if (data.contains(".")) {
+		else if (Boolean.FALSE.equals(configItem.hasDecimalPlace())
+				&& data.contains(".")) {
+
 			throw new WrongFormatDetailException(
 					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
 							configItem.getDisplayValue(), data));
 		}
 
-		// Check decimal place
-		if (configItem.has1000Separator()) {
+		// Check 1000 separator place
+		if (Boolean.TRUE.equals(configItem.has1000Separator())) {
 			String dataToCheck = data;
 			validate1000Seperator(configItem, dataToCheck);
 		}
-		else if (data.contains(",")) {
+		else if (Boolean.FALSE.equals(configItem.has1000Separator())
+				&& data.contains(",")) {
 			throw new WrongFormatDetailException(
 					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
 							configItem.getDisplayValue(), data));
 		}
 
+	}
+
+	private void validateSignFlag(FileLayoutConfigItem configItem, String dataToCheck) {
+
+		String plusSymbol = StringUtils.defaultString(configItem.getPlusSymbol(),
+				StringUtils.EMPTY);
+
+		String minusSymbol = StringUtils.defaultString(configItem.getMinusSymbol(),
+				StringUtils.EMPTY);
+
+		String pattern = "^[" + plusSymbol + minusSymbol + "0-9,._]*$";
+
+		Pattern r = Pattern.compile(pattern);
+
+		// Now create matcher object
+		Matcher m = r.matcher(dataToCheck);
+		if (!m.matches()) {
+			throw new WrongFormatDetailException(
+					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+							configItem.getDisplayValue(), dataToCheck));
+		}
 	}
 
 	private void validate1000Seperator(FileLayoutConfigItem configItem,
@@ -229,8 +260,6 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 	protected BigDecimal getBigDecimalValue(FileLayoutConfigItem configItem, String data)
 			throws IllegalAccessException {
 
-		// data = data.trim();
-
 		validateBigDecimalFormat(configItem, data);
 
 		if (PaddingType.LEFT.equals(configItem.getPaddingType())) {
@@ -253,24 +282,21 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			}
 
 			String normalNumber = data;
-			String degitNumber = "00";
 
-			if (configItem.getDecimalPlace() != null) {
+			if (configItem.getDecimalPlace() != null && !normalNumber.contains(".")) {
 				normalNumber = data.substring(0,
 						(data.length() - configItem.getDecimalPlace()));
-				degitNumber = data
+				String degitNumber = data
 						.substring(data.length() - configItem.getDecimalPlace());
-				normalNumber = normalNumber.replaceAll("\\.", "");
-
+				normalNumber = normalNumber + "." + degitNumber;
 			}
 
-			if (configItem.has1000Separator()) {
+			if (Boolean.TRUE.equals(configItem.has1000Separator())) {
 				normalNumber = normalNumber.replaceAll(",", "");
-
 			}
 
-			valueAmount = new BigDecimal(normalNumber + "." + degitNumber)
-					.setScale(configItem.getDecimalPlace());
+			valueAmount = new BigDecimal(normalNumber)
+					.setScale(configItem.getDecimalPlace(), RoundingMode.HALF_UP);
 
 		}
 		catch (NumberFormatException e) {
