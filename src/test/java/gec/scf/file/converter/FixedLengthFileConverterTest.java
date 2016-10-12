@@ -400,7 +400,7 @@ public class FixedLengthFileConverterTest {
 
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
-		thrown.expectMessage("Total Document Amount (100,0000) invalid format");
+		thrown.expectMessage("Total Document Amount (00000100,000000) invalid format");
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -488,7 +488,7 @@ public class FixedLengthFileConverterTest {
 		docAmountConfig.setPaddingCharacter("0");
 		docAmountConfig.setPaddingType(PaddingType.LEFT);
 		docAmountConfig.setDecimalPlace(2);
-		docAmountConfig.setUseDecimalPlace(true);
+		docAmountConfig.setUseDecimalPlace(false);
 		docAmountConfig.setRecordType(RecordType.DETAIL);
 
 		configItems.add(docAmountConfig);
@@ -528,7 +528,7 @@ public class FixedLengthFileConverterTest {
 		footerDocAmountConfig.setStartIndex(8);
 		footerDocAmountConfig.setLength(15);
 		footerDocAmountConfig.setDecimalPlace(2);
-		footerDocAmountConfig.setUseDecimalPlace(true);
+		footerDocAmountConfig.setUseDecimalPlace(false);
 		footerDocAmountConfig.setPaddingCharacter("0");
 		footerDocAmountConfig.setPaddingType(PaddingType.LEFT);
 		footerDocAmountConfig.setRecordType(RecordType.FOOTER);

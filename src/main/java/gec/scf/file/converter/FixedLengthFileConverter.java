@@ -42,9 +42,9 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 	private int totalDetailRecord;
 
 	private BigDecimal totalDetailAmount = new BigDecimal("0");
-	
+
 	private Long lastDocumentNo;
-	
+
 	private File tempFile;
 
 	private BufferedReader tempFileReader;
@@ -74,9 +74,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			bufferedWriter = new BufferedWriter(new FileWriter(tempFile));
 
 			InputStream tempFileContent = new FileInputStream(tempFile);
-			
-//			validateBinaryFile(tempFileContent);
-			
+
 			tempFileReader = new BufferedReader(
 					new InputStreamReader(tempFileContent, "UTF-8"));
 
@@ -158,12 +156,10 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 						// Found a blank recoredId
 						FileLayoutConfigItem footerRecordType = footerRecordTypeExtractor
 								.getConfig();
-						throw new WrongFormatFileException(
-								MessageFormat.format(
-										CovertErrorConstant.FOOTER_NOT_LAST_LINE_OF_FILE,
-										footerRecordType.getDisplayValue(),
-										fileLayoutConfig.getFooterFlag()),
-								currentLineNo);
+						throw new WrongFormatFileException(MessageFormat.format(
+								CovertErrorConstant.FOOTER_NOT_LAST_LINE_OF_FILE,
+								footerRecordType.getDisplayValue(),
+								fileLayoutConfig.getFooterFlag()));
 					}
 					else if (fileLayoutConfig.getFooterFlag().equals(recordType)) {
 						List<FileLayoutConfigItem> footerConfigItems = fileConfigItems
@@ -228,6 +224,10 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 							}
 							totalDetailAmount = totalDetailAmount.add(docAmount);
 						}
+						catch (WrongFormatDetailException e) {
+							totalDetailAmount = totalDetailAmount
+									.add(new BigDecimal("0.0"));
+						}
 						catch (Exception e) {
 							log.warn(e.getMessage(), e);
 						}
@@ -261,7 +261,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			throw new WrongFormatFileException("File read error occurred", null);
 		}
 		finally {
-			currentLineNo = 0;
+			currentLineNo = 1;
 			try {
 				if (bufferedWriter != null) {
 					bufferedWriter.close();
@@ -385,9 +385,10 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			if (StringUtils.isNotBlank(configItem.getDatetimeFormat())) {
 				validateDateFormat(configItem, dataValidate);
 			}
-			
+
 			if ("documentNo".equals(configItem.getFieldName())) {
-				lastDocumentNo = validateDocumentNo(configItem, dataValidate, lastDocumentNo);
+				lastDocumentNo = validateDocumentNo(configItem, dataValidate,
+						lastDocumentNo);
 			}
 		}
 
