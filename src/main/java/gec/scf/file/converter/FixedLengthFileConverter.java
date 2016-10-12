@@ -79,7 +79,9 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 			InputStream tempFileContent = new FileInputStream(tempFile);
 
-			// validateBinaryFile(tempFileContent);
+			if (fileLayoutConfig.isCheckBinaryFile()) {
+				fileContent = validateBinaryFile(fileContent);
+			}
 
 			tempFileReader = new BufferedReader(new InputStreamReader(tempFileContent, "UTF-8"));
 

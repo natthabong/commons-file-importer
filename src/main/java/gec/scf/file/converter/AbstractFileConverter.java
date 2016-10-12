@@ -60,11 +60,12 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			else if (classType.isAssignableFrom(BigDecimal.class)) {
 
 				BigDecimal valueAmount = getBigDecimalValue(itemConf, recordValue);
-
-				if (StringUtils.isNotBlank(signFlagData)) {
-					valueAmount = applySignFlag(valueAmount, itemConf, signFlagData);
+				if (valueAmount!=null) {
+					if (StringUtils.isNotBlank(signFlagData)) {
+						valueAmount = applySignFlag(valueAmount, itemConf, signFlagData);
+					}
+					field.set(entity, valueAmount);
 				}
-				field.set(entity, valueAmount);
 			}
 			else {
 				validateRequiredField(itemConf, recordValue);
@@ -174,9 +175,9 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 					number = "0";
 				}
 
-				if (Boolean.TRUE.equals(configItem.hasDecimalPlace())) {
+//				if (Boolean.TRUE.equals(configItem.hasDecimalPlace())) {
 					number = number.replaceAll(",", "");
-				}
+//				}
 
 				BigDecimal amount = new BigDecimal(number);
 				if (StringUtils.isEmpty(number) || amount.intValue() == 0) {
@@ -269,7 +270,11 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		if (PaddingType.LEFT.equals(configItem.getPaddingType())) {
 			data = StringUtils.stripStart(data, configItem.getPaddingCharacter());
 		}
-
+		
+		if (StringUtils.isBlank(data)&&!configItem.isRequired()) {
+			return null;
+		}
+		
 		validateBigDecimalFormat(configItem, data);
 
 		BigDecimal valueAmount = null;

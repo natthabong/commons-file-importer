@@ -796,6 +796,39 @@ public class CSVFileConverterGetDetailFileTest {
 				sponsorDoc.getDocumentAmount().compareTo(expected) == 0);
 	}
 
+	@Test
+	public void given_config_is_no_required_and_cheque_amount_is_blank_when_get_detail_cheque_amount_should_is_null()
+			throws WrongFormatFileException {
+		// Arrange
+		String[] csvValidFileContent = new String[2];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,\"\",";
+
+		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setStartIndex(12);
+		chequeAmount.setLength(10);
+		chequeAmount.setDocFieldName("documentAmount");
+		chequeAmount.setRequired(false);
+		chequeAmount.setDisplayValue("Cheque Amount");
+		chequeAmount.setDecimalPlace(2);
+		chequeAmount.setHas1000Separator(null);
+		chequeAmount.setHasDecimalPlace(null);
+		chequeAmount.setTransient(false);
+		chequeAmount.setPlusSymbol(null);
+
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent, chequeAmount);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
+
+		// Assert	
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
+
+		assertNull(MessageFormat.format("Sponsor document amount should be null but {0}",
+				sponsorDoc.getDocumentAmount()), sponsorDoc.getDocumentAmount());
+	}
+
 	private CSVFileConverter<SponsorDocument> mockSponsorFileLayout(
 			String[] csvValidFileContent, DefaultFileLayoutConfigItem chequeAmount)
 			throws WrongFormatFileException {

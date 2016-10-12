@@ -41,4 +41,10 @@ public class ErrorLineDetail implements Serializable {
 		this.errorLineNo = errorLineNo;
 	}
 
+	@Override
+	public String toString() {
+		return "ErrorLineDetail [errorMessage=" + errorMessage + ", errorLineNo="
+				+ errorLineNo + "]";
+	}
+
 }
