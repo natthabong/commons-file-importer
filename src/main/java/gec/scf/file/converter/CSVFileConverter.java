@@ -42,7 +42,7 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 		try {
 
 			if (fileLayoutConfig.isCheckBinaryFile()) {
-				validateBinaryFile(fileContent);
+				fileContent = validateBinaryFile(fileContent);
 			}
 			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"),
 					CSVFormat.EXCEL.withSkipHeaderRecord(true)
