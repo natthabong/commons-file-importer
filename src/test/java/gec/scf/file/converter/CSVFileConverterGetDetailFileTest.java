@@ -725,6 +725,42 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
+	public void given_config_has_decimal_place_is_true_and_cheque_amount_is_1005540_no_scale_when_get_detail_cheque_amount_should_is_1005540()
+			throws WrongFormatFileException {
+		// Arrange
+		String[] csvValidFileContent = new String[2];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,\"1005540\",";
+
+		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setStartIndex(12);
+		chequeAmount.setLength(10);
+		chequeAmount.setDocFieldName("documentAmount");
+		chequeAmount.setRequired(true);
+		chequeAmount.setDisplayValue("Cheque Amount");
+		chequeAmount.setDecimalPlace(2);
+		chequeAmount.setHas1000Separator(null);
+		chequeAmount.setHasDecimalPlace(null);
+		chequeAmount.setTransient(false);
+		chequeAmount.setPlusSymbol(null);
+
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent, chequeAmount);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
+
+		BigDecimal expected = new BigDecimal("1005540.00");
+		assertTrue(
+				MessageFormat.format("Sponsor document amount should be {0} but {1}",
+						expected, sponsorDoc.getDocumentAmount()),
+				sponsorDoc.getDocumentAmount().compareTo(expected) == 0);
+	}
+
+	@Test
 	public void given_not_set_config_has_decimal_place_and_set_config_decimal_place_is_2_and_cheque_amount_is_100554_003_when_get_detail_cheque_amount_should_is_100554_00()
 			throws WrongFormatFileException {
 		// Arrange

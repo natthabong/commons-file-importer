@@ -287,7 +287,9 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 			String normalNumber = data;
 
-			if (configItem.getDecimalPlace() != null && !normalNumber.contains(".")) {
+			if (configItem.getDecimalPlace() != null
+					&& Boolean.FALSE.equals(configItem.hasDecimalPlace())
+					&& !normalNumber.contains(".")) {
 				normalNumber = data.substring(0,
 						(data.length() - configItem.getDecimalPlace()));
 				String degitNumber = data

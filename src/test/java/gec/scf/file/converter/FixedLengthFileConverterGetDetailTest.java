@@ -603,10 +603,11 @@ public class FixedLengthFileConverterGetDetailTest {
 			docAmountConfig.setPaddingCharacter("0");
 			docAmountConfig.setPaddingType(PaddingType.LEFT);
 			docAmountConfig.setDecimalPlace(2);
+			docAmountConfig.setHasDecimalPlace(false);
 			docAmountConfig.setRecordType(RecordType.DETAIL);
 			docAmountConfig.setTransient(isTransient);
 			docAmountConfig.setRequired(true);
-			docAmountConfig.setHasDecimalPlace(false);
+		
 			docAmountConfig.setDisplayValue("Document Amount");
 
 			configItems.add(docAmountConfig);
@@ -654,7 +655,6 @@ public class FixedLengthFileConverterGetDetailTest {
 		configItems.add(footerTotalDocConfig);
 
 		DefaultFileLayoutConfigItem footerDocAmountFlagConfig = new DefaultFileLayoutConfigItem();
-		footerDocAmountFlagConfig.setDocFieldName("optionVarcharField3");
 		footerDocAmountFlagConfig.setDisplayValue("Total Document Amount Flag");
 		footerDocAmountFlagConfig.setStartIndex(23);
 		footerDocAmountFlagConfig.setLength(1);
@@ -669,7 +669,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		footerDocAmountConfig.setStartIndex(8);
 		footerDocAmountConfig.setLength(15);
 		footerDocAmountConfig.setDecimalPlace(2);
-		footerDocAmountConfig.setHasDecimalPlace(true);
+		footerDocAmountConfig.setHasDecimalPlace(false);
 		footerDocAmountConfig.setPaddingCharacter("0");
 		footerDocAmountConfig.setPaddingType(PaddingType.LEFT);
 		footerDocAmountConfig.setRecordType(RecordType.FOOTER);
