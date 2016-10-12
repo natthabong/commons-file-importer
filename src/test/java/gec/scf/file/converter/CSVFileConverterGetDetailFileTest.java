@@ -451,9 +451,8 @@ public class CSVFileConverterGetDetailFileTest {
 		assertEquals("Cheque Amount (+100) invalid format", payerErrMsg);
 	}
 
-	@Ignore
 	@Test
-	public void given_cheque_amount_have_comma_invalid_format_when_get_detail_should_status_fail()
+	public void given_cheque_amount_have_invalid_comma_format_when_get_detail_should_status_fail()
 			throws WrongFormatFileException {
 		// Arrage
 		String[] csvValidFileContent = new String[2];
