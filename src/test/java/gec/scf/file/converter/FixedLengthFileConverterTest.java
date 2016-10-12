@@ -400,7 +400,7 @@ public class FixedLengthFileConverterTest {
 
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
-		thrown.expectMessage("Total Document Amount (100,0000) invalid format");
+		thrown.expectMessage("Total Document Amount (00000100,000000) invalid format");
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);

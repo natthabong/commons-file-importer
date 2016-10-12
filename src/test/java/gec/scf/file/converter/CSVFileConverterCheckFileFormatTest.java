@@ -82,8 +82,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		// Actual
 		try {
 			csvFileConverter.checkFileFormat(csvFileContent);
-		}
-		catch (WrongFormatFileException e) {
+		} catch (WrongFormatFileException e) {
 			assertEquals("data length (12) must have 13 field", e.getErrorMessage());
 			assertEquals(2, e.getErrorLineNo().intValue());
 			throw e;
@@ -106,8 +105,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		// Actual
 		try {
 			csvFileConverter.checkFileFormat(csvFileContent);
-		}
-		catch (WrongFormatFileException e) {
+		} catch (WrongFormatFileException e) {
 			assertEquals("data length (14) must have 13 field", e.getErrorMessage());
 			assertEquals(2, e.getErrorLineNo().intValue());
 			throw e;

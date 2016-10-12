@@ -199,7 +199,12 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 							}
 							totalDetailAmount = totalDetailAmount.add(docAmount);
-						} catch (Exception e) {
+}
+						catch (WrongFormatDetailException e) {
+							totalDetailAmount = totalDetailAmount
+									.add(new BigDecimal("0.0"));
+						}
+						catch (Exception e) {
 							log.warn(e.getMessage(), e);
 						}
 					}
@@ -223,7 +228,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 		} catch (IOException e) {
 			throw new WrongFormatFileException("File read error occurred", null);
 		} finally {
-			currentLineNo = 0;
+			currentLineNo = 1;
 			try {
 				if (bufferedWriter != null) {
 					bufferedWriter.close();

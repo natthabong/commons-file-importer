@@ -13,7 +13,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
@@ -24,7 +23,7 @@ import gec.scf.file.importer.ErrorLineDetail;
 
 public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
-	private static final Logger log = Logger.getLogger(CSVFileConverter.class);
+//	private static final Logger log = Logger.getLogger(CSVFileConverter.class);
 
 	private FileLayoutConfig fileLayoutConfig;
 
@@ -48,6 +47,7 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"),
 					CSVFormat.EXCEL.withSkipHeaderRecord(true)
 							.withDelimiter(fileLayoutConfig.getDelimeter().charAt(0)));
+
 
 			csvRecords = csvParser.getRecords();
 
@@ -107,7 +107,7 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 			result.setObjectValue(document);
 			result.setSuccess(true);
 			result.setLineNo(currentLine);
-		}catch (WrongFormatDetailException e) {
+		} catch (WrongFormatDetailException e) {
 			result.setErrorLineDetails(e.getErrorLineDetails());
 			result.setSuccess(false);
 			result.setLineNo(currentLine);
