@@ -60,7 +60,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			else if (classType.isAssignableFrom(BigDecimal.class)) {
 
 				BigDecimal valueAmount = getBigDecimalValue(itemConf, recordValue);
-				if (valueAmount!=null) {
+				if (valueAmount != null) {
 					if (StringUtils.isNotBlank(signFlagData)) {
 						valueAmount = applySignFlag(valueAmount, itemConf, signFlagData);
 					}
@@ -175,9 +175,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 					number = "0";
 				}
 
-//				if (Boolean.TRUE.equals(configItem.hasDecimalPlace())) {
-					number = number.replaceAll(",", "");
-//				}
+				number = number.replaceAll(",", "");
 
 				BigDecimal amount = new BigDecimal(number);
 				if (StringUtils.isEmpty(number) || amount.intValue() == 0) {
@@ -194,7 +192,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 
 		// Check decimal place
-		if (Boolean.TRUE.equals(configItem.hasDecimalPlace())) {
+		if (Boolean.TRUE.equals(configItem.hasDecimalPlace())
+				|| (configItem.hasDecimalPlace() == null && data.contains("."))) {
 
 			String dataToCheck = data;
 			validateDecimalPlace(configItem, dataToCheck);
@@ -208,7 +207,9 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 
 		// Check 1000 separator place
-		if (Boolean.TRUE.equals(configItem.has1000Separator())) {
+		if (Boolean.TRUE.equals(configItem.has1000Separator())
+				|| (configItem.has1000Separator() == null && data.contains(","))) {
+
 			String dataToCheck = data;
 			validate1000Seperator(configItem, dataToCheck);
 		}
@@ -270,11 +271,11 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		if (PaddingType.LEFT.equals(configItem.getPaddingType())) {
 			data = StringUtils.stripStart(data, configItem.getPaddingCharacter());
 		}
-		
-		if (StringUtils.isBlank(data)&&!configItem.isRequired()) {
+
+		if (StringUtils.isBlank(data) && !configItem.isRequired()) {
 			return null;
 		}
-		
+
 		validateBigDecimalFormat(configItem, data);
 
 		BigDecimal valueAmount = null;
@@ -302,9 +303,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 				normalNumber = normalNumber + "." + degitNumber;
 			}
 
-			if (Boolean.TRUE.equals(configItem.has1000Separator())) {
-				normalNumber = normalNumber.replaceAll(",", "");
-			}
+			normalNumber = normalNumber.replaceAll(",", "");
 
 			valueAmount = new BigDecimal(normalNumber)
 					.setScale(configItem.getDecimalPlace(), RoundingMode.HALF_UP);
