@@ -23,6 +23,7 @@ import org.apache.commons.validator.routines.DateValidator;
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.configuration.PaddingType;
+import gec.scf.file.configuration.RecordType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 
@@ -61,7 +62,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 				BigDecimal valueAmount = getBigDecimalValue(itemConf, recordValue);
 				if (valueAmount != null) {
-					if (StringUtils.isNotBlank(signFlagData)) {
+					if (StringUtils.isNotEmpty(signFlagData)) {
 						valueAmount = applySignFlag(valueAmount, itemConf, signFlagData);
 					}
 					field.set(entity, valueAmount);
@@ -108,7 +109,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 		if (!dateValidator.isValid(data.trim(), configItem.getDatetimeFormat(),
 				Locale.US)) {
-			if (!configItem.isTransient()||configItem.isRequired()) {
+			if (configItem.getRecordType() == null
+					|| RecordType.DETAIL.equals(configItem.getRecordType())) {
 				throw new WrongFormatDetailException(
 						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
 								configItem.getDisplayValue(), data));

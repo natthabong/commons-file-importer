@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +42,9 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 	private int totalDetailRecord;
 
-	private BigDecimal totalDetailAmount = new BigDecimal("0");
+	private BigDecimal totalDetailDocAmount = new BigDecimal("0");
+
+	private BigDecimal totalDetailOutstandingAmount = new BigDecimal("0");
 
 	private Long lastDocumentNo;
 
@@ -51,9 +54,17 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 	private FileLayoutConfigItem detailDocAmountLayoutConfig;
 
-	private FileLayoutConfigItem footerTotalDocAmountLayoutConfig;
+	private FileLayoutConfigItem detailOutstandingAmountLayoutConfig;
 
 	private FileLayoutConfigItem footerTotalDocLayoutConfig;
+
+	private FileLayoutConfigItem footerTotalDocAmountLayoutConfig;
+
+	private FileLayoutConfigItem footerTotalOutstandingAmountLayoutConfig;
+
+	private Map<String, String> headerData = new HashMap<String, String>();
+
+	private Map<String, String> footerData = new HashMap<String, String>();
 
 	public FixedLengthFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
 		super(fileLayoutConfig, clazz);
@@ -74,7 +85,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 				throw new IllegalArgumentException("Invalid file content");
 			}
 
-			tempFile = File.createTempFile("drawdownAdvice", ".temp");
+			tempFile = File.createTempFile("DOCUMENT_T_", ".temp");
 			bufferedWriter = new BufferedWriter(new FileWriter(tempFile));
 
 			InputStream tempFileContent = new FileInputStream(tempFile);
@@ -143,7 +154,8 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 						List<FileLayoutConfigItem> headerConfigItems = fileConfigItems
 								.get(RecordType.HEADER);
 
-						validateLineDataFormat(currentLine, headerConfigItems);
+						validateLineDataFormat(currentLine, headerConfigItems,
+								headerData);
 						hasCheckedHeader = true;
 						continue;
 					}
@@ -229,14 +241,47 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 								String signFlagData = getCuttedData(
 										detailDocAmountLayoutConfig.getSignFlagConfig(),
 										currentLine);
-								totalDetailAmount = applySignFlag(totalDetailAmount,
+								totalDetailDocAmount = applySignFlag(totalDetailDocAmount,
 										detailDocAmountLayoutConfig, signFlagData);
 
 							}
-							totalDetailAmount = totalDetailAmount.add(docAmount);
+							totalDetailDocAmount = totalDetailDocAmount.add(docAmount);
 						}
 						catch (WrongFormatDetailException e) {
-							totalDetailAmount = totalDetailAmount
+							totalDetailDocAmount = totalDetailDocAmount
+									.add(new BigDecimal("0.0"));
+						}
+						catch (Exception e) {
+							log.warn(e.getMessage(), e);
+						}
+					}
+
+					if (detailOutstandingAmountLayoutConfig != null) {
+						try {
+
+							String data = getCuttedData(
+									detailOutstandingAmountLayoutConfig, currentLine);
+
+							BigDecimal docAmount = getBigDecimalValue(
+									detailOutstandingAmountLayoutConfig, data);
+							if (detailOutstandingAmountLayoutConfig
+									.getSignFlagConfig() != null) {
+
+								String signFlagData = getCuttedData(
+										detailOutstandingAmountLayoutConfig
+												.getSignFlagConfig(),
+										currentLine);
+								totalDetailOutstandingAmount = applySignFlag(
+										totalDetailOutstandingAmount,
+										detailOutstandingAmountLayoutConfig,
+										signFlagData);
+
+							}
+							totalDetailOutstandingAmount = totalDetailOutstandingAmount
+									.add(docAmount);
+						}
+						catch (WrongFormatDetailException e) {
+							totalDetailDocAmount = totalDetailDocAmount
 									.add(new BigDecimal("0.0"));
 						}
 						catch (Exception e) {
@@ -307,7 +352,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			List<FileLayoutConfigItem> footerConfigItems)
 			throws WrongFormatFileException {
 
-		validateLineDataFormat(currentLine, footerConfigItems);
+		validateLineDataFormat(currentLine, footerConfigItems, footerData);
 
 		if (footerTotalDocLayoutConfig != null) {
 			int start = footerTotalDocLayoutConfig.getStartIndex() - 1;
@@ -359,13 +404,13 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 							footerTotalDocAmountLayoutConfig, signFlagData);
 
 				}
-				if (footerTotalAmount.compareTo(totalDetailAmount) != 0) {
+				if (footerTotalAmount.compareTo(totalDetailDocAmount) != 0) {
 					throw new WrongFormatFileException(
 							MessageFormat.format(
 									CovertErrorConstant.FOOTER_TOTAL_AMOUNT_INVALIDE_LENGTH_MESSAGE,
 									footerTotalDocAmountLayoutConfig.getDisplayValue(),
 									footerTotalAmount.doubleValue(),
-									totalDetailAmount.doubleValue()),
+									totalDetailDocAmount.doubleValue()),
 							currentLineNo);
 				}
 			}
@@ -383,10 +428,78 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 						currentLineNo);
 			}
 		}
+
+		if (footerTotalOutstandingAmountLayoutConfig != null) {
+
+			String totalOutstandingAmoutData = getCuttedData(
+					footerTotalOutstandingAmountLayoutConfig, currentLine);
+			try {
+
+				BigDecimal footerTotalAmount = getBigDecimalValue(
+						footerTotalOutstandingAmountLayoutConfig,
+						totalOutstandingAmoutData);
+
+				if (footerTotalDocAmountLayoutConfig.getSignFlagConfig() != null) {
+
+					String signFlagData = getCuttedData(
+							footerTotalOutstandingAmountLayoutConfig.getSignFlagConfig(),
+							currentLine);
+
+					footerTotalAmount = applySignFlag(footerTotalAmount,
+							footerTotalOutstandingAmountLayoutConfig, signFlagData);
+
+				}
+				if (footerTotalAmount.compareTo(totalDetailOutstandingAmount) != 0) {
+					throw new WrongFormatFileException(
+							MessageFormat.format(
+									CovertErrorConstant.FOOTER_TOTAL_AMOUNT_INVALIDE_LENGTH_MESSAGE,
+									footerTotalOutstandingAmountLayoutConfig
+											.getDisplayValue(),
+									footerTotalAmount.doubleValue(),
+									totalDetailOutstandingAmount.doubleValue()),
+							currentLineNo);
+				}
+			}
+			catch (WrongFormatFileException e) {
+				throw e;
+			}
+			catch (WrongFormatDetailException e) {
+				throw new WrongFormatFileException(e.getErrorMessage(), currentLineNo);
+			}
+			catch (Exception e) {
+				throw new WrongFormatFileException(
+						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+								footerTotalDocAmountLayoutConfig.getDisplayValue(),
+								totalOutstandingAmoutData),
+						currentLineNo);
+			}
+		}
+
+		// Matching with header
+		for (FileLayoutConfigItem fileLayoutConfigItem : footerConfigItems) {
+			String docFieldName = fileLayoutConfigItem.getDocFieldName();
+
+			String footerRawData = footerData.get(docFieldName);
+
+			if (StringUtils.isNotBlank(footerRawData)) {
+
+				String headerRawData = headerData.get(docFieldName);
+
+				if (headerRawData != null && !footerRawData.equals(headerRawData)) {
+
+					throw new WrongFormatFileException(
+							MessageFormat.format(CovertErrorConstant.MISMATCH_WITH_HEADER,
+									fileLayoutConfigItem.getDisplayValue(), footerRawData,
+									headerRawData));
+				}
+			}
+		}
+
 	}
 
 	private void validateLineDataFormat(String currentLine,
-			List<FileLayoutConfigItem> configItems) throws WrongFormatFileException {
+			List<FileLayoutConfigItem> configItems, Map<String, String> rawDataOfLine)
+			throws WrongFormatFileException {
 
 		validateLineDataLength(currentLine, configItems);
 
@@ -394,7 +507,11 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 			int start = configItem.getStartIndex() - 1;
 			int end = (configItem.getStartIndex() + configItem.getLenght()) - 1;
-			String dataValidate = currentLine.substring(start, end).trim();
+			String dataValidate = currentLine.substring(start, end);
+
+			if (StringUtils.isNotBlank(configItem.getDocFieldName())) {
+				rawDataOfLine.put(configItem.getDocFieldName(), dataValidate);
+			}
 
 			if (StringUtils.isNotBlank(configItem.getExpectedValue())) {
 				validateExpectedValue(configItem, dataValidate);
@@ -486,6 +603,10 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 							.equals(fileLayoutConfig.getDocFieldName())) {
 						footerTotalDocAmountLayoutConfig = fileLayoutConfig;
 					}
+					if ("totalOutstandingAmount"
+							.equals(fileLayoutConfig.getDocFieldName())) {
+						footerTotalOutstandingAmountLayoutConfig = fileLayoutConfig;
+					}
 					if ("totalDocumentNumber"
 							.equals(fileLayoutConfig.getDocFieldName())) {
 						footerTotalDocLayoutConfig = fileLayoutConfig;
@@ -495,6 +616,9 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 				case DETAIL:
 					if ("documentAmount".equals(fileLayoutConfig.getDocFieldName())) {
 						detailDocAmountLayoutConfig = fileLayoutConfig;
+					}
+					if ("outstandingAmount".equals(fileLayoutConfig.getDocFieldName())) {
+						detailOutstandingAmountLayoutConfig = fileLayoutConfig;
 					}
 					detailList.add(fileLayoutConfig);
 					break;
@@ -605,7 +729,11 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 				isError = true;
 			}
 			catch (Exception e) {
-				// TODO manage error message
+				ErrorLineDetail errorLineDetail = new ErrorLineDetail();
+				errorLineDetail.setErrorLineNo(currentLineNo);
+				errorLineDetail.setErrorMessage(e.getMessage());
+				errorLineDetails.add(errorLineDetail);
+				isError = true;
 				e.printStackTrace();
 			}
 		}

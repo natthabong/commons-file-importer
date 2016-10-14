@@ -6,7 +6,7 @@ public interface CovertErrorConstant {
 
 	String FOOTER_TOTAL_LINE_INVALIDE_LENGTH_MESSAGE = "{0} ({1}) is invalid. Total detail line is {2}";
 
-	String FOOTER_TOTAL_AMOUNT_INVALIDE_LENGTH_MESSAGE = "{0} ({1,number,#,##0.00}) is invalid. Total detail line is {2,number,#,###.00}";
+	String FOOTER_TOTAL_AMOUNT_INVALIDE_LENGTH_MESSAGE = "{0} ({1,number,#,##0.00}) is invalid. Total detail line is {2,number,#,##0.00}";
 
 	String FOOTER_NOT_LAST_FILE = "{0} ({1}) not found on last row";
 	String RECORD_ID_MISS_MATCH = "{0} ({1}) mismatch";
@@ -27,4 +27,6 @@ public interface CovertErrorConstant {
 	String DIGIT_OVER_MAX_DIGIT = "{0} digit is over max digit ({1})";
 
 	String DATA_LENGTH_OF_FIELD_OVER = "data length ({0}) must have {1} field";
+
+	String MISMATCH_WITH_HEADER = "{0} ({1}) in footer is invalid, mismatch in header ({2})";
 }

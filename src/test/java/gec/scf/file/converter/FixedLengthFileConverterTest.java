@@ -20,7 +20,6 @@ import gec.scf.file.configuration.FileType;
 import gec.scf.file.configuration.PaddingType;
 import gec.scf.file.configuration.RecordType;
 import gec.scf.file.example.domain.SponsorDocument;
-import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 
 public class FixedLengthFileConverterTest {
