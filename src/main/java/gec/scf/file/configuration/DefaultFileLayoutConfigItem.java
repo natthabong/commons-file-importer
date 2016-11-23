@@ -64,12 +64,12 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	}
 
 	@Override
-	public String getPlusSymbol() {
+	public String getPositiveFlag() {
 		return plusSymbol;
 	}
 
 	@Override
-	public String getMinusSymbol() {
+	public String getNegativeFlag() {
 		return minusSymbol;
 	}
 

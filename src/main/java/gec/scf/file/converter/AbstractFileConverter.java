@@ -164,7 +164,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			}
 		}
 
-		if (configItem.getMinusSymbol() != null || configItem.getPlusSymbol() != null) {
+		if (configItem.getNegativeFlag() != null || configItem.getPositiveFlag() != null) {
 			validateSignFlag(configItem, data);
 		}
 
@@ -226,10 +226,10 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 	private void validateSignFlag(FileLayoutConfigItem configItem, String dataToCheck) {
 
-		String plusSymbol = StringUtils.defaultString(configItem.getPlusSymbol(),
+		String plusSymbol = StringUtils.defaultString(configItem.getPositiveFlag(),
 				StringUtils.EMPTY);
 
-		String minusSymbol = StringUtils.defaultString(configItem.getMinusSymbol(),
+		String minusSymbol = StringUtils.defaultString(configItem.getNegativeFlag(),
 				StringUtils.EMPTY);
 
 		String pattern = "^[" + plusSymbol + minusSymbol + "0-9,._]*$";
@@ -283,13 +283,13 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		BigDecimal valueAmount = null;
 		try {
 
-			if (StringUtils.isNotBlank(configItem.getPlusSymbol())
-					&& data.startsWith(configItem.getPlusSymbol())) {
+			if (StringUtils.isNotBlank(configItem.getPositiveFlag())
+					&& data.startsWith(configItem.getPositiveFlag())) {
 				data = data.substring(1);
 			}
 
-			if (StringUtils.isNotBlank(configItem.getMinusSymbol())
-					&& data.startsWith(configItem.getMinusSymbol())) {
+			if (StringUtils.isNotBlank(configItem.getNegativeFlag())
+					&& data.startsWith(configItem.getNegativeFlag())) {
 				data = "-" + data.substring(1);
 			}
 
@@ -338,10 +338,10 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			FileLayoutConfigItem configItem, String signFlagData) {
 
 		FileLayoutConfigItem signFlagConfig = configItem.getSignFlagConfig();
-		if (signFlagData.equals(signFlagConfig.getMinusSymbol())) {
+		if (signFlagData.equals(signFlagConfig.getNegativeFlag())) {
 			valueAmount = valueAmount.multiply(new BigDecimal("-1"));
 		}
-		else if (signFlagData.equals(signFlagConfig.getPlusSymbol())) {
+		else if (signFlagData.equals(signFlagConfig.getPositiveFlag())) {
 			valueAmount = valueAmount.multiply(new BigDecimal("1"));
 		}
 		else {

@@ -12,9 +12,9 @@ public interface FileLayoutConfigItem {
 
 	String getDatetimeFormat();
 
-	String getPlusSymbol();
+	String getPositiveFlag();
 
-	String getMinusSymbol();
+	String getNegativeFlag();
 
 	Integer getDecimalPlace();
 
