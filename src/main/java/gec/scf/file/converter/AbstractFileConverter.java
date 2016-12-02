@@ -325,7 +325,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		String[] splitter = dataToCheck.toString().split("\\.");
 		if (splitter.length > 1) {
 			int decimalLength = splitter[1].length();
-			if (decimalLength != itemConf.getDecimalPlace()) {
+			if (decimalLength > itemConf.getDecimalPlace()) {
 				throw new WrongFormatDetailException(
 						MessageFormat.format(CovertErrorConstant.DIGIT_OVER_MAX_DIGIT,
 								itemConf.getDisplayValue(), itemConf.getDecimalPlace()));
