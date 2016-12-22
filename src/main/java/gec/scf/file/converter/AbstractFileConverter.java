@@ -77,10 +77,10 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 	}
 
 	protected long validateDocumentNo(FileLayoutConfigItem configItem, String data,
-			Long lastDocumentNo) throws WrongFormatDetailException {
+			Long lastDocumentNo) throws WrongFormatFileException {
 		Long docNoValidate = Long.parseLong(data.trim());
 		if (docNoValidate <= lastDocumentNo) {
-			throw new WrongFormatDetailException(
+			throw new WrongFormatFileException(
 					MessageFormat.format(CovertErrorConstant.DOCUMENT_NO_INVALID,
 							configItem.getDisplayValue(), data));
 		}
