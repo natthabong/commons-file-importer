@@ -4,7 +4,7 @@ public interface FileLayoutConfigItem {
 
 	String getDocFieldName();
 
-	RecordType getRecordType();
+	RecordType getRecordTypeData();
 
 	Integer getStartIndex();
 

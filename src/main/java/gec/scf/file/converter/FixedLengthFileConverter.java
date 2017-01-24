@@ -557,7 +557,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 	private void throwErrorByRecordType(FileLayoutConfigItem item, String errorMessage)
 			throws WrongFormatFileException {
-		if (RecordType.DETAIL.equals(item.getRecordType())) {
+		if (RecordType.DETAIL.equals(item.getRecordTypeData())) {
 			throw new WrongFormatDetailException(errorMessage);
 		}
 		else {
@@ -591,10 +591,10 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 		for (FileLayoutConfigItem fileLayoutConfig : list) {
 			if ("recordId".equals(fileLayoutConfig.getDocFieldName())) {
 				RecordTypeExtractor extractor = new RecordTypeExtractor(fileLayoutConfig);
-				extractors.put(fileLayoutConfig.getRecordType(), extractor);
+				extractors.put(fileLayoutConfig.getRecordTypeData(), extractor);
 			}
 			else {
-				switch (fileLayoutConfig.getRecordType()) {
+				switch (fileLayoutConfig.getRecordTypeData()) {
 				case HEADER:
 					headerList.add(fileLayoutConfig);
 					break;

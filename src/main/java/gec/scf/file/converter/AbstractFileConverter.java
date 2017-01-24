@@ -109,8 +109,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 		if (!dateValidator.isValid(data.trim(), configItem.getDatetimeFormat(),
 				Locale.US)) {
-			if (configItem.getRecordType() == null
-					|| RecordType.DETAIL.equals(configItem.getRecordType())) {
+			if (configItem.getRecordTypeData() == null
+					|| RecordType.DETAIL.equals(configItem.getRecordTypeData())) {
 				throw new WrongFormatDetailException(
 						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
 								configItem.getDisplayValue(), data));

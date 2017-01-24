@@ -43,8 +43,12 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 		return docFieldName;
 	}
 
-	@Override
 	public RecordType getRecordType() {
+		return recordType;
+	}
+
+	@Override
+	public RecordType getRecordTypeData() {
 		return recordType;
 	}
 
