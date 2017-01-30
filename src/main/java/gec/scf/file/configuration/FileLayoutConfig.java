@@ -21,4 +21,6 @@ public interface FileLayoutConfig {
 	public String getCharsetName();
 
 	public String getOwnerId();
+
+	public Long getOffsetRowNo();
 }

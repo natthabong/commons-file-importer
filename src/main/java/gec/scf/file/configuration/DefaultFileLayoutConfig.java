@@ -20,7 +20,9 @@ public class DefaultFileLayoutConfig implements FileLayoutConfig {
 
 	private boolean checkBinaryFile;
 
-	private String charsetName;	
+	private String charsetName;
+
+	private long offsetRowNo;
 
 	public Integer getStartIndex() {
 		return startIndex;
@@ -121,5 +123,14 @@ public class DefaultFileLayoutConfig implements FileLayoutConfig {
 	public String getOwnerId() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void setOffsetRowNo(long offsetRowNo) {
+		this.offsetRowNo = offsetRowNo;		
+	}
+
+	@Override
+	public Long getOffsetRowNo() {
+		return offsetRowNo;
 	}
 }
