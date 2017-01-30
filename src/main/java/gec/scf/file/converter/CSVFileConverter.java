@@ -44,16 +44,21 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 			if (fileLayoutConfig.isCheckBinaryFile()) {
 				fileContent = validateBinaryFile(fileContent);
 			}
-			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"),
-					CSVFormat.EXCEL.withSkipHeaderRecord(true)
-							.withDelimiter(fileLayoutConfig.getDelimeter().charAt(0)));
-
+			CSVFormat csvFormat = CSVFormat.EXCEL.withSkipHeaderRecord(true)
+					.withDelimiter(fileLayoutConfig.getDelimeter().charAt(0));
+					
+			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"), csvFormat);
 
 			csvRecords = csvParser.getRecords();
 
 			validateDataLength(fileLayoutConfig.getConfigItems());
 
-			currentLine = 1;
+			if(fileLayoutConfig.getOffsetRowNo() != null && fileLayoutConfig.getOffsetRowNo() > 0){
+				currentLine = fileLayoutConfig.getOffsetRowNo().intValue();
+			}else{
+				currentLine = 1;
+			}
+			
 		} catch (WrongFormatFileException e) {
 			throw e;
 		} catch (UnsupportedEncodingException e) {
@@ -97,7 +102,7 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 	@Override
 	public DetailResult<T> getDetail() {
 
-		DetailResult<T> result = new DetailResult<T>();
+		DetailResult<T> result = new DetailResult<T>();		
 
 		try {
 			CSVRecord csvRecord = csvRecords.get(currentLine++);
