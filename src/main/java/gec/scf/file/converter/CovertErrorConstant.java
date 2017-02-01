@@ -29,4 +29,14 @@ public interface CovertErrorConstant {
 	String DATA_LENGTH_OF_FIELD_OVER = "data length ({0}) must have {1} field";
 
 	String MISMATCH_WITH_HEADER = "{0} ({1}) in footer is invalid, mismatch in header ({2})";
+	
+	String EQUAL_TO_UPLOAD_DATE_INVALID = "{0} ({1}) not equals current date ({2})";
+	
+	String EQUAL_OR_GREATER_THAN_UPLOAD_DATE_INVALID =  "{0} ({1}) not equals or greater than current date ({2})";
+	
+	String GREATER_THAN_UPLOAD_DATE_INVALID =  "{0} ({1}) not greater than current date ({2})";
+	
+	String EQUAL_OR_LESS_THAN_UPLOAD_DATE_INVALID =  "{0} ({1}) not equal or less than current date ({2})";
+	
+	String LESS_THAN_UPLOAD_DATE_INVALID =  "{0} ({1}) not less than current date ({2})";
 }

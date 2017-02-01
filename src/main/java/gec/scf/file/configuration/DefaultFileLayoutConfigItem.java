@@ -38,6 +38,8 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private FileLayoutConfigItem signFlagConfig;
 
+	private ValidationType validationType;
+
 	@Override
 	public String getDocFieldName() {
 		return docFieldName;
@@ -214,6 +216,15 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	public void setSignFlagConfig(FileLayoutConfigItem signFlagConfig) {
 		this.signFlagConfig = signFlagConfig;
+	}
+
+	public void setValidationType(ValidationType validationType) {
+		this.validationType = validationType;		
+	}
+
+	@Override
+	public ValidationType getValidationType() {
+		return validationType;
 	}
 
 }
