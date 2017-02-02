@@ -32,22 +32,25 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 	private Class<T> entityClass;
 
 	private FileLayoutConfig fileLayoutConfig;
-	
+
 	protected FieldValidatorFactory fieldValidatorFactory;
+
+	protected FileObserverFactory fileObserverFactory;
 
 	public AbstractFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
 		this.setFileLayoutConfig(fileLayoutConfig);
 		this.entityClass = clazz;
+		this.fileObserverFactory = new FileObserverFactory();
+		this.fieldValidatorFactory = new FieldValidatorFactory();
 	}
 
 	protected void applyObjectValue(T entity, FileLayoutConfigItem itemConf,
 			String recordValue, String signFlagData)
 			throws NoSuchFieldException, SecurityException, WrongFormatDetailException,
 			WrongFormatFileException, IllegalAccessException, ParseException {
-
+		Object value = null;
 		if (!itemConf.isTransient()) {
-			Field field = null;
-			field = entityClass.getDeclaredField(itemConf.getDocFieldName());
+			Field field = entityClass.getDeclaredField(itemConf.getDocFieldName());
 			field.setAccessible(true);
 			Class<?> classType = field.getType();
 
@@ -57,23 +60,23 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 				SimpleDateFormat sdf = new SimpleDateFormat(itemConf.getDatetimeFormat(),
 						Locale.US);
-				Date date = sdf.parse(recordValue);
-				field.set(entity, date);
+				value = sdf.parse(recordValue);
 			}
 			else if (classType.isAssignableFrom(BigDecimal.class)) {
 
-				BigDecimal valueAmount = getBigDecimalValue(itemConf, recordValue);
-				if (valueAmount != null) {
+				BigDecimal amountValue = getBigDecimalValue(itemConf, recordValue);
+				if (amountValue != null) {
 					if (StringUtils.isNotEmpty(signFlagData)) {
-						valueAmount = applySignFlag(valueAmount, itemConf, signFlagData);
+						amountValue = applySignFlag(amountValue, itemConf, signFlagData);
 					}
-					field.set(entity, valueAmount);
 				}
+				value = amountValue;
 			}
 			else {
 				validateRequiredField(itemConf, recordValue);
-				field.set(entity, recordValue.trim());
+				value = recordValue.trim();
 			}
+			field.set(entity, value);
 		}
 
 	}
@@ -166,7 +169,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			}
 		}
 
-		if (configItem.getNegativeFlag() != null || configItem.getPositiveFlag() != null) {
+		if (configItem.getNegativeFlag() != null
+				|| configItem.getPositiveFlag() != null) {
 			validateSignFlag(configItem, data);
 		}
 
@@ -438,7 +442,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 	public void setEntityClass(Class<T> entityClass) {
 		this.entityClass = entityClass;
 	}
-	
+
 	public FieldValidatorFactory getFieldValidatorFactory() {
 		return fieldValidatorFactory;
 	}
