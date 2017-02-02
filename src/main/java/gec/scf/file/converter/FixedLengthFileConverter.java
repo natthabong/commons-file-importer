@@ -10,18 +10,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import gec.scf.file.common.DateTimeImpl;
+import gec.scf.file.common.DateTimeProvider;
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.configuration.RecordType;
@@ -69,8 +68,21 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 	private Map<String, String> footerData = new HashMap<String, String>();
 
+	private DateTimeProvider currentDateTime;
+
+	private FileObserverFactory fileObserverFactory;
+
+	private Map<RecordType, List<FileObserver>> observers;
+
+	// private List<FieldValidator> footerValidators ;
+
+	// private FieldValidatorFactory fieldValidatorFactory;
+
 	public FixedLengthFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
 		super(fileLayoutConfig, clazz);
+		currentDateTime = new DateTimeImpl();
+		// footerValidators = new ArrayList<FieldValidator>();
+		// this.fieldValidatorFactory = fieldValidatorFactory;
 	}
 
 	@Override
@@ -157,8 +169,11 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 						List<FileLayoutConfigItem> headerConfigItems = fileConfigItems
 						        .get(RecordType.HEADER);
 
-						validateLineDataFormat(currentLine, headerConfigItems,
-						        headerData);
+						validateLineDataFormat(currentLine, headerConfigItems, headerData,
+						        null);
+
+						// validateLineDataFormat(currentLine, headerConfigItems,
+						// headerData);
 						hasCheckedHeader = true;
 						continue;
 					}
@@ -355,39 +370,44 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 	        List<FileLayoutConfigItem> footerConfigItems)
 	        throws WrongFormatFileException {
 
-		validateLineDataFormat(currentLine, footerConfigItems, footerData);
+		Map<String, Object> dataToValidate = new HashMap<String, Object>();
+		dataToValidate.put("COUNT_OF_DOCUMENT_DETAIL", totalDetailRecord);
 
-		if (footerTotalDocLayoutConfig != null) {
-			int start = footerTotalDocLayoutConfig.getStartIndex() - 1;
-			int end = (footerTotalDocLayoutConfig.getStartIndex()
-			        + footerTotalDocLayoutConfig.getLenght()) - 1;
+		validateLineDataFormat(currentLine, footerConfigItems, footerData,
+		        dataToValidate);
+		// validateLineDataFormat(currentLine, footerConfigItems, footerData);
 
-			String totalDocData = currentLine.substring(start, end).trim();
-			try {
-
-				Integer footeTotalDocuments = Integer.valueOf(totalDocData);
-
-				if (totalDetailRecord != footeTotalDocuments) {
-					throw new WrongFormatFileException(
-					        MessageFormat.format(
-					                CovertErrorConstant.FOOTER_TOTAL_LINE_INVALIDE_LENGTH_MESSAGE,
-					                footerTotalDocLayoutConfig.getDisplayValue(),
-					                footeTotalDocuments, totalDetailRecord),
-					        currentLineNo);
-				}
-
-			}
-			catch (WrongFormatFileException e) {
-				throw e;
-			}
-			catch (Exception e) {
-				throw new WrongFormatFileException(
-				        MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
-				                footerTotalDocLayoutConfig.getDisplayValue(),
-				                totalDocData),
-				        currentLineNo);
-			}
-		}
+		// if (footerTotalDocLayoutConfig != null) {
+		// int start = footerTotalDocLayoutConfig.getStartIndex() - 1;
+		// int end = (footerTotalDocLayoutConfig.getStartIndex()
+		// + footerTotalDocLayoutConfig.getLenght()) - 1;
+		//
+		// String totalDocData = currentLine.substring(start, end).trim();
+		// try {
+		//
+		// Integer footeTotalDocuments = Integer.valueOf(totalDocData);
+		//
+		// if (totalDetailRecord != footeTotalDocuments) {
+		// throw new WrongFormatFileException(
+		// MessageFormat.format(
+		// CovertErrorConstant.FOOTER_TOTAL_LINE_INVALIDE_LENGTH_MESSAGE,
+		// footerTotalDocLayoutConfig.getDisplayValue(),
+		// footeTotalDocuments, totalDetailRecord),
+		// currentLineNo);
+		// }
+		//
+		// }
+		// catch (WrongFormatFileException e) {
+		// throw e;
+		// }
+		// catch (Exception e) {
+		// throw new WrongFormatFileException(
+		// MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+		// footerTotalDocLayoutConfig.getDisplayValue(),
+		// totalDocData),
+		// currentLineNo);
+		// }
+		// }
 
 		if (footerTotalDocAmountLayoutConfig != null) {
 
@@ -501,9 +521,45 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 	}
 
+	// private void validateLineDataFormat(String currentLine,
+	// List<FileLayoutConfigItem> configItems, Map<String, String> rawDataOfLine)
+	// throws WrongFormatFileException {
+	//
+	// validateLineDataLength(currentLine, configItems);
+	//
+	// for (FileLayoutConfigItem configItem : configItems) {
+	//
+	// int start = configItem.getStartIndex() - 1;
+	// int end = (configItem.getStartIndex() + configItem.getLenght()) - 1;
+	// String dataValidate = currentLine.substring(start, end);
+	//
+	// if (StringUtils.isNotBlank(configItem.getDocFieldName())) {
+	// rawDataOfLine.put(configItem.getDocFieldName(), dataValidate);
+	// }
+	//
+	// if (StringUtils.isNotBlank(configItem.getExpectedValue())) {
+	// validateExpectedValue(configItem, dataValidate);
+	// }
+	//
+	// if (StringUtils.isNotBlank(configItem.getDatetimeFormat())) {
+	// validateDateFormat(configItem, dataValidate);
+	// }
+	//
+	// if ("documentNo".equals(configItem.getDocFieldName())) {
+	// lastDocumentNo = validateDocumentNo(configItem, dataValidate,
+	// lastDocumentNo);
+	// }
+	//
+	// if (configItem.getValidationType() != null) {
+	// FieldValidator fieldValidator = fieldValidatorFactory.create(configItem);
+	// fieldValidator.validate(dataValidate);
+	// }
+	// }
+	// }
+
 	private void validateLineDataFormat(String currentLine,
-	        List<FileLayoutConfigItem> configItems, Map<String, String> rawDataOfLine)
-	        throws WrongFormatFileException {
+	        List<FileLayoutConfigItem> configItems, Map<String, String> rawDataOfLine,
+	        Map<String, Object> dataToValidate) throws WrongFormatFileException {
 
 		validateLineDataLength(currentLine, configItems);
 
@@ -531,93 +587,10 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			}
 
 			if (configItem.getValidationType() != null) {
-				validateRecordFieldType(configItem, dataValidate);
+				FieldValidator fieldValidator = fieldValidatorFactory.create(configItem);
+				fieldValidator.setDataToValidate(dataToValidate);
+				fieldValidator.validate(dataValidate);
 			}
-		}
-
-	}
-
-	private void validateRecordFieldType(FileLayoutConfigItem configItem,
-	        String dataValidate) throws WrongFormatFileException {
-		DateTimeFormatter formatter = DateTimeFormatter
-		        .ofPattern(configItem.getDatetimeFormat(), Locale.US);
-		LocalDate documentDateTime = LocalDate.parse(dataValidate, formatter);
-		LocalDate currentDateTime = LocalDate.now();
-
-		switch (configItem.getValidationType()) {
-		case EQUAL_TO_UPLOAD_DATE:
-			if (!documentDateTime.isEqual(currentDateTime)) {
-				String errorMessage = MessageFormat.format(
-				        CovertErrorConstant.EQUAL_TO_UPLOAD_DATE_INVALID,
-				        configItem.getDisplayValue(), formatter.format(documentDateTime),
-				        formatter.format(currentDateTime));
-				throwErrorByRecordType(configItem, errorMessage);
-			}
-			break;
-		case EQUAL_OR_GREATER_THAN_UPLOAD_DATE:
-			boolean isEqualCurrentUploadDate = false;
-			boolean isGreaterThanCurrentDate = false;
-			if (documentDateTime.isEqual(currentDateTime)) {
-				isEqualCurrentUploadDate = true;
-			}
-
-			if (documentDateTime.isAfter(currentDateTime)) {
-				isGreaterThanCurrentDate = true;
-			}
-
-			if (!isEqualCurrentUploadDate && !isGreaterThanCurrentDate) {
-				String errorMessage = MessageFormat.format(
-				        CovertErrorConstant.EQUAL_OR_GREATER_THAN_UPLOAD_DATE_INVALID,
-				        configItem.getDisplayValue(), formatter.format(documentDateTime),
-				        formatter.format(currentDateTime));
-				throwErrorByRecordType(configItem, errorMessage);
-			}
-			break;
-		case GREATER_THAN_UPLOAD_DATE:
-			if (!documentDateTime.isAfter(currentDateTime)) {
-				String errorMessage = MessageFormat.format(
-				        CovertErrorConstant.GREATER_THAN_UPLOAD_DATE_INVALID,
-				        configItem.getDisplayValue(), formatter.format(documentDateTime),
-				        formatter.format(currentDateTime));
-				throwErrorByRecordType(configItem, errorMessage);
-			}
-			break;
-
-		case EQUAL_OR_LESS_THAN_UPLOAD_DATE:
-			isEqualCurrentUploadDate = false;
-			boolean isLessThanCurrentDate = false;
-			if (documentDateTime.isEqual(currentDateTime)) {
-				isEqualCurrentUploadDate = true;
-			}
-
-			if (documentDateTime.isBefore(currentDateTime)) {
-				isLessThanCurrentDate = true;
-			}
-
-			if (!isEqualCurrentUploadDate && !isLessThanCurrentDate) {
-				String errorMessage = MessageFormat.format(
-				        CovertErrorConstant.EQUAL_OR_LESS_THAN_UPLOAD_DATE_INVALID,
-				        configItem.getDisplayValue(), formatter.format(documentDateTime),
-				        formatter.format(currentDateTime));
-				throwErrorByRecordType(configItem, errorMessage);
-			}
-			break;
-		case LESS_THAN_UPLOAD_DATE:
-			if (!documentDateTime.isBefore(currentDateTime)) {
-				String errorMessage = MessageFormat.format(
-				        CovertErrorConstant.LESS_THAN_UPLOAD_DATE_INVALID,
-				        configItem.getDisplayValue(), formatter.format(documentDateTime),
-				        formatter.format(currentDateTime));
-				throwErrorByRecordType(configItem, errorMessage);
-			}
-			break;
-		case EQUAL_TO_HEADER_FIELD:
-			/*
-			 * TODO: please implements case equal to header
-			 */
-			break;
-		default:
-			break;
 		}
 	}
 
@@ -680,39 +653,55 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 		List<FileLayoutConfigItem> detailList = new ArrayList<FileLayoutConfigItem>();
 		List<FileLayoutConfigItem> footerList = new ArrayList<FileLayoutConfigItem>();
 
-		for (FileLayoutConfigItem fileLayoutConfig : list) {
-			if ("recordId".equals(fileLayoutConfig.getDocFieldName())) {
-				RecordTypeExtractor extractor = new RecordTypeExtractor(fileLayoutConfig);
-				extractors.put(fileLayoutConfig.getRecordTypeData(), extractor);
+		for (FileLayoutConfigItem fileLayoutConfigItem : list) {
+			if ("recordId".equals(fileLayoutConfigItem.getDocFieldName())) {
+				RecordTypeExtractor extractor = new RecordTypeExtractor(fileLayoutConfigItem);
+				extractors.put(fileLayoutConfigItem.getRecordTypeData(), extractor);
 			}
 			else {
-				switch (fileLayoutConfig.getRecordTypeData()) {
+				FileObserver fileObserver = null;
+				switch (fileLayoutConfigItem.getRecordTypeData()) {
 				case HEADER:
-					headerList.add(fileLayoutConfig);
+					headerList.add(fileLayoutConfigItem);
 					break;
 				case FOOTER:
-					if ("totalDocumentAmount"
-					        .equals(fileLayoutConfig.getDocFieldName())) {
-						footerTotalDocAmountLayoutConfig = fileLayoutConfig;
-					}
-					if ("totalOutstandingAmount"
-					        .equals(fileLayoutConfig.getDocFieldName())) {
-						footerTotalOutstandingAmountLayoutConfig = fileLayoutConfig;
-					}
-					if ("totalDocumentNumber"
-					        .equals(fileLayoutConfig.getDocFieldName())) {
-						footerTotalDocLayoutConfig = fileLayoutConfig;
-					}
-					footerList.add(fileLayoutConfig);
+					// footerValidators.add(fieldValidatorFactory.create(fileLayoutConfig));
+
+					// if ("totalDocumentAmount"
+					// .equals(fileLayoutConfig.getDocFieldName())) {
+					// footerTotalDocAmountLayoutConfig = fileLayoutConfig;
+					// }
+					// if ("totalOutstandingAmount"
+					// .equals(fileLayoutConfig.getDocFieldName())) {
+					// footerTotalOutstandingAmountLayoutConfig = fileLayoutConfig;
+					// }
+					// if ("totalDocumentNumber"
+					// .equals(fileLayoutConfig.getDocFieldName())) {
+					// footerTotalDocLayoutConfig = fileLayoutConfig;
+					// }
+					
+					
+//					fileObserver = fileObserverFactory.create(fileLayoutConfigItem);
+//					
+//					List<FileObserver> observerList = observers
+//					        .get(fileObserver.getRecordType());
+//					
+//					if(observerList == null){
+//						observerList = new ArrayList<FileObserver>();
+//					}
+//					
+//					observerList.add(fileObserver);
+//
+					footerList.add(fileLayoutConfigItem);
 					break;
 				case DETAIL:
-					if ("documentAmount".equals(fileLayoutConfig.getDocFieldName())) {
-						detailDocAmountLayoutConfig = fileLayoutConfig;
+					if ("documentAmount".equals(fileLayoutConfigItem.getDocFieldName())) {
+						detailDocAmountLayoutConfig = fileLayoutConfigItem;
 					}
-					if ("outstandingAmount".equals(fileLayoutConfig.getDocFieldName())) {
-						detailOutstandingAmountLayoutConfig = fileLayoutConfig;
+					if ("outstandingAmount".equals(fileLayoutConfigItem.getDocFieldName())) {
+						detailOutstandingAmountLayoutConfig = fileLayoutConfigItem;
 					}
-					detailList.add(fileLayoutConfig);
+					detailList.add(fileLayoutConfigItem);
 					break;
 
 				default:
@@ -877,4 +866,5 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 		}
 
 	}
+
 }
