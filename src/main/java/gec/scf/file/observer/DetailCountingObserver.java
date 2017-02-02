@@ -33,4 +33,5 @@ public class DetailCountingObserver implements FileObserver<Integer> {
 	public FileLayoutConfigItem getObserveFieldConfig() {
 		return null;
 	}
+
 }
