@@ -10,6 +10,7 @@ public class FileConverterFactory {
 		FileConverter<T> converter = null;
 		if (FileType.FIXED_LENGTH.equals(config.getFileType())) {
 			converter = new FixedLengthFileConverter<T>(config, clazz);
+			
 		}
 		else {
 			converter = new CSVFileConverter<T>(config, clazz);
