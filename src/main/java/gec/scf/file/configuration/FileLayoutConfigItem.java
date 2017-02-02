@@ -39,5 +39,7 @@ public interface FileLayoutConfigItem {
 	FileLayoutConfigItem getSignFlagConfig();
 
 	ValidationType getValidationType();
+	
+	FileLayoutConfigItem getValidationRecordFieldConfig();
 
 }

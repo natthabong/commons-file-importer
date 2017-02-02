@@ -11,7 +11,4 @@ public interface FileConverter<T> {
 
 	public DetailResult<T> getDetail();
 
-	@Deprecated
-	public void setFieldValidatorFactory(FieldValidatorFactory fieldValidatorFactory);
-
 }
