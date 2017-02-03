@@ -1,10 +1,10 @@
 package gec.scf.file.converter;
 
 import gec.scf.file.configuration.FileLayoutConfigItem;
-import gec.scf.file.observer.DateTimeFieldValidator;
-import gec.scf.file.observer.DetailCountingValidator;
-import gec.scf.file.observer.HeaderMatchingValidator;
-import gec.scf.file.observer.SummaryFieldValidator;
+import gec.scf.file.validation.DateTimeFieldValidator;
+import gec.scf.file.validation.DetailCountingValidator;
+import gec.scf.file.validation.HeaderMatchingValidator;
+import gec.scf.file.validation.SummaryFieldValidator;
 
 public class FieldValidatorFactory {
 

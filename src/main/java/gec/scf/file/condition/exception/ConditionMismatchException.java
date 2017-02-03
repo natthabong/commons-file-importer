@@ -1,4 +1,4 @@
-package gec.scf.file.validator.exception;
+package gec.scf.file.condition.exception;
 
 public class ConditionMismatchException extends Exception {
 

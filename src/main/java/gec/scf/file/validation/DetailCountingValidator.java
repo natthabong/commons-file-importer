@@ -1,14 +1,15 @@
-package gec.scf.file.observer;
+package gec.scf.file.validation;
 
 import java.text.MessageFormat;
 
 import gec.scf.file.configuration.FileLayoutConfigItem;
+import gec.scf.file.configuration.RecordType;
 import gec.scf.file.converter.CovertErrorConstant;
 import gec.scf.file.converter.FieldValidator;
-import gec.scf.file.converter.FileObserver;
+import gec.scf.file.converter.DataObserver;
 import gec.scf.file.exception.WrongFormatFileException;
 
-public class DetailCountingValidator implements FieldValidator {
+public class DetailCountingValidator implements FieldValidator, DataObserver<Integer> {
 
 	/**
 	 * 
@@ -16,7 +17,7 @@ public class DetailCountingValidator implements FieldValidator {
 
 	private final FileLayoutConfigItem configItem;
 
-	private FileObserver<?> fileObserver;
+	private int total;
 
 	public DetailCountingValidator(FileLayoutConfigItem configItem) {
 		this.configItem = configItem;
@@ -26,7 +27,7 @@ public class DetailCountingValidator implements FieldValidator {
 	public void validate(Object data) throws WrongFormatFileException {
 		try {
 			int footerTotalDocument = Integer.parseInt(String.valueOf(data));
-			int totalDetail = (Integer) fileObserver.getValue();
+			int totalDetail = (Integer) getValue();
 
 			if (footerTotalDocument != totalDetail) {
 				throw new WrongFormatFileException(MessageFormat.format(
@@ -43,9 +44,23 @@ public class DetailCountingValidator implements FieldValidator {
 	}
 
 	@Override
-	public void setObserver(FileObserver<?> fileObserver) {
-		this.fileObserver = fileObserver;
+	public RecordType getObserveSection() {
+		return RecordType.DETAIL;
+	}
+
+	@Override
+	public void observe(Object currentLine) {
+		total++;
 
 	}
 
+	@Override
+	public Integer getValue() {
+		return Integer.valueOf(total);
+	}
+
+	@Override
+	public FileLayoutConfigItem getObserveFieldConfig() {
+		return null;
+	}
 }

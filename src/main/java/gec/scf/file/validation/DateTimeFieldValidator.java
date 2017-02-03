@@ -1,4 +1,4 @@
-package gec.scf.file.observer;
+package gec.scf.file.validation;
 
 import java.text.MessageFormat;
 import java.time.LocalDate;
@@ -9,7 +9,6 @@ import java.util.Locale;
 import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.converter.CovertErrorConstant;
 import gec.scf.file.converter.FieldValidator;
-import gec.scf.file.converter.FileObserver;
 import gec.scf.file.exception.WrongFormatFileException;
 
 public class DateTimeFieldValidator implements FieldValidator {
@@ -103,11 +102,6 @@ public class DateTimeFieldValidator implements FieldValidator {
 		default:
 			break;
 		}
-	}
-
-	@Override
-	public void setObserver(FileObserver<?> fileObserver) {
-
 	}
 
 }

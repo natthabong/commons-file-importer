@@ -1,6 +1,6 @@
-package gec.scf.file.validator;
+package gec.scf.file.condition;
 
-import gec.scf.file.validator.exception.ConditionMismatchException;
+import gec.scf.file.condition.exception.ConditionMismatchException;
 
 public interface ConditionMatching<T> {
 

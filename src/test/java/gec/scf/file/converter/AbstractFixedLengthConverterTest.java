@@ -96,6 +96,7 @@ public class AbstractFixedLengthConverterTest {
 		footerFilterConfig.setDocFieldName("filter");
 		footerFilterConfig.setStartIndex(92);
 		footerFilterConfig.setLength(209);
+		footerFilterConfig.setExpectedValue(" ");
 		footerFilterConfig.setRecordType(RecordType.FOOTER);
 		configItems.add(footerFilterConfig);
 
@@ -140,15 +141,14 @@ public class AbstractFixedLengthConverterTest {
 		corporateNameConfig.setExpectedValue("Siam Makro Plc.");
 		corporateNameConfig.setDisplayValue("Corporate Name");
 		corporateNameConfig.setRecordType(RecordType.HEADER);
-
 		configItems.add(corporateNameConfig);
 
 		DefaultFileLayoutConfigItem filterConfig = new DefaultFileLayoutConfigItem();
 		filterConfig.setDocFieldName("filter");
 		filterConfig.setStartIndex(54);
 		filterConfig.setLength(247);
+		filterConfig.setExpectedValue(" ");
 		filterConfig.setRecordType(RecordType.HEADER);
-
 		configItems.add(filterConfig);
 
 		DefaultFileLayoutConfigItem detailRecordTypeConfig = new DefaultFileLayoutConfigItem();
@@ -157,7 +157,6 @@ public class AbstractFixedLengthConverterTest {
 		detailRecordTypeConfig.setStartIndex(1);
 		detailRecordTypeConfig.setLength(1);
 		detailRecordTypeConfig.setRecordType(RecordType.DETAIL);
-
 		configItems.add(detailRecordTypeConfig);
 
 		DefaultFileLayoutConfigItem docAmountConfig = new DefaultFileLayoutConfigItem();
@@ -170,7 +169,6 @@ public class AbstractFixedLengthConverterTest {
 		docAmountConfig.setHasDecimalPlace(false);
 		docAmountConfig.setHas1000Separator(false);
 		docAmountConfig.setRecordType(RecordType.DETAIL);
-
 		configItems.add(docAmountConfig);
 
 		DefaultFileLayoutConfigItem detailFilterConfig = new DefaultFileLayoutConfigItem();
@@ -178,7 +176,6 @@ public class AbstractFixedLengthConverterTest {
 		detailFilterConfig.setStartIndex(54);
 		detailFilterConfig.setLength(248);
 		detailFilterConfig.setRecordType(RecordType.DETAIL);
-
 		configItems.add(detailFilterConfig);
 
 		DefaultFileLayoutConfigItem footerRecordTypeConfig = new DefaultFileLayoutConfigItem();
@@ -187,7 +184,6 @@ public class AbstractFixedLengthConverterTest {
 		footerRecordTypeConfig.setStartIndex(1);
 		footerRecordTypeConfig.setLength(1);
 		footerRecordTypeConfig.setRecordType(RecordType.FOOTER);
-
 		configItems.add(footerRecordTypeConfig);
 
 		DefaultFileLayoutConfigItem footerTotalDocConfig = new DefaultFileLayoutConfigItem();
@@ -219,9 +215,9 @@ public class AbstractFixedLengthConverterTest {
 		DefaultFileLayoutConfigItem footerFilterConfig = new DefaultFileLayoutConfigItem();
 		footerFilterConfig.setDocFieldName("filter");
 		footerFilterConfig.setStartIndex(54);
+		footerFilterConfig.setExpectedValue(" ");
 		footerFilterConfig.setLength(247);
 		footerFilterConfig.setRecordType(RecordType.FOOTER);
-
 		configItems.add(footerFilterConfig);
 
 		fileLayout.setConfigItems(configItems);

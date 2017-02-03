@@ -1,27 +1,31 @@
-package gec.scf.file.observer;
+package gec.scf.file.validation;
 
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 
 import gec.scf.file.configuration.FileLayoutConfigItem;
+import gec.scf.file.configuration.RecordType;
 import gec.scf.file.converter.CovertErrorConstant;
 import gec.scf.file.converter.FieldValidator;
-import gec.scf.file.converter.FileObserver;
+import gec.scf.file.converter.DataObserver;
 import gec.scf.file.exception.WrongFormatFileException;
 
-public class SummaryFieldValidator implements FieldValidator {
+public class SummaryFieldValidator implements FieldValidator, DataObserver<BigDecimal> {
 
 	private final FileLayoutConfigItem configItem;
 
-	private FileObserver<?> fileObserver;
+	private FileLayoutConfigItem aggregationFieldConfig;
+
+	private BigDecimal value = new BigDecimal("0.0");
 
 	public SummaryFieldValidator(FileLayoutConfigItem configItem) {
 		this.configItem = configItem;
+		this.aggregationFieldConfig = configItem.getValidationRecordFieldConfig();
 	}
 
 	@Override
 	public void validate(Object data) throws WrongFormatFileException {
-		BigDecimal totalDetail = (BigDecimal) fileObserver.getValue();
+		BigDecimal totalDetail = (BigDecimal) getValue();
 		BigDecimal totalFooter = (BigDecimal) data;
 
 		if (totalFooter.compareTo(totalDetail) != 0) {
@@ -35,8 +39,22 @@ public class SummaryFieldValidator implements FieldValidator {
 	}
 
 	@Override
-	public void setObserver(FileObserver<?> fileObserver) {
-		this.fileObserver = fileObserver;
+	public RecordType getObserveSection() {
+		return RecordType.DETAIL;
+	}
 
+	@Override
+	public void observe(Object data) {
+		value = value.add((BigDecimal) data);
+	}
+
+	@Override
+	public BigDecimal getValue() {
+		return value;
+	}
+
+	@Override
+	public FileLayoutConfigItem getObserveFieldConfig() {
+		return aggregationFieldConfig;
 	}
 }

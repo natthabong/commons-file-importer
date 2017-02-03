@@ -28,8 +28,7 @@ import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
 import gec.scf.file.importer.ErrorLineDetail;
-import gec.scf.file.observer.SummaryFieldObserver;
-import gec.scf.file.observer.SummaryFieldValidator;
+import gec.scf.file.validation.SummaryFieldValidator;
 
 public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
@@ -54,7 +53,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 	private Map<String, String> footerData = new HashMap<String, String>();
 
-	private Map<RecordType, Set<FileObserver<?>>> observers = new HashMap<RecordType, Set<FileObserver<?>>>();
+	private Map<RecordType, Set<DataObserver<?>>> observers = new HashMap<RecordType, Set<DataObserver<?>>>();
 
 	private Map<FileLayoutConfigItem, FieldValidator> validators = new HashMap<FileLayoutConfigItem, FieldValidator>();
 
@@ -223,14 +222,14 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 						log.error(e.getMessage(), e);
 					}
 
-					Set<FileObserver<?>> detailObservers = observers
+					Set<DataObserver<?>> detailObservers = observers
 							.get(RecordType.DETAIL);
 
 					if (detailObservers != null) {
 						final String detailData = currentLine;
 						detailObservers.forEach(observer -> {
 
-							if (observer instanceof SummaryFieldObserver) {
+							if (observer instanceof SummaryFieldValidator) {
 
 								FileLayoutConfigItem aggregationFieldConfig = observer
 										.getObserveFieldConfig();
@@ -492,8 +491,8 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			}
 			else {
 
-				FileObserver<?> fileObserver = fileObserverFactory
-						.create(fileLayoutConfigItem);
+//				FileObserver<?> fileObserver = fileObserverFactory
+//						.create(fileLayoutConfigItem);
 
 				if (fileLayoutConfigItem.getValidationType() != null) {
 
@@ -501,15 +500,25 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 							.create(fileLayoutConfigItem);
 					if (fieldValidator != null) {
 
-						if (fileObserver != null) {
+						if (fieldValidator instanceof DataObserver) {
+							DataObserver<?> fileObserver = (DataObserver<?>) fieldValidator;
 							if (observers.get(fileObserver.getObserveSection()) == null) {
 								observers.put(fileObserver.getObserveSection(),
-										new HashSet<FileObserver<?>>());
+										new HashSet<DataObserver<?>>());
 							}
 							observers.get(fileObserver.getObserveSection()).add(fileObserver);
-							fieldValidator.setObserver(fileObserver);
 						}
 						validators.put(fileLayoutConfigItem, fieldValidator);
+						
+//						if (fileObserver != null) {
+//							if (observers.get(fileObserver.getObserveSection()) == null) {
+//								observers.put(fileObserver.getObserveSection(),
+//										new HashSet<FileObserver<?>>());
+//							}
+//							observers.get(fileObserver.getObserveSection()).add(fileObserver);
+//							fieldValidator.setObserver(fileObserver);
+//						}
+//						validators.put(fileLayoutConfigItem, fieldValidator);
 					}
 				}
 

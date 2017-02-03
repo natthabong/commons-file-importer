@@ -14,14 +14,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import gec.scf.file.condition.ConditionMatching;
+import gec.scf.file.condition.ConditionMatchingProvider;
+import gec.scf.file.condition.ConditionType;
+import gec.scf.file.condition.DataCondition;
+import gec.scf.file.condition.DataInvalidException;
+import gec.scf.file.condition.DataValidator;
+import gec.scf.file.condition.exception.ConditionMismatchException;
 import gec.scf.file.example.domain.SponsorDocument;
-import gec.scf.file.validator.ConditionMatching;
-import gec.scf.file.validator.ConditionMatchingProvider;
-import gec.scf.file.validator.ConditionType;
-import gec.scf.file.validator.DataCondition;
-import gec.scf.file.validator.DataInvalidException;
-import gec.scf.file.validator.DataValidator;
-import gec.scf.file.validator.exception.ConditionMismatchException;
 
 public class DataValidatorTest {
 
