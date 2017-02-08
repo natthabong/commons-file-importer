@@ -491,9 +491,6 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			}
 			else {
 
-//				FileObserver<?> fileObserver = fileObserverFactory
-//						.create(fileLayoutConfigItem);
-
 				if (fileLayoutConfigItem.getValidationType() != null) {
 
 					FieldValidator fieldValidator = fieldValidatorFactory
@@ -509,16 +506,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 							observers.get(fileObserver.getObserveSection()).add(fileObserver);
 						}
 						validators.put(fileLayoutConfigItem, fieldValidator);
-						
-//						if (fileObserver != null) {
-//							if (observers.get(fileObserver.getObserveSection()) == null) {
-//								observers.put(fileObserver.getObserveSection(),
-//										new HashSet<FileObserver<?>>());
-//							}
-//							observers.get(fileObserver.getObserveSection()).add(fileObserver);
-//							fieldValidator.setObserver(fileObserver);
-//						}
-//						validators.put(fileLayoutConfigItem, fieldValidator);
+
 					}
 				}
 
