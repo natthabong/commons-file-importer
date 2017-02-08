@@ -2,24 +2,29 @@ package gec.scf.file.validation;
 
 import java.text.MessageFormat;
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import gec.scf.file.common.DateTimeProvider;
+import gec.scf.file.common.DateTimeProviderImpl;
 import gec.scf.file.configuration.FileLayoutConfigItem;
+import gec.scf.file.configuration.RecordType;
 import gec.scf.file.converter.CovertErrorConstant;
+import gec.scf.file.converter.DataObserver;
 import gec.scf.file.converter.FieldValidator;
 import gec.scf.file.exception.WrongFormatFileException;
 
-public class DateTimeFieldValidator implements FieldValidator {
+public class DateTimeFieldValidator implements FieldValidator, DataObserver<LocalDate> {
 
 	/**
 	 * 
 	 */
 	private final FileLayoutConfigItem configItem;
+	private DateTimeProvider dateTimeProvider;
 
 	public DateTimeFieldValidator(FileLayoutConfigItem configItem) {
 		this.configItem = configItem;
+		dateTimeProvider = new DateTimeProviderImpl();
 	}
 
 	@Override
@@ -28,7 +33,7 @@ public class DateTimeFieldValidator implements FieldValidator {
 		DateTimeFormatter formatter = DateTimeFormatter
 				.ofPattern(configItem.getDatetimeFormat(), Locale.US);
 		LocalDate documentDateTime = LocalDate.parse(String.valueOf(data), formatter);
-		LocalDate currentDateTime = LocalDate.of(2017, Month.FEBRUARY, 1);
+		LocalDate currentDateTime = getValue();
 
 		switch (configItem.getValidationType()) {
 		case EQUAL_TO_UPLOAD_DATE:
@@ -102,6 +107,26 @@ public class DateTimeFieldValidator implements FieldValidator {
 		default:
 			break;
 		}
+	}
+
+	@Override
+	public RecordType getObserveSection() {
+		return RecordType.HEADER;
+	}
+
+	@Override
+	public void observe(Object dateTimeProvider) {
+	
+	}
+
+	@Override
+	public LocalDate getValue() {
+		return dateTimeProvider.getNow();
+	}
+
+	@Override
+	public FileLayoutConfigItem getObserveFieldConfig() {
+		return null;
 	}
 
 }

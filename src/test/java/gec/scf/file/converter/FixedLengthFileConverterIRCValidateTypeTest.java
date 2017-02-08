@@ -1,35 +1,52 @@
 package gec.scf.file.converter;
 
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.Month;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
 
+import gec.scf.file.common.DateTimeProvider;
+import gec.scf.file.configuration.DefaultFileLayoutConfigItem;
 import gec.scf.file.configuration.FileLayoutConfig;
+import gec.scf.file.configuration.FileLayoutConfigItem;
+import gec.scf.file.configuration.RecordType;
 import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatFileException;
+import gec.scf.file.validation.DateTimeFieldValidator;
 
 public class FixedLengthFileConverterIRCValidateTypeTest
-		extends AbstractFixedLengthConverterTest {
+        extends AbstractFixedLengthConverterTest {
 
+	
 	private FileConverter<SponsorDocument> fixLengthFileConverter;
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
+	@Mock
+	public DateTimeProvider dateTimeProvider;
+
+	@Spy
+	private FieldValidatorFactory fieldValidatorFactory;
+
 	@Before
 	public void setup() {
-		MockitoAnnotations.initMocks(this);
-
+		MockitoAnnotations.initMocks(this);		
 	}
 
 	@Test
 	public void given_config_footer_validation_type_is_EQUAL_TO_UPLOAD_DATE_and_current_date_2017_02_01_when_upload_file_then_should_not_throw_exception()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 
 		// Arrange
 		String[] fixedLengthContent = new String[3];
@@ -38,18 +55,30 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 		fixedLengthContent[2] = "F20170201155917Inoue Rubber (Thailand) Plc.  IRC  00400025100000201316445610000020131644561                                                                                                                                                                                                                 ";
 
 		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+		
+		DefaultFileLayoutConfigItem fileLayoutConfigItem = prepareFileLayoutConfigItem("Send date",
+		        "yyyyMMdd", ValidationType.EQUAL_TO_UPLOAD_DATE);
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
-				"yyyyMMdd", ValidationType.EQUAL_TO_UPLOAD_DATE);
-		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
+		mockFieldValidatorFactory(fileLayoutConfigItem);
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
 	}
 
+	private void mockFieldValidatorFactory(
+	        DefaultFileLayoutConfigItem fileLayoutConfigItem) {
+		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout(fileLayoutConfigItem);
+		
+		DateTimeFieldValidator validator = Mockito.spy(new DateTimeFieldValidator(fileLayoutConfigItem));
+		Mockito.when(validator.getValue()).thenReturn(LocalDate.of(2017, Month.FEBRUARY, 1));
+		Mockito.doReturn(validator).when(fieldValidatorFactory).create(Mockito.any(FileLayoutConfigItem.class));
+
+		fixLengthFileConverter = spyToAnswerValidation(fieldValidatorFactory, fileLayoutConfig);
+	}
+
 	@Test
 	public void given_config_footer_validation_type_is_EQUAL_TO_UPLOAD_DATE_and_date_in_file_is_2017_01_30_and_current_date_2017_02_01_when_upload_file_then_should_throw_exception()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 		// Arrange
 		String[] fixedLengthContent = new String[3];
 		fixedLengthContent[0] = "H20170130155917Inoue Rubber (Thailand) Plc.  IRC  004                                                                                                                                                                                                                                                       ";
@@ -57,10 +86,11 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 		fixedLengthContent[2] = "F20170130155917Inoue Rubber (Thailand) Plc.  IRC  00400025100000201316445610000020131644561                                                                                                                                                                                                                 ";
 
 		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+		
+		DefaultFileLayoutConfigItem fileLayoutConfigItem = prepareFileLayoutConfigItem("Send date",
+		        "yyyyMMdd", ValidationType.EQUAL_TO_UPLOAD_DATE);
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
-				"yyyyMMdd", ValidationType.EQUAL_TO_UPLOAD_DATE);
-		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
+		mockFieldValidatorFactory(fileLayoutConfigItem);
 
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
@@ -72,7 +102,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 	@Test
 	public void given_config_footer_validation_type_is_EQUAL_OR_GREATER_THAN_UPLOAD_DATE_and_date_in_file_is_2017_01_30_and_current_date_2017_02_01_when_upload_file_then_should_throw_exception()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 		// Arrange
 		String[] fixedLengthContent = new String[3];
 		fixedLengthContent[0] = "H20170130155917Inoue Rubber (Thailand) Plc.  IRC  004                                                                                                                                                                                                                                                       ";
@@ -81,14 +111,15 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
-				"yyyyMMdd", ValidationType.EQUAL_OR_GREATER_THAN_UPLOAD_DATE);
-		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
+		DefaultFileLayoutConfigItem fileLayoutConfigItem = prepareFileLayoutConfigItem("Send date",
+		        "yyyyMMdd", ValidationType.EQUAL_OR_GREATER_THAN_UPLOAD_DATE);
+
+		mockFieldValidatorFactory(fileLayoutConfigItem);
 
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage(
-				"Send date (20170130) not equals or greater than current date (20170201)");
+		        "Send date (20170130) not equals or greater than current date (20170201)");
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -96,7 +127,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 	@Test
 	public void given_config_footer_validation_type_is_EQUAL_OR_GREATER_THAN_UPLOAD_DATE_and_date_in_file_is_2017_02_01_and_current_date_2017_02_01_when_upload_file_then_should_not_throw_exception()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 		// Arrange
 		String[] fixedLengthContent = new String[3];
 		fixedLengthContent[0] = "H20170201155917Inoue Rubber (Thailand) Plc.  IRC  004                                                                                                                                                                                                                                                       ";
@@ -105,9 +136,13 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
-				"yyyyMMdd", ValidationType.EQUAL_OR_GREATER_THAN_UPLOAD_DATE);
-		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
+		DefaultFileLayoutConfigItem fileLayoutConfigItem = prepareFileLayoutConfigItem("Send date",
+		        "yyyyMMdd", ValidationType.EQUAL_OR_GREATER_THAN_UPLOAD_DATE);
+
+		mockFieldValidatorFactory(fileLayoutConfigItem);
+//		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
+//		        "yyyyMMdd", ValidationType.EQUAL_OR_GREATER_THAN_UPLOAD_DATE);
+//		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -115,7 +150,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 	@Test
 	public void given_config_footer_validation_type_is_EQUAL_OR_GREATER_THAN_UPLOAD_DATE_and_date_in_file_is_2017_02_04_and_current_date_2017_02_01_when_upload_file_then_should_not_throw_exception()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 		// Arrange
 		String[] fixedLengthContent = new String[3];
 		fixedLengthContent[0] = "H20170204155917Inoue Rubber (Thailand) Plc.  IRC  004                                                                                                                                                                                                                                                       ";
@@ -123,10 +158,14 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 		fixedLengthContent[2] = "F20170204155917Inoue Rubber (Thailand) Plc.  IRC  00400025100000201316445610000020131644561                                                                                                                                                                                                                 ";
 
 		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+		
+		DefaultFileLayoutConfigItem fileLayoutConfigItem = prepareFileLayoutConfigItem("Send date",
+		        "yyyyMMdd", ValidationType.GREATER_THAN_UPLOAD_DATE);
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
-				"yyyyMMdd", ValidationType.GREATER_THAN_UPLOAD_DATE);
-		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
+		mockFieldValidatorFactory(fileLayoutConfigItem);
+//		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
+//		        "yyyyMMdd", ValidationType.GREATER_THAN_UPLOAD_DATE);
+//		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -134,7 +173,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 	@Test
 	public void given_config_footer_validation_type_is_GREATER_THAN_UPLOAD_DATE_and_date_in_file_is_2017_02_01_and_current_date_2017_02_01_when_upload_file_then_should_throw_exception()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 
 		// Arrange
 		String[] fixedLengthContent = new String[3];
@@ -144,14 +183,18 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
-				"yyyyMMdd", ValidationType.GREATER_THAN_UPLOAD_DATE);
-		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
+		DefaultFileLayoutConfigItem fileLayoutConfigItem = prepareFileLayoutConfigItem("Send date",
+		        "yyyyMMdd", ValidationType.GREATER_THAN_UPLOAD_DATE);
+
+		mockFieldValidatorFactory(fileLayoutConfigItem);
+//		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
+//		        "yyyyMMdd", ValidationType.GREATER_THAN_UPLOAD_DATE);
+//		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
 
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage(
-				"Send date (20170201) not greater than current date (20170201)");
+		        "Send date (20170201) not greater than current date (20170201)");
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -159,7 +202,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 	@Test
 	public void given_config_footer_validation_type_is_EQUAL_OR_LESS_THAN_UPLOAD_DATE_and_date_in_file_is_2017_02_01_and_current_date_2017_02_01_when_upload_file_then_should_not_throw_exception()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 		// Arrange
 		String[] fixedLengthContent = new String[3];
 		fixedLengthContent[0] = "H20170201155917Inoue Rubber (Thailand) Plc.  IRC  004                                                                                                                                                                                                                                                       ";
@@ -168,9 +211,13 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
-				"yyyyMMdd", ValidationType.EQUAL_OR_LESS_THAN_UPLOAD_DATE);
-		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
+		DefaultFileLayoutConfigItem fileLayoutConfigItem = prepareFileLayoutConfigItem("Send date",
+		        "yyyyMMdd", ValidationType.EQUAL_OR_LESS_THAN_UPLOAD_DATE);
+
+		mockFieldValidatorFactory(fileLayoutConfigItem);
+//		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
+//		        "yyyyMMdd", ValidationType.EQUAL_OR_LESS_THAN_UPLOAD_DATE);
+//		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -178,7 +225,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 	@Test
 	public void given_config_footer_validation_type_is_EQUAL_OR_LESS_THAN_UPLOAD_DATE_and_date_in_file_is_2017_01_30_and_current_date_2017_02_01_when_upload_file_then_should_not_throw_exception()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 		// Arrange
 		String[] fixedLengthContent = new String[3];
 		fixedLengthContent[0] = "H20170130155917Inoue Rubber (Thailand) Plc.  IRC  004                                                                                                                                                                                                                                                       ";
@@ -187,9 +234,10 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
-				"yyyyMMdd", ValidationType.EQUAL_OR_LESS_THAN_UPLOAD_DATE);
-		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
+		DefaultFileLayoutConfigItem fileLayoutConfigItem = prepareFileLayoutConfigItem("Send date",
+		        "yyyyMMdd", ValidationType.EQUAL_OR_LESS_THAN_UPLOAD_DATE);
+
+		mockFieldValidatorFactory(fileLayoutConfigItem);
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -197,7 +245,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 	@Test
 	public void given_config_footer_validation_type_is_EQUAL_OR_LESS_THAN_UPLOAD_DATE_and_date_in_file_is_2017_02_05_and_current_date_2017_02_01_when_upload_file_then_should_throw_exception()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 		// Arrange
 		String[] fixedLengthContent = new String[3];
 		fixedLengthContent[0] = "H20170205155917Inoue Rubber (Thailand) Plc.  IRC  004                                                                                                                                                                                                                                                       ";
@@ -205,15 +253,16 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 		fixedLengthContent[2] = "F20170205155917Inoue Rubber (Thailand) Plc.  IRC  00400025100000201316445610000020131644561                                                                                                                                                                                                                 ";
 
 		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+		
+		DefaultFileLayoutConfigItem fileLayoutConfigItem = prepareFileLayoutConfigItem("Send date",
+		        "yyyyMMdd", ValidationType.EQUAL_OR_LESS_THAN_UPLOAD_DATE);
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
-				"yyyyMMdd", ValidationType.EQUAL_OR_LESS_THAN_UPLOAD_DATE);
-		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
+		mockFieldValidatorFactory(fileLayoutConfigItem);
 
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage(
-				"Send date (20170205) not equal or less than current date (20170201)");
+		        "Send date (20170205) not equal or less than current date (20170201)");
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -221,7 +270,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 	@Test
 	public void given_config_footer_validation_type_is_LESS_THAN_UPLOAD_DATE_and_date_in_file_is_2017_02_05_and_current_date_2017_02_01_when_upload_file_then_should_throw_exception()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 		// Arrange
 		String[] fixedLengthContent = new String[3];
 		fixedLengthContent[0] = "H20170205155917Inoue Rubber (Thailand) Plc.  IRC  004                                                                                                                                                                                                                                                       ";
@@ -229,15 +278,16 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 		fixedLengthContent[2] = "F20170205155917Inoue Rubber (Thailand) Plc.  IRC  00400025100000201316445610000020131644561                                                                                                                                                                                                                 ";
 
 		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+		
+		DefaultFileLayoutConfigItem fileLayoutConfigItem = prepareFileLayoutConfigItem("Send date",
+		        "yyyyMMdd", ValidationType.LESS_THAN_UPLOAD_DATE);
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
-				"yyyyMMdd", ValidationType.LESS_THAN_UPLOAD_DATE);
-		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
+		mockFieldValidatorFactory(fileLayoutConfigItem);
 
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage(
-				"Send date (20170205) not less than current date (20170201)");
+		        "Send date (20170205) not less than current date (20170201)");
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -245,7 +295,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 	@Test
 	public void given_config_footer_validation_type_is_LESS_THAN_UPLOAD_DATE_and_date_in_file_is_2017_02_01_and_current_date_2017_02_01_when_upload_file_then_should_throw_exception()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 		// Arrange
 		String[] fixedLengthContent = new String[3];
 		fixedLengthContent[0] = "H20170201155917Inoue Rubber (Thailand) Plc.  IRC  004                                                                                                                                                                                                                                                       ";
@@ -254,22 +304,25 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
-				"yyyyMMdd", ValidationType.LESS_THAN_UPLOAD_DATE);
-		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
+		DefaultFileLayoutConfigItem fileLayoutConfigItem = prepareFileLayoutConfigItem("Send date",
+		        "yyyyMMdd", ValidationType.LESS_THAN_UPLOAD_DATE);
+
+		mockFieldValidatorFactory(fileLayoutConfigItem);
 
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage(
-				"Send date (20170201) not less than current date (20170201)");
+		        "Send date (20170201) not less than current date (20170201)");
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
 	}
 
+	
+
 	@Test
 	public void given_config_footer_validation_type_is_LESS_THAN_UPLOAD_DATE_and_date_in_file_is_2017_01_31_and_current_date_2017_02_01_when_upload_file_then_should_not_throw_exception()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 		// Arrange
 		String[] fixedLengthContent = new String[3];
 		fixedLengthContent[0] = "H20170131155917Inoue Rubber (Thailand) Plc.  IRC  004                                                                                                                                                                                                                                                       ";
@@ -277,10 +330,11 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 		fixedLengthContent[2] = "F20170131155917Inoue Rubber (Thailand) Plc.  IRC  00400025100000201316445610000020131644561                                                                                                                                                                                                                 ";
 
 		InputStream documentFile = getFixedLengthFileContent(fixedLengthContent);
+		
+		DefaultFileLayoutConfigItem fileLayoutConfigItem = prepareFileLayoutConfigItem("Send date",
+		        "yyyyMMdd", ValidationType.LESS_THAN_UPLOAD_DATE);
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout("Send date",
-				"yyyyMMdd", ValidationType.LESS_THAN_UPLOAD_DATE);
-		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
+		mockFieldValidatorFactory(fileLayoutConfigItem);
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
@@ -288,7 +342,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 	@Test
 	public void given_total_document_in_the_footer_is_not_equal_to_total_of_document_in_detail_when_check_file_format_should_throw_WrongFormatFileException()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 
 		// Arrange
 		String[] fixedLengthContent = new String[4];
@@ -311,7 +365,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 	@Test
 	public void given_total_document_amount_in_the_footer_which_has_wrong_number_format_when_check_file_format_should_throw_WrongFormatFileException()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 
 		// Arrange
 		String[] fixedLengthContent = new String[4];
@@ -334,7 +388,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 
 	@Test
 	public void given_total_document_amount_in_the_footer_is_not_equal_to_sum_of_document_amount_in_detail_when_check_file_format_should_throw_WrongFormatFileException()
-			throws WrongFormatFileException {
+	        throws WrongFormatFileException {
 
 		// Arrange
 		String[] fixedLengthContent = new String[4];
@@ -351,7 +405,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage(
-				"Total Document Amount (99,000.00) is invalid. Total detail line is 101,000.00");
+		        "Total Document Amount (99,000.00) is invalid. Total detail line is 101,000.00");
 
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
