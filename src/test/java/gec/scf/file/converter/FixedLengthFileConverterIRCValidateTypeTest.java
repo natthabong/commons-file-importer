@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -18,7 +17,6 @@ import gec.scf.file.common.DateTimeProvider;
 import gec.scf.file.configuration.DefaultFileLayoutConfigItem;
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
-import gec.scf.file.configuration.RecordType;
 import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatFileException;
@@ -28,7 +26,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
         extends AbstractFixedLengthConverterTest {
 
 	
-	private FileConverter<SponsorDocument> fixLengthFileConverter;
+	private AbstractFileConverter<SponsorDocument> fixLengthFileConverter;
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -37,7 +35,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 	public DateTimeProvider dateTimeProvider;
 
 	@Spy
-	private FieldValidatorFactory fieldValidatorFactory;
+	private FieldValidatorFactory fieldValidatorFactory = new FieldValidatorFactoryTest();
 
 	@Before
 	public void setup() {

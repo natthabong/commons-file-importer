@@ -11,5 +11,4 @@ public interface FileConverter<T> {
 
 	public DetailResult<T> getDetail();
 
-	public void setFieldValidatorFactory(FieldValidatorFactory fieldValidatorFactory);
 }

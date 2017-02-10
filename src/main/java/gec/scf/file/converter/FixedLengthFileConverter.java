@@ -34,8 +34,6 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 	private static final Logger log = Logger.getLogger(FixedLengthFileConverter.class);
 
-	private FileLayoutConfig fileLayoutConfig;
-
 	private Map<RecordType, List<FileLayoutConfigItem>> fileConfigItems = null;
 
 	private Map<RecordType, RecordTypeExtractor> extractors = new EnumMap<RecordType, RecordTypeExtractor>(
@@ -64,7 +62,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 	@Override
 	public void checkFileFormat(InputStream fileContent) throws WrongFormatFileException {
 
-		fileConfigItems = prepareConfiguration(fileLayoutConfig.getConfigItems());
+		fileConfigItems = prepareConfiguration(getFileLayoutConfig().getConfigItems());
 
 		BufferedWriter bufferedWriter = null;
 		BufferedReader bufferReader = null;
@@ -81,7 +79,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 			InputStream tempFileContent = new FileInputStream(tempFile);
 
-			if (fileLayoutConfig.isCheckBinaryFile()) {
+			if (getFileLayoutConfig().isCheckBinaryFile()) {
 				fileContent = validateBinaryFile(fileContent);
 			}
 
@@ -117,7 +115,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 						throw new WrongFormatFileException(MessageFormat.format(
 								CovertErrorConstant.HEADER_NOT_FIRST_LINE_OF_FILE,
 								headerRecordType.getDisplayValue(),
-								fileLayoutConfig.getHeaderFlag()));
+								getFileLayoutConfig().getHeaderFlag()));
 					}
 					else if (!hasCheckedFooter) {
 
@@ -140,9 +138,9 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 						throw new WrongFormatFileException(MessageFormat.format(
 								CovertErrorConstant.HEADER_NOT_FIRST_LINE_OF_FILE,
 								headerRecordType.getDisplayValue(),
-								fileLayoutConfig.getHeaderFlag()));
+								getFileLayoutConfig().getHeaderFlag()));
 					}
-					else if (fileLayoutConfig.getHeaderFlag().equals(recordType)) {
+					else if (getFileLayoutConfig().getHeaderFlag().equals(recordType)) {
 
 						List<FileLayoutConfigItem> headerConfigItems = fileConfigItems
 								.get(RecordType.HEADER);
@@ -176,10 +174,10 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 								MessageFormat.format(
 										CovertErrorConstant.FOOTER_NOT_LAST_LINE_OF_FILE,
 										footerRecordType.getDisplayValue(),
-										fileLayoutConfig.getFooterFlag()),
+										getFileLayoutConfig().getFooterFlag()),
 								currentLineNo);
 					}
-					else if (fileLayoutConfig.getFooterFlag().equals(recordType)) {
+					else if (getFileLayoutConfig().getFooterFlag().equals(recordType)) {
 						List<FileLayoutConfigItem> footerConfigItems = fileConfigItems
 								.get(RecordType.FOOTER);
 
@@ -195,7 +193,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 				String recordType = detailRecordTypeExtractor.extract(currentLine);
 
 				// Validate Detail
-				if (fileLayoutConfig.getDetailFlag().equals(recordType)) {
+				if (getFileLayoutConfig().getDetailFlag().equals(recordType)) {
 
 					if (hasCheckedFooter) {
 
@@ -205,7 +203,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 								MessageFormat.format(
 										CovertErrorConstant.FOOTER_NOT_LAST_FILE,
 										detialRecordTypeConfig.getDisplayValue(),
-										fileLayoutConfig.getFooterFlag()),
+										getFileLayoutConfig().getFooterFlag()),
 								currentLineNo);
 					}
 
@@ -280,7 +278,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 				throw new WrongFormatFileException(
 						MessageFormat.format(CovertErrorConstant.FOOTER_NOT_LAST_FILE,
 								recordTypeLayoutCofig.getDisplayValue(),
-								fileLayoutConfig.getFooterFlag()));
+								getFileLayoutConfig().getFooterFlag()));
 			}
 		}
 		catch (IllegalArgumentException e) {
@@ -503,7 +501,8 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 								observers.put(fileObserver.getObserveSection(),
 										new HashSet<DataObserver<?>>());
 							}
-							observers.get(fileObserver.getObserveSection()).add(fileObserver);
+							observers.get(fileObserver.getObserveSection())
+									.add(fileObserver);
 						}
 						validators.put(fileLayoutConfigItem, fieldValidator);
 
@@ -638,14 +637,6 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 			throw new WrongFormatDetailException(errorLineDetails);
 		}
 		return entity;
-	}
-
-	public FileLayoutConfig getFileLayoutConfig() {
-		return fileLayoutConfig;
-	}
-
-	public void setFileLayoutConfig(FileLayoutConfig fileLayoutConfig) {
-		this.fileLayoutConfig = fileLayoutConfig;
 	}
 
 	public Long getLastDocumentNo() {

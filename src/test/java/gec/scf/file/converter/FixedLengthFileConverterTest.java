@@ -10,6 +10,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import gec.scf.file.configuration.DefaultFileLayoutConfig;
@@ -24,10 +26,14 @@ import gec.scf.file.exception.WrongFormatFileException;
 
 public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTest {
 
-	private FileConverter<SponsorDocument> fixLengthFileConverter;
+	@InjectMocks
+	private AbstractFileConverter<SponsorDocument> fixLengthFileConverter;
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
+
+	@Mock
+	private FieldValidatorFactory fieldValidatorFactory;
 
 	@Before
 	public void setup() {
@@ -36,6 +42,7 @@ public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTe
 
 		fixLengthFileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
+		fixLengthFileConverter.setFieldValidatorFactory(fieldValidatorFactory);
 
 		MockitoAnnotations.initMocks(this);
 	}
@@ -342,8 +349,7 @@ public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTe
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
-		
-		
+
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage(
@@ -390,7 +396,7 @@ public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTe
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
-		
+
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage("Total Document No (001,00) invalid format");
@@ -413,7 +419,7 @@ public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTe
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		fixLengthFileConverter = stubToAnswerValidation(fileLayoutConfig);
-		
+
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage("Total Document Amount (00000100,000000) invalid format");

@@ -36,9 +36,9 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 	protected FieldValidatorFactory fieldValidatorFactory;
 
 	public AbstractFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
-		this.setFileLayoutConfig(fileLayoutConfig);
+		this.fileLayoutConfig = fileLayoutConfig;
 		this.entityClass = clazz;
-		
+
 	}
 
 	protected void applyObjectValue(T entity, FileLayoutConfigItem itemConf,
