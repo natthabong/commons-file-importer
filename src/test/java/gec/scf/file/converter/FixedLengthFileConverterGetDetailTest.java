@@ -589,25 +589,25 @@ public class FixedLengthFileConverterGetDetailTest
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		DefaultFileLayoutConfigItem supplierCode = new DefaultFileLayoutConfigItem();
-		supplierCode.setDocFieldName("supplierCode");
-		supplierCode.setStartIndex(7);
-		supplierCode.setLength(20);
-		supplierCode.setRequired(true);
-		supplierCode.setRecordType(RecordType.DETAIL);
-		supplierCode.setTransient(false);
-		supplierCode.setDisplayValue("Supplier Code");
-		supplierCode.setValidationType(ValidationType.IN_CUSTOMER_CODE_GROUP);
-		supplierCode.setExpectedValue("1");
+		DefaultFileLayoutConfigItem supplierCodeConfig = new DefaultFileLayoutConfigItem();
+		supplierCodeConfig.setDocFieldName("supplierCode");
+		supplierCodeConfig.setStartIndex(7);
+		supplierCodeConfig.setLength(20);
+		supplierCodeConfig.setRequired(true);
+		supplierCodeConfig.setRecordType(RecordType.DETAIL);
+		supplierCodeConfig.setTransient(false);
+		supplierCodeConfig.setDisplayValue("Supplier Code");
+		supplierCodeConfig.setValidationType(ValidationType.IN_CUSTOMER_CODE_GROUP);
+		supplierCodeConfig.setExpectedValue("1");
 
 		FieldValidatorFactory fieldValidatorFactory = spy(
 				new FieldValidatorFactoryTest());
 
 		FieldValidator supplierIdSetter = new ExpectedCustomerCodeValidatorStub();
-		doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCode));
+		doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCodeConfig));
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout(
-				supplierCode);
+				supplierCodeConfig);
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
 		fileConverter.checkFileFormat(fixedlengthFileContent);

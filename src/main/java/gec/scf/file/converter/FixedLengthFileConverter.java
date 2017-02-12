@@ -30,7 +30,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 	private static final Logger log = Logger.getLogger(FixedLengthFileConverter.class);
 
-	private int currentLineNo;
+	protected int currentLineNo;
 
 	private File tempFile;
 
@@ -292,7 +292,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 	}
 
-	private void validateHeader(String currentLine,
+	protected void validateHeader(String currentLine,
 			List<FileLayoutConfigItem> footerConfigItems)
 			throws WrongFormatFileException {
 		try {
@@ -335,7 +335,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 		}
 	}
 
-	private int getLengthOfLine(
+	protected int getLengthOfLine(
 			List<? extends FileLayoutConfigItem> fileLayoutConfigItems) {
 		int result = 0;
 		for (FileLayoutConfigItem item : fileLayoutConfigItems) {
@@ -383,7 +383,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 		return detailResult;
 	}
 
-	private T convertDetail(String currentLine,
+	protected T convertDetail(String currentLine,
 			List<? extends FileLayoutConfigItem> fileLayoutConfigs) {
 
 		T entity = null;
@@ -433,6 +433,6 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 		int start = configItem.getStartIndex() - 1;
 		int end = (configItem.getStartIndex() + configItem.getLenght()) - 1;
 
-		return String.valueOf(currentLine).substring(start, end).trim();
+		return String.valueOf(currentLine).substring(start, end);
 	}
 }
