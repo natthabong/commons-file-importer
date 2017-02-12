@@ -22,10 +22,10 @@ public class AbstractFixedLengthConverterTest {
 	protected AbstractFileConverter<SponsorDocument> stubToAnswerValidation(
 			FileLayoutConfig fileLayoutConfig) {
 
-		AbstractFileConverter<SponsorDocument> fixLengthFileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
 		FieldValidatorFactory fieldValidatorFactory = new FieldValidatorFactoryTest();
-		fixLengthFileConverter.setFieldValidatorFactory(fieldValidatorFactory);
+		AbstractFileConverter<SponsorDocument> fixLengthFileConverter = new FixedLengthFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+
 		return fixLengthFileConverter;
 	}
 
@@ -34,8 +34,7 @@ public class AbstractFixedLengthConverterTest {
 			FileLayoutConfig fileLayoutConfig) {
 
 		AbstractFileConverter<SponsorDocument> fixLengthFileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
-		fixLengthFileConverter.setFieldValidatorFactory(fieldValidatorFactory);
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
 		return fixLengthFileConverter;
 	}
 
@@ -121,78 +120,211 @@ public class AbstractFixedLengthConverterTest {
 		return fileLayout;
 	}
 
-	// protected FileLayoutConfig createFixedLengthFileLayout(String displayValue,
-	// String dateFormat, ValidationType validationType) {
-	// DefaultFileLayoutConfig fileLayout = new DefaultFileLayoutConfig();
-	// fileLayout.setFileType(FileType.FIXED_LENGTH);
-	// fileLayout.setHeaderFlag("H");
-	// fileLayout.setDetailFlag("D");
-	// fileLayout.setFooterFlag("F");
-	//
-	// List<FileLayoutConfigItem> configItems = new ArrayList<FileLayoutConfigItem>();
-	// DefaultFileLayoutConfigItem headerRecordTypeConfig = new
-	// DefaultFileLayoutConfigItem();
-	// headerRecordTypeConfig.setDocFieldName("recordId");
-	// headerRecordTypeConfig.setStartIndex(1);
-	// headerRecordTypeConfig.setLength(1);
-	// headerRecordTypeConfig.setDisplayValue("Record Type");
-	// headerRecordTypeConfig.setRecordType(RecordType.HEADER);
-	// configItems.add(headerRecordTypeConfig);
-	//
-	// DefaultFileLayoutConfigItem filterConfig = new DefaultFileLayoutConfigItem();
-	// filterConfig.setDocFieldName("filter");
-	// filterConfig.setStartIndex(92);
-	// filterConfig.setLength(209);
-	// filterConfig.setRecordType(RecordType.HEADER);
-	// configItems.add(filterConfig);
-	//
-	// DefaultFileLayoutConfigItem detailRecordTypeConfig = new
-	// DefaultFileLayoutConfigItem();
-	// detailRecordTypeConfig.setDocFieldName("recordId");
-	// detailRecordTypeConfig.setDisplayValue("Record Type");
-	// detailRecordTypeConfig.setStartIndex(1);
-	// detailRecordTypeConfig.setLength(1);
-	// detailRecordTypeConfig.setRecordType(RecordType.DETAIL);
-	// configItems.add(detailRecordTypeConfig);
-	//
-	// DefaultFileLayoutConfigItem detailFilterConfig = new DefaultFileLayoutConfigItem();
-	// detailFilterConfig.setDocFieldName("filter");
-	// detailFilterConfig.setStartIndex(126);
-	// detailFilterConfig.setLength(175);
-	// detailFilterConfig.setRecordType(RecordType.DETAIL);
-	// configItems.add(detailFilterConfig);
-	//
-	// DefaultFileLayoutConfigItem footerRecordTypeConfig = new
-	// DefaultFileLayoutConfigItem();
-	// footerRecordTypeConfig.setDocFieldName("recordId");
-	// footerRecordTypeConfig.setDisplayValue("Record Type");
-	// footerRecordTypeConfig.setStartIndex(1);
-	// footerRecordTypeConfig.setLength(1);
-	// footerRecordTypeConfig.setRecordType(RecordType.FOOTER);
-	// configItems.add(footerRecordTypeConfig);
-	//
-	//// DefaultFileLayoutConfigItem footerSendDateConfig = new
-	// DefaultFileLayoutConfigItem();
-	//// footerSendDateConfig.setLength(8);
-	//// footerSendDateConfig.setStartIndex(2);
-	//// footerSendDateConfig.setRecordType(RecordType.FOOTER);
-	//// footerSendDateConfig.setDatetimeFormat(dateFormat);
-	//// footerSendDateConfig.setTransient(true);
-	//// footerSendDateConfig.setDisplayValue(displayValue);
-	//// footerSendDateConfig.setValidationType(validationType);
-	//// configItems.add(footerSendDateConfig);
-	//
-	// DefaultFileLayoutConfigItem footerFilterConfig = new DefaultFileLayoutConfigItem();
-	// footerFilterConfig.setDocFieldName("filter");
-	// footerFilterConfig.setStartIndex(92);
-	// footerFilterConfig.setLength(209);
-	// footerFilterConfig.setExpectedValue(" ");
-	// footerFilterConfig.setRecordType(RecordType.FOOTER);
-	// configItems.add(footerFilterConfig);
-	//
-	// fileLayout.setConfigItems(configItems);
-	// return fileLayout;
-	// }
+	protected FileLayoutConfig createMakroFixedLengthFileLayoutNoValidation() {
+		return createMakroFixedLengthFileLayout(null);
+	}
+
+	protected FileLayoutConfig createMakroFixedLengthFileLayout(
+			DefaultFileLayoutConfigItem otherConfig) {
+
+		DefaultFileLayoutConfig fileLayout = new DefaultFileLayoutConfig();
+		fileLayout.setFileType(FileType.FIXED_LENGTH);
+		fileLayout.setHeaderFlag("H");
+		fileLayout.setDetailFlag("D");
+		fileLayout.setFooterFlag("T");
+
+		List<FileLayoutConfigItem> configItems = new ArrayList<FileLayoutConfigItem>();
+
+		DefaultFileLayoutConfigItem headerRecordTypeConfig = new DefaultFileLayoutConfigItem();
+		headerRecordTypeConfig.setDocFieldName("recordId");
+		headerRecordTypeConfig.setStartIndex(1);
+		headerRecordTypeConfig.setLength(1);
+		headerRecordTypeConfig.setDisplayValue("Record Type");
+		headerRecordTypeConfig.setRecordType(RecordType.HEADER);
+
+		configItems.add(headerRecordTypeConfig);
+
+		DefaultFileLayoutConfigItem filterConfig = new DefaultFileLayoutConfigItem();
+		filterConfig.setDocFieldName("filter");
+		filterConfig.setStartIndex(54);
+		filterConfig.setLength(247);
+		filterConfig.setRecordType(RecordType.HEADER);
+
+		configItems.add(filterConfig);
+
+		DefaultFileLayoutConfigItem detailRecordTypeConfig = new DefaultFileLayoutConfigItem();
+		detailRecordTypeConfig.setDocFieldName("recordId");
+		detailRecordTypeConfig.setDisplayValue("Record Type");
+		detailRecordTypeConfig.setStartIndex(1);
+		detailRecordTypeConfig.setLength(1);
+		detailRecordTypeConfig.setRecordType(RecordType.DETAIL);
+		detailRecordTypeConfig.setTransient(true);
+
+		configItems.add(detailRecordTypeConfig);
+
+		if (otherConfig == null) {
+			DefaultFileLayoutConfigItem corporateCode = new DefaultFileLayoutConfigItem();
+			corporateCode.setDocFieldName(null);
+			corporateCode.setStartIndex(2);
+			corporateCode.setLength(5);
+			corporateCode.setExpectedValue("MAK");
+			corporateCode.setRecordType(RecordType.DETAIL);
+			corporateCode.setDisplayValue("Corporate Code");
+			corporateCode.setTransient(false);
+
+			configItems.add(corporateCode);
+
+			DefaultFileLayoutConfigItem supplierCode = new DefaultFileLayoutConfigItem();
+			supplierCode.setDocFieldName("supplierCode");
+			supplierCode.setStartIndex(7);
+			supplierCode.setLength(20);
+			supplierCode.setRequired(true);
+			supplierCode.setRecordType(RecordType.DETAIL);
+			supplierCode.setTransient(false);
+			supplierCode.setDisplayValue("Supplier Code");
+
+			configItems.add(supplierCode);
+
+			DefaultFileLayoutConfigItem receiptNumber = new DefaultFileLayoutConfigItem();
+			receiptNumber.setDocFieldName("documentNo");
+			receiptNumber.setStartIndex(27);
+			receiptNumber.setLength(20);
+			receiptNumber.setRequired(true);
+			receiptNumber.setRecordType(RecordType.DETAIL);
+			receiptNumber.setTransient(false);
+			receiptNumber.setDisplayValue("Receipt Number");
+
+			configItems.add(receiptNumber);
+
+			DefaultFileLayoutConfigItem receiptDate = new DefaultFileLayoutConfigItem();
+			receiptDate.setDocFieldName("documentDate");
+			receiptDate.setStartIndex(47);
+			receiptDate.setLength(8);
+			receiptDate.setRequired(true);
+			receiptDate.setRecordType(RecordType.DETAIL);
+			receiptDate.setTransient(false);
+			receiptDate.setDatetimeFormat("yyyyMMdd");
+			receiptDate.setDisplayValue("Receipt Date");
+
+			configItems.add(receiptDate);
+
+			DefaultFileLayoutConfigItem documentDueDate = new DefaultFileLayoutConfigItem();
+			documentDueDate.setDocFieldName("sponsorPaymentDate");
+			documentDueDate.setStartIndex(55);
+			documentDueDate.setLength(8);
+			documentDueDate.setRequired(true);
+			documentDueDate.setRecordType(RecordType.DETAIL);
+			documentDueDate.setTransient(false);
+			documentDueDate.setDatetimeFormat("yyyyMMdd");
+			documentDueDate.setDisplayValue("Document Due Date");
+
+			configItems.add(documentDueDate);
+
+			DefaultFileLayoutConfigItem docAmountFlagConfig = new DefaultFileLayoutConfigItem();
+			docAmountFlagConfig.setDocFieldName("optionVarcharField2");
+			docAmountFlagConfig.setStartIndex(78);
+			docAmountFlagConfig.setLength(1);
+			docAmountFlagConfig.setRecordType(RecordType.DETAIL);
+			docAmountFlagConfig.setTransient(true);
+			docAmountFlagConfig.setPlusSymbol("1");
+			docAmountFlagConfig.setMinusSymbol("0");
+			docAmountFlagConfig.setDisplayValue("Document Amount Flag");
+
+			configItems.add(docAmountFlagConfig);
+
+			DefaultFileLayoutConfigItem docAmountConfig = new DefaultFileLayoutConfigItem();
+			docAmountConfig.setSignFlagConfig(docAmountFlagConfig);
+			docAmountConfig.setDocFieldName("documentAmount");
+			docAmountConfig.setStartIndex(63);
+			docAmountConfig.setLength(15);
+			docAmountConfig.setPaddingCharacter("0");
+			docAmountConfig.setPaddingType(PaddingType.LEFT);
+			docAmountConfig.setDecimalPlace(2);
+			docAmountConfig.setHasDecimalPlace(false);
+			docAmountConfig.setRecordType(RecordType.DETAIL);
+			docAmountConfig.setTransient(false);
+			docAmountConfig.setRequired(true);
+
+			docAmountConfig.setDisplayValue("Document Amount");
+
+			configItems.add(docAmountConfig);
+
+			DefaultFileLayoutConfigItem documentType = new DefaultFileLayoutConfigItem();
+			documentType.setDocFieldName("documentType");
+			documentType.setRecordType(RecordType.DETAIL);
+			documentType.setDefaultValue("INV");
+			documentType.setTransient(false);
+
+			configItems.add(documentType);
+		}
+		else {
+			configItems.add(otherConfig);
+		}
+
+		DefaultFileLayoutConfigItem detailFilterConfig = new DefaultFileLayoutConfigItem();
+		detailFilterConfig.setDocFieldName("filter");
+		detailFilterConfig.setStartIndex(79);
+		detailFilterConfig.setLength(222);
+		detailFilterConfig.setRecordType(RecordType.DETAIL);
+		detailFilterConfig.setTransient(true);
+
+		configItems.add(detailFilterConfig);
+
+		DefaultFileLayoutConfigItem footerRecordTypeConfig = new DefaultFileLayoutConfigItem();
+		footerRecordTypeConfig.setDocFieldName("recordId");
+		footerRecordTypeConfig.setDisplayValue("Record Type");
+		footerRecordTypeConfig.setStartIndex(1);
+		footerRecordTypeConfig.setLength(1);
+		footerRecordTypeConfig.setRecordType(RecordType.FOOTER);
+
+		configItems.add(footerRecordTypeConfig);
+
+		DefaultFileLayoutConfigItem footerTotalDocConfig = new DefaultFileLayoutConfigItem();
+		footerTotalDocConfig.setDocFieldName("totalDocumentNumber");
+		footerTotalDocConfig.setStartIndex(2);
+		footerTotalDocConfig.setLength(6);
+		footerTotalDocConfig.setDecimalPlace(0);
+		footerTotalDocConfig.setPaddingCharacter("0");
+		footerTotalDocConfig.setDecimalPlace(0);
+		footerTotalDocConfig.setPaddingType(PaddingType.LEFT);
+		footerTotalDocConfig.setRecordType(RecordType.FOOTER);
+
+		configItems.add(footerTotalDocConfig);
+
+		DefaultFileLayoutConfigItem footerDocAmountFlagConfig = new DefaultFileLayoutConfigItem();
+		footerDocAmountFlagConfig.setDisplayValue("Total Document Amount Flag");
+		footerDocAmountFlagConfig.setStartIndex(23);
+		footerDocAmountFlagConfig.setLength(1);
+		footerDocAmountFlagConfig.setRecordType(RecordType.FOOTER);
+		footerDocAmountFlagConfig.setPlusSymbol("1");
+		footerDocAmountFlagConfig.setMinusSymbol("0");
+		configItems.add(footerDocAmountFlagConfig);
+
+		DefaultFileLayoutConfigItem footerDocAmountConfig = new DefaultFileLayoutConfigItem();
+		footerDocAmountConfig.setDocFieldName("totalDocumentAmount");
+		footerDocAmountConfig.setDisplayValue("Total Document Amount");
+		footerDocAmountConfig.setStartIndex(8);
+		footerDocAmountConfig.setLength(15);
+		footerDocAmountConfig.setDecimalPlace(2);
+		footerDocAmountConfig.setHasDecimalPlace(false);
+		footerDocAmountConfig.setPaddingCharacter("0");
+		footerDocAmountConfig.setPaddingType(PaddingType.LEFT);
+		footerDocAmountConfig.setRecordType(RecordType.FOOTER);
+
+		configItems.add(footerDocAmountConfig);
+
+		DefaultFileLayoutConfigItem footerFilterConfig = new DefaultFileLayoutConfigItem();
+		footerFilterConfig.setDocFieldName("filter");
+		footerFilterConfig.setStartIndex(24);
+		footerFilterConfig.setLength(277);
+		footerFilterConfig.setRecordType(RecordType.FOOTER);
+
+		configItems.add(footerFilterConfig);
+
+		fileLayout.setConfigItems(configItems);
+
+		return fileLayout;
+	}
 
 	protected FileLayoutConfig createMakroFixedLengthFileLayout() {
 		DefaultFileLayoutConfig fileLayout = new DefaultFileLayoutConfig();

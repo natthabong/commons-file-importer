@@ -3,19 +3,14 @@ package gec.scf.file.converter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.lang.StringUtils;
-
+import au.com.bytecode.opencsv.CSVReader;
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
+import gec.scf.file.configuration.RecordType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
@@ -23,83 +18,88 @@ import gec.scf.file.importer.ErrorLineDetail;
 
 public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
-	private List<CSVRecord> csvRecords;
+	private List<String[]> csvRecords;
 
 	private int currentLine;
 
+	private int totalColumns;
+
+	private int offset;
+
+	public CSVFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz,
+			FieldValidatorFactory fieldValidatorFactory) {
+
+		super(fileLayoutConfig, clazz, fieldValidatorFactory);
+
+		List<FileLayoutConfigItem> detailConfigs = getFileLayoutMappingFor(
+				RecordType.DETAIL);
+
+		if (detailConfigs != null) {
+
+			for (FileLayoutConfigItem item : detailConfigs) {
+				if (item.getStartIndex() == null)
+					continue;
+				if (totalColumns < item.getStartIndex()) {
+					totalColumns = item.getStartIndex();
+				}
+			}
+		}
+	}
+
 	public CSVFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
-		super(fileLayoutConfig, clazz);
+		this(fileLayoutConfig, clazz, null);
 	}
 
 	@Override
 	public void checkFileFormat(InputStream fileContent) throws WrongFormatFileException {
 
-		CSVParser csvParser = null;
+		int startRow = 0;
+		if (getFileLayoutConfig().getOffsetRowNo() != null) {
+			offset = getFileLayoutConfig().getOffsetRowNo().intValue();
+			startRow += offset;
+		}
+
+		if (startRow < 1) {
+			startRow = 1;
+		}
+
+		int cuurentRow = startRow;
 		try {
+			List<FileLayoutConfigItem> detailConfigs = getFileLayoutMappingFor(
+					RecordType.DETAIL);
 
-			if (getFileLayoutConfig().isCheckBinaryFile()) {
-				fileContent = validateBinaryFile(fileContent);
+			@SuppressWarnings("resource")
+			CSVReader reader = new CSVReader(new InputStreamReader(fileContent,
+					getFileLayoutConfig().getCharsetName()), ',', '"', startRow);
+
+			csvRecords = reader.readAll();
+			for (String[] record : csvRecords) {
+				cuurentRow++;
+				validateLineDataLength(record, detailConfigs);
+
 			}
-			CSVFormat csvFormat = CSVFormat.EXCEL.withSkipHeaderRecord(true)
-					.withDelimiter(getFileLayoutConfig().getDelimeter().charAt(0));
-
-			csvParser = new CSVParser(new InputStreamReader(fileContent, "UTF-8"),
-					csvFormat);
-
-			csvRecords = csvParser.getRecords();
-
-			validateDataLength(getFileLayoutConfig().getConfigItems());
-
-			if (getFileLayoutConfig().getOffsetRowNo() != null
-					&& getFileLayoutConfig().getOffsetRowNo() > 0) {
-				currentLine = getFileLayoutConfig().getOffsetRowNo().intValue();
-			}
-			else {
-				currentLine = 1;
-			}
-
 		}
 		catch (WrongFormatFileException e) {
+			e.setErrorLineNo(cuurentRow);
 			throw e;
 		}
-		catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
 		catch (IOException e) {
-			e.printStackTrace();
+			throw new WrongFormatFileException(e.getMessage(), cuurentRow);
 		}
+
 	}
 
-	private void validateDataLength(
-			List<? extends FileLayoutConfigItem> layoutConfigItems)
+	protected void validateLineDataLength(Object currentLine,
+			List<FileLayoutConfigItem> layoutConfigItems)
 			throws WrongFormatFileException {
-		int layoutItemLength = 0;
-		for (FileLayoutConfigItem item : layoutConfigItems) {
-			if (item.getStartIndex() == null)
-				continue;
-
-			if (layoutItemLength < item.getStartIndex()) {
-				layoutItemLength = item.getStartIndex();
-			}
-		}
-
-		for (CSVRecord record : csvRecords) {
-			Iterator<String> iterator = record.iterator();
-
-			int recordLength = 0;
-			while (iterator.hasNext()) {
-				iterator.next();
-				recordLength++;
-			}
-
-			if (recordLength != layoutItemLength) {
-				WrongFormatFileException error = new WrongFormatFileException();
-				error.setErrorLineNo((int) record.getRecordNumber());
-				error.setErrorMessage(MessageFormat.format(
-						CovertErrorConstant.DATA_LENGTH_OF_FIELD_OVER, recordLength,
-						layoutItemLength));
-				throw error;
-			}
+		String[] lineData = (String[]) currentLine;
+		int recordColumns = lineData.length;
+		if (recordColumns != totalColumns) {
+			WrongFormatFileException error = new WrongFormatFileException();
+			error.setErrorMessage(
+					MessageFormat.format(CovertErrorConstant.DATA_LENGTH_OF_FIELD_OVER,
+							recordColumns, totalColumns));
+			throw error;
 		}
 	}
 
@@ -109,12 +109,13 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 		DetailResult<T> result = new DetailResult<T>();
 
 		try {
-			CSVRecord csvRecord = csvRecords.get(currentLine++);
+			List<FileLayoutConfigItem> detailConfigs = getFileLayoutMappingFor(
+					RecordType.DETAIL);
+			String[] csvRecord = csvRecords.get(currentLine++);
 
-			T document = convertCSVToObject(csvRecord,
-					getFileLayoutConfig().getConfigItems());
+			T detail = convertDetail(csvRecord, detailConfigs);
 
-			result.setObjectValue(document);
+			result.setObjectValue(detail);
 			result.setSuccess(true);
 			result.setLineNo(currentLine);
 		}
@@ -130,7 +131,7 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 		return result;
 	}
 
-	private T convertCSVToObject(CSVRecord csvRecord,
+	private T convertDetail(String[] csvRecord,
 			List<? extends FileLayoutConfigItem> itemConfigs)
 			throws WrongFormatDetailException {
 
@@ -151,20 +152,7 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
 		for (FileLayoutConfigItem itemConf : itemConfigs) {
 			try {
-				String recordValue = "";
-
-				if (StringUtils.isNotBlank(itemConf.getDefaultValue())) {
-					recordValue = itemConf.getDefaultValue();
-				}
-				else {
-					int startIndex = itemConf.getStartIndex() - 1;
-					recordValue = csvRecord.get(startIndex);
-				}
-
-				if (StringUtils.isNotBlank(itemConf.getDocFieldName())) {
-					applyObjectValue(document, itemConf, recordValue);
-				}
-
+				applyObjectValue(document, itemConf, csvRecord);
 			}
 			catch (WrongFormatDetailException e) {
 				ErrorLineDetail errorLineDetail = new ErrorLineDetail();
@@ -174,8 +162,11 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 				isError = true;
 			}
 			catch (Exception e) {
-				// TODO manage error message
-				e.printStackTrace();
+				ErrorLineDetail errorLineDetail = new ErrorLineDetail();
+				errorLineDetail.setErrorLineNo(currentLine);
+				errorLineDetail.setErrorMessage(e.getMessage());
+				errorLineDetails.add(errorLineDetail);
+				isError = true;
 			}
 		}
 
@@ -183,6 +174,12 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 			throw new WrongFormatDetailException(errorLineDetails);
 		}
 		return document;
+	}
+
+	@Override
+	String getCuttedData(FileLayoutConfigItem itemConf, Object currentLine) {
+		String[] columns = (String[]) currentLine;
+		return columns[itemConf.getStartIndex() - 1];
 	}
 
 }

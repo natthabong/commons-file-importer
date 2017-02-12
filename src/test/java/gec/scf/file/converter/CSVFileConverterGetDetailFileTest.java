@@ -19,6 +19,7 @@ import gec.scf.file.configuration.DefaultFileLayoutConfig;
 import gec.scf.file.configuration.DefaultFileLayoutConfigItem;
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
+import gec.scf.file.configuration.RecordType;
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
@@ -441,6 +442,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvValidFileContent[1] = "18,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,7,SCB,พระประแดง,100093231,22/02/2015,22/02/2015,29/10/2015,+100,BCOB";
 
 		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setRecordType(RecordType.DETAIL);
 		chequeAmount.setStartIndex(12);
 		chequeAmount.setLength(10);
 		chequeAmount.setDocFieldName("documentAmount");
@@ -470,6 +472,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvValidFileContent[1] = "18,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,7,SCB,พระประแดง,100093231,22/02/2015,22/02/2015,29/10/2015,+100,BCOB";
 
 		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setRecordType(RecordType.DETAIL);
 		chequeAmount.setStartIndex(12);
 		chequeAmount.setLength(10);
 		chequeAmount.setDocFieldName("documentAmount");
@@ -501,6 +504,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvValidFileContent[1] = "18,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,7,SCB,พระประแดง,100093231,22/02/2015,22/02/2015,29/10/2015,+100,BCOB";
 
 		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setRecordType(RecordType.DETAIL);
 		chequeAmount.setStartIndex(12);
 		chequeAmount.setLength(10);
 		chequeAmount.setDocFieldName("documentAmount");
@@ -665,6 +669,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,\"100554\",";
 
 		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setRecordType(RecordType.DETAIL);
 		chequeAmount.setStartIndex(12);
 		chequeAmount.setLength(10);
 		chequeAmount.setDocFieldName("documentAmount");
@@ -745,6 +750,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,\"100554.003\",";
 
 		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setRecordType(RecordType.DETAIL);
 		chequeAmount.setStartIndex(12);
 		chequeAmount.setLength(10);
 		chequeAmount.setDocFieldName("documentAmount");
@@ -781,6 +787,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,\"100554.2\",";
 
 		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setRecordType(RecordType.DETAIL);
 		chequeAmount.setStartIndex(12);
 		chequeAmount.setLength(10);
 		chequeAmount.setDocFieldName("documentAmount");
@@ -817,6 +824,7 @@ public class CSVFileConverterGetDetailFileTest {
 		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,\"\",";
 
 		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setRecordType(RecordType.DETAIL);
 		chequeAmount.setStartIndex(12);
 		chequeAmount.setLength(10);
 		chequeAmount.setDocFieldName("documentAmount");
@@ -950,8 +958,10 @@ public class CSVFileConverterGetDetailFileTest {
 			no.setDocFieldName(null);
 			no.setRequired(false);
 			no.setDisplayValue("No");
+			no.setRecordType(RecordType.DETAIL);
 
 			DefaultFileLayoutConfigItem supplierCode = new DefaultFileLayoutConfigItem();
+			supplierCode.setRecordType(RecordType.DETAIL);
 			supplierCode.setStartIndex(2);
 			supplierCode.setLength(20);
 			supplierCode.setDocFieldName("supplierCode");
@@ -960,6 +970,7 @@ public class CSVFileConverterGetDetailFileTest {
 			supplierCode.setTransient(false);
 
 			DefaultFileLayoutConfigItem depositBranch = new DefaultFileLayoutConfigItem();
+			depositBranch.setRecordType(RecordType.DETAIL);
 			depositBranch.setStartIndex(3);
 			depositBranch.setLength(20);
 			depositBranch.setDocFieldName(null);
@@ -967,6 +978,7 @@ public class CSVFileConverterGetDetailFileTest {
 			depositBranch.setDisplayValue("Deposit branch");
 
 			DefaultFileLayoutConfigItem payer = new DefaultFileLayoutConfigItem();
+			payer.setRecordType(RecordType.DETAIL);
 			payer.setStartIndex(4);
 			payer.setLength(20);
 			payer.setDocFieldName("optionVarcharField1");
@@ -975,6 +987,7 @@ public class CSVFileConverterGetDetailFileTest {
 			payer.setTransient(false);
 
 			DefaultFileLayoutConfigItem bankCode = new DefaultFileLayoutConfigItem();
+			bankCode.setRecordType(RecordType.DETAIL);
 			bankCode.setStartIndex(5);
 			bankCode.setLength(3);
 			bankCode.setDocFieldName("optionVarcharField2");
@@ -983,6 +996,7 @@ public class CSVFileConverterGetDetailFileTest {
 			bankCode.setTransient(false);
 
 			DefaultFileLayoutConfigItem bank = new DefaultFileLayoutConfigItem();
+			bank.setRecordType(RecordType.DETAIL);
 			bank.setStartIndex(6);
 			bank.setLength(20);
 			bank.setDocFieldName("optionVarcharField3");
@@ -991,6 +1005,7 @@ public class CSVFileConverterGetDetailFileTest {
 			bank.setTransient(false);
 
 			DefaultFileLayoutConfigItem chequeBranch = new DefaultFileLayoutConfigItem();
+			chequeBranch.setRecordType(RecordType.DETAIL);
 			chequeBranch.setStartIndex(7);
 			chequeBranch.setLength(50);
 			chequeBranch.setDocFieldName(null);
@@ -998,6 +1013,7 @@ public class CSVFileConverterGetDetailFileTest {
 			chequeBranch.setDisplayValue("Cheque Branch");
 
 			DefaultFileLayoutConfigItem chequeNo = new DefaultFileLayoutConfigItem();
+			chequeNo.setRecordType(RecordType.DETAIL);
 			chequeNo.setStartIndex(8);
 			chequeNo.setLength(50);
 			chequeNo.setDocFieldName("documentNo");
@@ -1006,6 +1022,7 @@ public class CSVFileConverterGetDetailFileTest {
 			chequeNo.setTransient(false);
 
 			DefaultFileLayoutConfigItem chequeDueDate = new DefaultFileLayoutConfigItem();
+			chequeDueDate.setRecordType(RecordType.DETAIL);
 			chequeDueDate.setStartIndex(9);
 			chequeDueDate.setLength(10);
 			chequeDueDate.setDocFieldName("documentDate");
@@ -1015,6 +1032,7 @@ public class CSVFileConverterGetDetailFileTest {
 			chequeDueDate.setTransient(false);
 
 			DefaultFileLayoutConfigItem goodFundDate = new DefaultFileLayoutConfigItem();
+			goodFundDate.setRecordType(RecordType.DETAIL);
 			goodFundDate.setStartIndex(10);
 			goodFundDate.setLength(10);
 			goodFundDate.setDocFieldName("sponsorPaymentDate");
@@ -1024,6 +1042,7 @@ public class CSVFileConverterGetDetailFileTest {
 			goodFundDate.setTransient(false);
 
 			DefaultFileLayoutConfigItem depositDate = new DefaultFileLayoutConfigItem();
+			depositDate.setRecordType(RecordType.DETAIL);
 			depositDate.setStartIndex(11);
 			depositDate.setLength(10);
 			depositDate.setDocFieldName("optionDateField1");
@@ -1033,6 +1052,7 @@ public class CSVFileConverterGetDetailFileTest {
 			depositDate.setTransient(false);
 
 			DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+			chequeAmount.setRecordType(RecordType.DETAIL);
 			chequeAmount.setStartIndex(12);
 			chequeAmount.setLength(10);
 			chequeAmount.setDocFieldName("documentAmount");
@@ -1046,6 +1066,7 @@ public class CSVFileConverterGetDetailFileTest {
 			layoutItems.add(chequeAmount);
 
 			DefaultFileLayoutConfigItem documentType = new DefaultFileLayoutConfigItem();
+			documentType.setRecordType(RecordType.DETAIL);
 			documentType.setLength(3);
 			documentType.setDocFieldName("documentType");
 			documentType.setRequired(false);
@@ -1069,6 +1090,7 @@ public class CSVFileConverterGetDetailFileTest {
 		}
 
 		DefaultFileLayoutConfigItem clearingType = new DefaultFileLayoutConfigItem();
+		clearingType.setRecordType(RecordType.DETAIL);
 		clearingType.setStartIndex(13);
 		clearingType.setLength(10);
 		clearingType.setDocFieldName(null);

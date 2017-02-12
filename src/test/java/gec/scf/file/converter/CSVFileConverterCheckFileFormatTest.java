@@ -22,6 +22,7 @@ import org.mockito.Mockito;
 import gec.scf.file.configuration.DefaultFileLayoutConfig;
 import gec.scf.file.configuration.DefaultFileLayoutConfigItem;
 import gec.scf.file.configuration.FileLayoutConfigItem;
+import gec.scf.file.configuration.RecordType;
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatFileException;
 
@@ -32,8 +33,7 @@ public class CSVFileConverterCheckFileFormatTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private CSVFileConverter<SponsorDocument> csvFileConverter = new CSVFileConverter<SponsorDocument>(null,
-			SponsorDocument.class);
+	// private CSVFileConverter<SponsorDocument> csvFileConverter;
 
 	@Ignore
 	@Test
@@ -45,6 +45,8 @@ public class CSVFileConverterCheckFileFormatTest {
 		File csvFile = new File(part.getFile());
 		InputStream csvFileContent = new FileInputStream(csvFile);
 
+		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(null,
+				NOT_CHECK_BINARY);
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage("Data is binary file");
@@ -62,6 +64,9 @@ public class CSVFileConverterCheckFileFormatTest {
 		File csvFile = new File(part.getFile());
 		InputStream csvFileContent = new FileInputStream(csvFile);
 
+		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(null,
+				NOT_CHECK_BINARY);
+
 		// Actual
 		csvFileConverter.checkFileFormat(csvFileContent);
 	}
@@ -75,14 +80,15 @@ public class CSVFileConverterCheckFileFormatTest {
 		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554";
 		csvValidFileContent[2] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554,";
 
-		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(csvValidFileContent,
-				NOT_CHECK_BINARY);
+		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(
+				csvValidFileContent, NOT_CHECK_BINARY);
 		InputStream csvFileContent = new ByteArrayInputStream(
 				StringUtils.join(csvValidFileContent, System.lineSeparator()).getBytes());
 		// Actual
 		try {
 			csvFileConverter.checkFileFormat(csvFileContent);
-		} catch (WrongFormatFileException e) {
+		}
+		catch (WrongFormatFileException e) {
 			assertEquals("data length (12) must have 13 field", e.getErrorMessage());
 			assertEquals(2, e.getErrorLineNo().intValue());
 			throw e;
@@ -98,14 +104,15 @@ public class CSVFileConverterCheckFileFormatTest {
 		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554,,";
 		csvValidFileContent[2] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554,";
 
-		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(csvValidFileContent,
-				NOT_CHECK_BINARY);
+		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(
+				csvValidFileContent, NOT_CHECK_BINARY);
 		InputStream csvFileContent = new ByteArrayInputStream(
 				StringUtils.join(csvValidFileContent, System.lineSeparator()).getBytes());
 		// Actual
 		try {
 			csvFileConverter.checkFileFormat(csvFileContent);
-		} catch (WrongFormatFileException e) {
+		}
+		catch (WrongFormatFileException e) {
 			assertEquals("data length (14) must have 13 field", e.getErrorMessage());
 			assertEquals(2, e.getErrorLineNo().intValue());
 			throw e;
@@ -121,8 +128,8 @@ public class CSVFileConverterCheckFileFormatTest {
 		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554,";
 		csvValidFileContent[2] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,1000554,";
 
-		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(csvValidFileContent,
-				NOT_CHECK_BINARY);
+		CSVFileConverter<SponsorDocument> csvFileConverter = mockSponsorFileLayout(
+				csvValidFileContent, NOT_CHECK_BINARY);
 		InputStream csvFileContent = new ByteArrayInputStream(
 				StringUtils.join(csvValidFileContent, System.lineSeparator()).getBytes());
 
@@ -130,17 +137,19 @@ public class CSVFileConverterCheckFileFormatTest {
 		csvFileConverter.checkFileFormat(csvFileContent);
 
 		// Assert
-		Mockito.verify(csvFileConverter, Mockito.never()).validateBinaryFile(csvFileContent);
+		Mockito.verify(csvFileConverter, Mockito.never())
+				.validateBinaryFile(csvFileContent);
 
 	}
 
-	private CSVFileConverter<SponsorDocument> mockSponsorFileLayout(String[] csvValidFileContent,
-			boolean checkBinaryFile) throws WrongFormatFileException {
+	private CSVFileConverter<SponsorDocument> mockSponsorFileLayout(
+			String[] csvValidFileContent, boolean checkBinaryFile)
+			throws WrongFormatFileException {
 
 		DefaultFileLayoutConfig fileLayout = getLayoutConfig(checkBinaryFile);
 
-		CSVFileConverter<SponsorDocument> csvFileConverter = Mockito
-				.spy(new CSVFileConverter<SponsorDocument>(fileLayout, SponsorDocument.class));
+		CSVFileConverter<SponsorDocument> csvFileConverter = Mockito.spy(
+				new CSVFileConverter<SponsorDocument>(fileLayout, SponsorDocument.class));
 		return csvFileConverter;
 	}
 
@@ -153,6 +162,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		List<FileLayoutConfigItem> layoutItems = new ArrayList<FileLayoutConfigItem>();
 
 		DefaultFileLayoutConfigItem no = new DefaultFileLayoutConfigItem();
+		no.setRecordType(RecordType.DETAIL);
 		no.setStartIndex(1);
 		no.setLength(10);
 		no.setDocFieldName(null);
@@ -160,6 +170,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		no.setDisplayValue("No");
 
 		DefaultFileLayoutConfigItem supplierCode = new DefaultFileLayoutConfigItem();
+		supplierCode.setRecordType(RecordType.DETAIL);
 		supplierCode.setStartIndex(2);
 		supplierCode.setLength(20);
 		supplierCode.setDocFieldName("supplierCode");
@@ -167,6 +178,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		supplierCode.setDisplayValue("Payer Code");
 
 		DefaultFileLayoutConfigItem depositBranch = new DefaultFileLayoutConfigItem();
+		depositBranch.setRecordType(RecordType.DETAIL);
 		depositBranch.setStartIndex(3);
 		depositBranch.setLength(20);
 		depositBranch.setDocFieldName(null);
@@ -174,6 +186,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		depositBranch.setDisplayValue("Deposit branch");
 
 		DefaultFileLayoutConfigItem payer = new DefaultFileLayoutConfigItem();
+		payer.setRecordType(RecordType.DETAIL);
 		payer.setStartIndex(4);
 		payer.setLength(20);
 		payer.setDocFieldName("optionVarcharField1");
@@ -181,6 +194,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		payer.setDisplayValue("Payer");
 
 		DefaultFileLayoutConfigItem bankCode = new DefaultFileLayoutConfigItem();
+		bankCode.setRecordType(RecordType.DETAIL);
 		bankCode.setStartIndex(5);
 		bankCode.setLength(3);
 		bankCode.setDocFieldName("optionVarcharField2");
@@ -188,6 +202,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		bankCode.setDisplayValue("Bank Code");
 
 		DefaultFileLayoutConfigItem bank = new DefaultFileLayoutConfigItem();
+		bank.setRecordType(RecordType.DETAIL);
 		bank.setStartIndex(6);
 		bank.setLength(20);
 		bank.setDocFieldName("optionVarcharField3");
@@ -195,6 +210,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		bank.setDisplayValue("Bank");
 
 		DefaultFileLayoutConfigItem chequeBranch = new DefaultFileLayoutConfigItem();
+		chequeBranch.setRecordType(RecordType.DETAIL);
 		chequeBranch.setStartIndex(7);
 		chequeBranch.setLength(50);
 		chequeBranch.setDocFieldName(null);
@@ -202,6 +218,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		chequeBranch.setDisplayValue("Cheque Branch");
 
 		DefaultFileLayoutConfigItem chequeNo = new DefaultFileLayoutConfigItem();
+		chequeNo.setRecordType(RecordType.DETAIL);
 		chequeNo.setStartIndex(8);
 		chequeNo.setLength(50);
 		chequeNo.setDocFieldName("documentNo");
@@ -209,6 +226,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		chequeNo.setDisplayValue("Cheque No");
 
 		DefaultFileLayoutConfigItem chequeDueDate = new DefaultFileLayoutConfigItem();
+		chequeDueDate.setRecordType(RecordType.DETAIL);
 		chequeDueDate.setStartIndex(9);
 		chequeDueDate.setLength(10);
 		chequeDueDate.setDocFieldName("documentDate");
@@ -217,6 +235,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		chequeDueDate.setDatetimeFormat("dd/MM/yyyy");
 
 		DefaultFileLayoutConfigItem goodFundDate = new DefaultFileLayoutConfigItem();
+		goodFundDate.setRecordType(RecordType.DETAIL);
 		goodFundDate.setStartIndex(10);
 		goodFundDate.setLength(10);
 		goodFundDate.setDocFieldName("sponsorPaymentDate");
@@ -225,6 +244,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		goodFundDate.setDatetimeFormat("dd/MM/yyyy");
 
 		DefaultFileLayoutConfigItem depositDate = new DefaultFileLayoutConfigItem();
+		depositDate.setRecordType(RecordType.DETAIL);
 		depositDate.setStartIndex(11);
 		depositDate.setLength(10);
 		depositDate.setDocFieldName("optionDateField1");
@@ -233,6 +253,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		depositDate.setDatetimeFormat("dd/MM/yyyy");
 
 		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setRecordType(RecordType.DETAIL);
 		chequeAmount.setStartIndex(12);
 		chequeAmount.setLength(10);
 		chequeAmount.setDocFieldName("documentAmount");
@@ -241,6 +262,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		chequeAmount.setDecimalPlace(2);
 
 		DefaultFileLayoutConfigItem clearingType = new DefaultFileLayoutConfigItem();
+		clearingType.setRecordType(RecordType.DETAIL);
 		clearingType.setStartIndex(13);
 		clearingType.setLength(10);
 		clearingType.setDocFieldName(null);

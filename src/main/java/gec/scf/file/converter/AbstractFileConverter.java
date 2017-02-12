@@ -10,8 +10,15 @@ import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,13 +26,16 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.DateValidator;
+import org.apache.log4j.Logger;
 
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.configuration.PaddingType;
 import gec.scf.file.configuration.RecordType;
+import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
+import gec.scf.file.validation.SummaryFieldValidator;
 
 public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
@@ -35,48 +45,238 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 	protected FieldValidatorFactory fieldValidatorFactory;
 
-	public AbstractFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
-		this.fileLayoutConfig = fileLayoutConfig;
-		this.entityClass = clazz;
+	private Map<RecordType, List<FileLayoutConfigItem>> fileLayoutMapping = new EnumMap<RecordType, List<FileLayoutConfigItem>>(
+			RecordType.class);
 
+	private Map<RecordType, RecordTypeExtractor> extractors = new EnumMap<RecordType, RecordTypeExtractor>(
+			RecordType.class);
+
+	private Map<RecordType, Set<DataObserver<?>>> observers = new HashMap<RecordType, Set<DataObserver<?>>>();
+
+	private Map<FileLayoutConfigItem, FieldValidator> validators = new HashMap<FileLayoutConfigItem, FieldValidator>();
+
+	private Map<FileLayoutConfigItem, FieldValueSetter> fieldSetters = new HashMap<FileLayoutConfigItem, FieldValueSetter>();
+
+	public AbstractFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
+		this(fileLayoutConfig, clazz, null);
 	}
 
-	protected void applyObjectValue(T entity, FileLayoutConfigItem itemConf,
-			String recordValue, String signFlagData)
-			throws NoSuchFieldException, SecurityException, WrongFormatDetailException,
-			WrongFormatFileException, IllegalAccessException, ParseException {
-		Object value = null;
-		if (!itemConf.isTransient()) {
-			Field field = entityClass.getDeclaredField(itemConf.getDocFieldName());
-			field.setAccessible(true);
-			Class<?> classType = field.getType();
-
-			if (classType.isAssignableFrom(Date.class)) {
-
-				validateDateFormat(itemConf, recordValue);
-
-				SimpleDateFormat sdf = new SimpleDateFormat(itemConf.getDatetimeFormat(),
-						Locale.US);
-				value = sdf.parse(recordValue);
-			}
-			else if (classType.isAssignableFrom(BigDecimal.class)) {
-
-				BigDecimal amountValue = getBigDecimalValue(itemConf, recordValue);
-				if (amountValue != null) {
-					if (StringUtils.isNotEmpty(signFlagData)) {
-						amountValue = applySignFlag(amountValue, itemConf, signFlagData);
-					}
-				}
-				value = amountValue;
-			}
-			else {
-				validateRequiredField(itemConf, recordValue);
-				value = recordValue.trim();
-			}
-			field.set(entity, value);
+	public AbstractFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz,
+			FieldValidatorFactory fieldValidatorFactory) {
+		this.fileLayoutConfig = fileLayoutConfig;
+		this.entityClass = clazz;
+		this.fieldValidatorFactory = fieldValidatorFactory;
+		if (fileLayoutConfig != null && fileLayoutConfig.getConfigItems() != null) {
+			fileLayoutMapping = prepareConfiguration(fileLayoutConfig.getConfigItems());
 		}
 
 	}
+
+	protected void applyObjectValue(T entity, FileLayoutConfigItem itemConfig,
+			Object currentLine)
+			throws NoSuchFieldException, SecurityException, WrongFormatDetailException,
+			WrongFormatFileException, IllegalAccessException, ParseException {
+
+		if (!itemConfig.isTransient()) {
+
+			Object value = null;
+
+			String tempDataString = null;
+
+			if (StringUtils.isNotBlank(itemConfig.getDefaultValue())) {
+				tempDataString = itemConfig.getDefaultValue();
+			}
+			else {
+
+				validateData(currentLine, itemConfig);
+
+				tempDataString = getCuttedData(itemConfig, currentLine);
+
+				if (itemConfig.getExpectedValue() != null
+						&& !ValidationType.IN_CUSTOMER_CODE_GROUP
+								.equals(itemConfig.getValidationType())) {
+
+					validateExpectedValue(itemConfig, tempDataString);
+				}
+			}
+
+			if (StringUtils.isNotBlank(itemConfig.getDocFieldName())) {
+
+				String signFlagData = null;
+				if (itemConfig.getSignFlagConfig() != null) {
+					FileLayoutConfigItem signFlagConfig = itemConfig.getSignFlagConfig();
+					signFlagData = getCuttedData(signFlagConfig, currentLine);
+				}
+
+				Field field = entityClass.getDeclaredField(itemConfig.getDocFieldName());
+				field.setAccessible(true);
+				Class<?> classType = field.getType();
+
+				if (classType.isAssignableFrom(Date.class)) {
+
+					validateDateFormat(itemConfig, tempDataString);
+
+					SimpleDateFormat sdf = new SimpleDateFormat(
+							itemConfig.getDatetimeFormat(), Locale.US);
+					value = sdf.parse(tempDataString);
+				}
+				else if (classType.isAssignableFrom(BigDecimal.class)) {
+
+					BigDecimal amountValue = getBigDecimalValue(itemConfig,
+							tempDataString);
+					if (amountValue != null) {
+						if (StringUtils.isNotEmpty(signFlagData)) {
+							amountValue = applySignFlag(amountValue, itemConfig,
+									signFlagData);
+						}
+					}
+					value = amountValue;
+				}
+				else {
+					validateRequiredField(itemConfig, tempDataString);
+					value = tempDataString.trim();
+				}
+				field.set(entity, value);
+			}
+
+			// Additional
+			FieldValueSetter fieldSetter = fieldSetters.get(itemConfig);
+			if (fieldSetter != null) {
+				fieldSetter.setValue(entity, value);
+			}
+
+		}
+
+	}
+
+	protected void validateLineDataFormat(Object currentLine,
+			List<FileLayoutConfigItem> configItems) throws WrongFormatFileException {
+
+		validateLineDataLength(currentLine, configItems);
+
+		for (FileLayoutConfigItem configItem : configItems) {
+
+			String dataValidate = getCuttedData(configItem, currentLine);
+
+			if (StringUtils.isNotBlank(configItem.getExpectedValue())) {
+				validateExpectedValue(configItem, dataValidate);
+			}
+
+			if (StringUtils.isNotBlank(configItem.getDatetimeFormat())) {
+				validateDateFormat(configItem, dataValidate);
+			}
+
+			validateData(currentLine, configItem);
+
+			// FieldValidator fieldValidator = getValidator(configItem);
+			//
+			// if (fieldValidator != null) {
+			// if (fieldValidator instanceof SummaryFieldValidator) {
+			// String totalAmoutData = getCuttedData(configItem, currentLine);
+			// try {
+			//
+			// BigDecimal footerTotalAmount = getBigDecimalValue(configItem,
+			// totalAmoutData);
+			//
+			// if (configItem.getSignFlagConfig() != null) {
+			//
+			// String signFlagData = getCuttedData(
+			// configItem.getSignFlagConfig(), currentLine);
+			//
+			// footerTotalAmount = applySignFlag(footerTotalAmount,
+			// configItem, signFlagData);
+			//
+			// }
+			// fieldValidator.validate(footerTotalAmount);
+			// }
+			// catch (WrongFormatFileException | WrongFormatDetailException e) {
+			// throw e;
+			// }
+			// catch (Exception e) {
+			// throw new WrongFormatFileException(
+			// MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+			// configItem.getDisplayValue(), totalAmoutData));
+			// }
+			// }
+			// else {
+			// fieldValidator.validate(dataValidate);
+			// }
+			// }
+		}
+	}
+
+	private void validateData(Object currentLine, FileLayoutConfigItem configItem)
+			throws WrongFormatFileException {
+
+		FieldValidator fieldValidator = getValidator(configItem);
+
+		if (fieldValidator != null) {
+			String dataToValidate = getCuttedData(configItem, currentLine);
+			if (fieldValidator instanceof SummaryFieldValidator) {
+				String totalAmoutData = getCuttedData(configItem, currentLine);
+				try {
+
+					BigDecimal footerTotalAmount = getBigDecimalValue(configItem,
+							totalAmoutData);
+
+					if (configItem.getSignFlagConfig() != null) {
+
+						String signFlagData = getCuttedData(
+								configItem.getSignFlagConfig(), currentLine);
+
+						footerTotalAmount = applySignFlag(footerTotalAmount, configItem,
+								signFlagData);
+
+					}
+					fieldValidator.validate(footerTotalAmount);
+				}
+				catch (WrongFormatFileException | WrongFormatDetailException e) {
+					throw e;
+				}
+				catch (Exception e) {
+					throw new WrongFormatFileException(
+							MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+									configItem.getDisplayValue(), totalAmoutData));
+				}
+			}
+			else {
+				fieldValidator.validate(dataToValidate);
+			}
+		}
+	}
+
+	abstract protected void validateLineDataLength(Object currentLine,
+			List<FileLayoutConfigItem> configItems) throws WrongFormatFileException;
+
+	protected void validateExpectedValue(FileLayoutConfigItem config, String data)
+			throws WrongFormatFileException {
+
+		if (StringUtils.isBlank(data)) {
+			String errorMessage = MessageFormat.format(
+					CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
+					config.getDisplayValue());
+			throwErrorByRecordType(config, errorMessage);
+		}
+		if (!config.getExpectedValue().equals(data.trim())) {
+			String errorMessage = MessageFormat.format(
+					CovertErrorConstant.MISMATCH_FORMAT, config.getDisplayValue(),
+					data.trim());
+			throwErrorByRecordType(config, errorMessage);
+		}
+
+	}
+
+	private void throwErrorByRecordType(FileLayoutConfigItem item, String errorMessage)
+			throws WrongFormatFileException {
+		if (RecordType.DETAIL.equals(item.getRecordTypeData())) {
+			throw new WrongFormatDetailException(errorMessage);
+		}
+		else {
+			throw new WrongFormatFileException(errorMessage);
+		}
+	}
+
+	abstract String getCuttedData(FileLayoutConfigItem itemConf, Object currentLine);
 
 	protected long validateDocumentNo(FileLayoutConfigItem configItem, String data,
 			Long lastDocumentNo) throws WrongFormatFileException {
@@ -87,13 +287,6 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 							configItem.getDisplayValue(), data));
 		}
 		return docNoValidate;
-	}
-
-	protected void applyObjectValue(T entity, FileLayoutConfigItem config,
-			String recordValue) throws NoSuchFieldException, ParseException,
-			IllegalAccessException, WrongFormatDetailException, WrongFormatFileException {
-
-		applyObjectValue(entity, config, recordValue, null);
 	}
 
 	protected void validateDateFormat(FileLayoutConfigItem configItem, String data)
@@ -424,6 +617,109 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		return fileContent;
 	}
 
+	protected Map<RecordType, List<FileLayoutConfigItem>> prepareConfiguration(
+			List<? extends FileLayoutConfigItem> list) {
+
+		Map<RecordType, List<FileLayoutConfigItem>> fileLayoutMapping = new EnumMap<RecordType, List<FileLayoutConfigItem>>(
+				RecordType.class);
+		List<FileLayoutConfigItem> headerList = new ArrayList<FileLayoutConfigItem>();
+		List<FileLayoutConfigItem> detailList = new ArrayList<FileLayoutConfigItem>();
+		List<FileLayoutConfigItem> footerList = new ArrayList<FileLayoutConfigItem>();
+
+		for (FileLayoutConfigItem fileLayoutConfigItem : list) {
+			if ("recordId".equals(fileLayoutConfigItem.getDocFieldName())) {
+				RecordTypeExtractor extractor = new RecordTypeExtractor(
+						fileLayoutConfigItem);
+				extractors.put(fileLayoutConfigItem.getRecordTypeData(), extractor);
+			}
+			else {
+
+				if (fieldValidatorFactory != null
+						&& fileLayoutConfigItem.getValidationType() != null) {
+
+					FieldValidator fieldValidator = fieldValidatorFactory
+							.create(fileLayoutConfigItem);
+					if (fieldValidator != null) {
+
+						if (fieldValidator instanceof DataObserver) {
+							DataObserver<?> fileObserver = (DataObserver<?>) fieldValidator;
+							if (observers.get(fileObserver.getObserveSection()) == null) {
+								observers.put(fileObserver.getObserveSection(),
+										new HashSet<DataObserver<?>>());
+							}
+							observers.get(fileObserver.getObserveSection())
+									.add(fileObserver);
+						}
+
+						if (fieldValidator instanceof FieldValueSetter) {
+							FieldValueSetter fileSetter = (FieldValueSetter) fieldValidator;
+							fieldSetters.put(fileLayoutConfigItem, fileSetter);
+						}
+						validators.put(fileLayoutConfigItem, fieldValidator);
+
+					}
+				}
+
+				switch (fileLayoutConfigItem.getRecordTypeData()) {
+				case HEADER:
+					headerList.add(fileLayoutConfigItem);
+					break;
+				case FOOTER:
+					footerList.add(fileLayoutConfigItem);
+					break;
+				case DETAIL:
+					detailList.add(fileLayoutConfigItem);
+					break;
+				default:
+					break;
+				}
+			}
+
+		}
+
+		fileLayoutMapping.put(RecordType.HEADER, headerList);
+		fileLayoutMapping.put(RecordType.DETAIL, detailList);
+		fileLayoutMapping.put(RecordType.FOOTER, footerList);
+
+		return fileLayoutMapping;
+	}
+
+	protected static class RecordTypeExtractor {
+
+		private FileLayoutConfigItem configItem;
+		private static final Logger log = Logger.getLogger(RecordTypeExtractor.class);
+
+		public RecordTypeExtractor(FileLayoutConfigItem configItem) {
+			this.configItem = configItem;
+		}
+
+		public FileLayoutConfigItem getConfig() {
+			return configItem;
+		}
+
+		public String extract(String currentLine) {
+			int beginIndex = configItem.getStartIndex() - 1;
+			String recordType = null;
+			try {
+				recordType = currentLine.substring(beginIndex,
+						beginIndex + configItem.getLenght());
+			}
+			catch (IndexOutOfBoundsException e) {
+				log.debug(e.getMessage());
+			}
+			return recordType;
+		}
+
+	}
+
+	protected RecordTypeExtractor getExtractor(RecordType recordType) {
+		return extractors.get(recordType);
+	}
+
+	protected List<FileLayoutConfigItem> getFileLayoutMappingFor(RecordType recordType) {
+		return fileLayoutMapping.get(recordType);
+	}
+
 	public FileLayoutConfig getFileLayoutConfig() {
 		return fileLayoutConfig;
 	}
@@ -440,11 +736,11 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		this.entityClass = entityClass;
 	}
 
-	public FieldValidatorFactory getFieldValidatorFactory() {
-		return fieldValidatorFactory;
+	public Set<DataObserver<?>> getObservers(RecordType recordType) {
+		return observers.get(recordType);
 	}
 
-	public void setFieldValidatorFactory(FieldValidatorFactory fieldValidatorFactory) {
-		this.fieldValidatorFactory = fieldValidatorFactory;
+	public FieldValidator getValidator(FileLayoutConfigItem configItem) {
+		return validators.get(configItem);
 	}
 }

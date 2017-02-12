@@ -2,14 +2,19 @@ package gec.scf.file.converter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -21,14 +26,15 @@ import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.configuration.FileType;
 import gec.scf.file.configuration.PaddingType;
 import gec.scf.file.configuration.RecordType;
+import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.example.domain.SponsorDocument;
+import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
 import gec.scf.file.importer.ErrorLineDetail;
 
-public class FixedLengthFileConverterGetDetailTest {
-
-	private boolean isTransient = false;
+public class FixedLengthFileConverterGetDetailTest
+		extends AbstractFixedLengthConverterTest {
 
 	@Test
 	public void given_detail_valid_format_should_status_success()
@@ -41,7 +47,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -65,7 +71,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -89,7 +95,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -113,7 +119,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -136,7 +142,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -160,7 +166,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -184,7 +190,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -208,7 +214,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -233,7 +239,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -257,7 +263,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -283,7 +289,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -308,7 +314,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -334,7 +340,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -357,7 +363,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -397,7 +403,8 @@ public class FixedLengthFileConverterGetDetailTest {
 		docAmountConfig.setHasDecimalPlace(false);
 		docAmountConfig.setDisplayValue("Document Amount");
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout(docAmountConfig);
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout(
+				docAmountConfig);
 
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
@@ -421,7 +428,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -434,31 +441,33 @@ public class FixedLengthFileConverterGetDetailTest {
 		assertEquals("INV", document.getDocumentType());
 	}
 
-	@Test
-	public void given_supplier_code_is_transient_when_get_detail_then_supplier_code_should_is_null()
-			throws WrongFormatFileException {
-		// Arrage
-		String[] fixedLengthContent = new String[4];
-		fixedLengthContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
-		fixedLengthContent[1] = "DMAK  MK001               1122033             20160812201611010000000100000000                                                                                                                                                                                                                              ";
-		fixedLengthContent[2] = "T0000010000000100000000                                                                                                                                                                                                                                                                                     ";
-		InputStream fixedlengthFileContent = new ByteArrayInputStream(
-				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-
-		isTransient = true;
-
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
-		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
-		fileConverter.checkFileFormat(fixedlengthFileContent);
-		// Actual
-		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-
-		// Assert
-		assertTrue(actualResult.isSuccess());
-		SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
-		assertNull(document.getSupplierCode());
-	}
+	// @Test
+	// public void
+	// given_supplier_code_is_transient_when_get_detail_then_supplier_code_should_is_null()
+	// throws WrongFormatFileException {
+	// // Arrage
+	// String[] fixedLengthContent = new String[4];
+	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
+	// fixedLengthContent[1] = "DMAK MK001 1122033 20160812201611010000000100000000 ";
+	// fixedLengthContent[2] = "T0000010000000100000000 ";
+	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
+	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
+	//
+	//// isTransient = true;
+	//
+	// FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
+	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
+	// FixedLengthFileConverter<SponsorDocument>(
+	// fileLayoutConfig, SponsorDocument.class);
+	// fileConverter.checkFileFormat(fixedlengthFileContent);
+	// // Actual
+	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+	//
+	// // Assert
+	// assertTrue(actualResult.isSuccess());
+	// SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
+	// assertNull(document.getSupplierCode());
+	// }
 
 	@Test
 	public void given_document_amount_flag_is_0_when_get_detail_then_document_amount_should_is_negative_value()
@@ -471,7 +480,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
 
-		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
@@ -483,11 +492,141 @@ public class FixedLengthFileConverterGetDetailTest {
 		assertEquals("-100000.00", document.getDocumentAmount().toString());
 	}
 
-	private FileLayoutConfig createFixedLengthFileLayout() {
-		return createFixedLengthFileLayout(null);
+	@Test
+	public void should_map_supplier_code_to_supplier_id()
+			throws WrongFormatFileException {
+		// Arrage
+		String[] fixedLengthContent = new String[4];
+		fixedLengthContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
+		fixedLengthContent[1] = "DMAK  MK002               1122033             20160812201611010000000100000000                                                                                                                                                                                                                              ";
+		fixedLengthContent[2] = "T0000010000000100000000                                                                                                                                                                                                                                                                                     ";
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(
+				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
+
+		DefaultFileLayoutConfigItem supplierCode = new DefaultFileLayoutConfigItem();
+		supplierCode.setDocFieldName("supplierCode");
+		supplierCode.setStartIndex(7);
+		supplierCode.setLength(20);
+		supplierCode.setRequired(true);
+		supplierCode.setRecordType(RecordType.DETAIL);
+		supplierCode.setTransient(false);
+		supplierCode.setDisplayValue("Supplier Code");
+		supplierCode.setValidationType(ValidationType.IN_CUSTOMER_CODE_GROUP);
+		supplierCode.setExpectedValue("1");
+
+		FieldValidatorFactory fieldValidatorFactory = spy(
+				new FieldValidatorFactoryTest());
+
+		FieldValidator supplierIdSetter = new ExpectedCustomerCodeValidatorStub();
+		doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCode));
+
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout(
+				supplierCode);
+		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("002", document.getSupplierId());
 	}
 
-	private FileLayoutConfig createFixedLengthFileLayout(
+	@Test
+	public void should_throw_when_customer_code_inactive()
+			throws WrongFormatFileException {
+		// Arrage
+		String[] fixedLengthContent = new String[4];
+		fixedLengthContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
+		fixedLengthContent[1] = "DMAK  MK001               1122034             20160812201611010000000100000000                                                                                                                                                                                                                              ";
+		fixedLengthContent[2] = "T0000010000000100000000                                                                                                                                                                                                                                                                                     ";
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(
+				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
+
+		DefaultFileLayoutConfigItem supplierCode = new DefaultFileLayoutConfigItem();
+		supplierCode.setDocFieldName("supplierCode");
+		supplierCode.setStartIndex(7);
+		supplierCode.setLength(20);
+		supplierCode.setRequired(true);
+		supplierCode.setRecordType(RecordType.DETAIL);
+		supplierCode.setTransient(false);
+		supplierCode.setDisplayValue("Supplier Code");
+		supplierCode.setValidationType(ValidationType.IN_CUSTOMER_CODE_GROUP);
+		supplierCode.setExpectedValue("1");
+
+		FieldValidatorFactory fieldValidatorFactory = spy(
+				new FieldValidatorFactoryTest());
+
+		FieldValidator supplierIdSetter = new ExpectedCustomerCodeValidatorStub();
+		doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCode));
+
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout(
+				supplierCode);
+		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+
+		// Assert
+		assertFalse(actualResult.isSuccess());
+		ErrorLineDetail errorLine = actualResult.getErrorLineDetails().get(0);
+		assertEquals("Supplier code (MK001) is inactive Supplier code",
+				errorLine.getErrorMessage());
+	}
+
+	@Test
+	public void should_throw_when_customer_code_not_existed()
+			throws WrongFormatFileException {
+		// Arrage
+		String[] fixedLengthContent = new String[4];
+		fixedLengthContent[0] = "H20160927120000Siam Makro Plc.               MAK  004                                                                                                                                                                                                                                                       ";
+		fixedLengthContent[1] = "DMAK  MK004               1122034             20160812201611010000000100000000                                                                                                                                                                                                                              ";
+		fixedLengthContent[2] = "T0000010000000100000000                                                                                                                                                                                                                                                                                     ";
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(
+				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
+
+		DefaultFileLayoutConfigItem supplierCode = new DefaultFileLayoutConfigItem();
+		supplierCode.setDocFieldName("supplierCode");
+		supplierCode.setStartIndex(7);
+		supplierCode.setLength(20);
+		supplierCode.setRequired(true);
+		supplierCode.setRecordType(RecordType.DETAIL);
+		supplierCode.setTransient(false);
+		supplierCode.setDisplayValue("Supplier Code");
+		supplierCode.setValidationType(ValidationType.IN_CUSTOMER_CODE_GROUP);
+		supplierCode.setExpectedValue("1");
+
+		FieldValidatorFactory fieldValidatorFactory = spy(
+				new FieldValidatorFactoryTest());
+
+		FieldValidator supplierIdSetter = new ExpectedCustomerCodeValidatorStub();
+		doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCode));
+
+		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout(
+				supplierCode);
+		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+
+		// Assert
+		assertFalse(actualResult.isSuccess());
+		ErrorLineDetail errorLine = actualResult.getErrorLineDetails().get(0);
+		assertEquals("Supplier code (MK004) is not exist Supplier code",
+				errorLine.getErrorMessage());
+	}
+
+	protected FileLayoutConfig createMakroFixedLengthFileLayout() {
+		return createMakroFixedLengthFileLayout(null);
+	}
+
+	protected FileLayoutConfig createMakroFixedLengthFileLayout(
 			DefaultFileLayoutConfigItem otherConfig) {
 
 		DefaultFileLayoutConfig fileLayout = new DefaultFileLayoutConfig();
@@ -521,7 +660,7 @@ public class FixedLengthFileConverterGetDetailTest {
 		detailRecordTypeConfig.setStartIndex(1);
 		detailRecordTypeConfig.setLength(1);
 		detailRecordTypeConfig.setRecordType(RecordType.DETAIL);
-		detailRecordTypeConfig.setTransient(isTransient);
+		detailRecordTypeConfig.setTransient(true);
 
 		configItems.add(detailRecordTypeConfig);
 
@@ -533,7 +672,7 @@ public class FixedLengthFileConverterGetDetailTest {
 			corporateCode.setExpectedValue("MAK");
 			corporateCode.setRecordType(RecordType.DETAIL);
 			corporateCode.setDisplayValue("Corporate Code");
-			corporateCode.setTransient(isTransient);
+			corporateCode.setTransient(false);
 
 			configItems.add(corporateCode);
 
@@ -543,9 +682,8 @@ public class FixedLengthFileConverterGetDetailTest {
 			supplierCode.setLength(20);
 			supplierCode.setRequired(true);
 			supplierCode.setRecordType(RecordType.DETAIL);
-			supplierCode.setTransient(isTransient);
+			supplierCode.setTransient(false);
 			supplierCode.setDisplayValue("Supplier Code");
-
 			configItems.add(supplierCode);
 
 			DefaultFileLayoutConfigItem receiptNumber = new DefaultFileLayoutConfigItem();
@@ -554,7 +692,7 @@ public class FixedLengthFileConverterGetDetailTest {
 			receiptNumber.setLength(20);
 			receiptNumber.setRequired(true);
 			receiptNumber.setRecordType(RecordType.DETAIL);
-			receiptNumber.setTransient(isTransient);
+			receiptNumber.setTransient(false);
 			receiptNumber.setDisplayValue("Receipt Number");
 
 			configItems.add(receiptNumber);
@@ -565,7 +703,7 @@ public class FixedLengthFileConverterGetDetailTest {
 			receiptDate.setLength(8);
 			receiptDate.setRequired(true);
 			receiptDate.setRecordType(RecordType.DETAIL);
-			receiptDate.setTransient(isTransient);
+			receiptDate.setTransient(false);
 			receiptDate.setDatetimeFormat("yyyyMMdd");
 			receiptDate.setDisplayValue("Receipt Date");
 
@@ -577,7 +715,7 @@ public class FixedLengthFileConverterGetDetailTest {
 			documentDueDate.setLength(8);
 			documentDueDate.setRequired(true);
 			documentDueDate.setRecordType(RecordType.DETAIL);
-			documentDueDate.setTransient(isTransient);
+			documentDueDate.setTransient(false);
 			documentDueDate.setDatetimeFormat("yyyyMMdd");
 			documentDueDate.setDisplayValue("Document Due Date");
 
@@ -605,9 +743,9 @@ public class FixedLengthFileConverterGetDetailTest {
 			docAmountConfig.setDecimalPlace(2);
 			docAmountConfig.setHasDecimalPlace(false);
 			docAmountConfig.setRecordType(RecordType.DETAIL);
-			docAmountConfig.setTransient(isTransient);
+			docAmountConfig.setTransient(false);
 			docAmountConfig.setRequired(true);
-		
+
 			docAmountConfig.setDisplayValue("Document Amount");
 
 			configItems.add(docAmountConfig);
@@ -616,7 +754,7 @@ public class FixedLengthFileConverterGetDetailTest {
 			documentType.setDocFieldName("documentType");
 			documentType.setRecordType(RecordType.DETAIL);
 			documentType.setDefaultValue("INV");
-			documentType.setTransient(isTransient);
+			documentType.setTransient(false);
 
 			configItems.add(documentType);
 		}
@@ -686,12 +824,39 @@ public class FixedLengthFileConverterGetDetailTest {
 
 		fileLayout.setConfigItems(configItems);
 
-		setConfigDefault();
-
 		return fileLayout;
 	}
 
-	public void setConfigDefault() {
-		isTransient = false;
+	private final class ExpectedCustomerCodeValidatorStub
+			implements FieldValidator, FieldValueSetter {
+
+		private static final String CASE_NOT_EXISTING = "{0} ({1}) is not exist {0}";
+
+		private static final String CASE_INACTIVE = "{0} ({1}) is inactive {0}";
+
+		@Override
+		public void setValue(Object target, Object value) {
+			try {
+				PropertyUtils.setProperty(target, "supplierId", "002");
+			}
+			catch (IllegalAccessException | InvocationTargetException
+					| NoSuchMethodException e) {
+				e.printStackTrace();
+			}
+		}
+
+		@Override
+		public void validate(Object dataValidate) throws WrongFormatDetailException {
+			String customerCodeData = String.valueOf(dataValidate).trim();
+			if ("MK004".equals(customerCodeData)) {
+				throw new WrongFormatDetailException(
+						MessageFormat.format(CASE_NOT_EXISTING, "Supplier code", "MK004"));
+			}
+			else if ("MK001".equals(customerCodeData)) {
+				throw new WrongFormatDetailException(
+						MessageFormat.format(CASE_INACTIVE, "Supplier code", "MK001"));
+			}
+
+		}
 	}
 }

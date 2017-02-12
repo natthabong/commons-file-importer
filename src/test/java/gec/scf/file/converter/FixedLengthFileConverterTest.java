@@ -41,8 +41,7 @@ public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTe
 		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
 
 		fixLengthFileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
-		fixLengthFileConverter.setFieldValidatorFactory(fieldValidatorFactory);
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
 
 		MockitoAnnotations.initMocks(this);
 	}
