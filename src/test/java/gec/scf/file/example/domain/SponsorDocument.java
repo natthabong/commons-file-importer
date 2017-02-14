@@ -18,6 +18,8 @@ public class SponsorDocument {
 
 	private String supplierId;
 
+	private String matchingRef;
+
 	private Date sponsorPaymentDate;
 
 	private BigDecimal documentAmount;
@@ -35,13 +37,33 @@ public class SponsorDocument {
 	private String optionVarcharField3;
 
 	private Date optionDateField1;
-	
+
 	private BigDecimal optionNumbericField1;
-	
+
+	private BigDecimal optionNumbericField2;
+
+	private BigDecimal optionNumbericField3;
+
+	public BigDecimal getOptionNumbericField2() {
+		return optionNumbericField2;
+	}
+
+	public void setOptionNumbericField2(BigDecimal optionNumbericField2) {
+		this.optionNumbericField2 = optionNumbericField2;
+	}
+
+	public BigDecimal getOptionNumbericField3() {
+		return optionNumbericField3;
+	}
+
+	public void setOptionNumbericField3(BigDecimal optionNumbericField3) {
+		this.optionNumbericField3 = optionNumbericField3;
+	}
+
 	private String optionVarcharField4;
 
 	private String termCode;
-	
+
 	private Date createdTime;
 
 	private Date lastModifiedTime;
@@ -224,7 +246,7 @@ public class SponsorDocument {
 	}
 
 	public String getTermCode() {
-		return termCode == null ? "": termCode;
+		return termCode == null ? "" : termCode;
 	}
 
 	public DocumentStatus getDocumentStatus() {
@@ -234,5 +256,13 @@ public class SponsorDocument {
 	public void setDocumentStatus(DocumentStatus documentStatus) {
 		this.documentStatus = documentStatus;
 	}
-	
+
+	public String getMatchingRef() {
+		return matchingRef;
+	}
+
+	public void setMatchingRef(String matchingRef) {
+		this.matchingRef = matchingRef;
+	}
+
 }

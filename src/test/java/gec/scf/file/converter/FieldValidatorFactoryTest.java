@@ -1,6 +1,7 @@
 package gec.scf.file.converter;
 
 import gec.scf.file.configuration.FileLayoutConfigItem;
+import gec.scf.file.validation.CloneHeaderData;
 import gec.scf.file.validation.DateTimeFieldValidator;
 import gec.scf.file.validation.DetailCountingValidator;
 import gec.scf.file.validation.HeaderMatchingValidator;
@@ -28,6 +29,9 @@ public class FieldValidatorFactoryTest implements FieldValidatorFactory {
 			break;
 		case EQUAL_TO_HEADER_FIELD:
 			fieldValidator = new HeaderMatchingValidator(configItem);
+			break;
+		case CLONE_VALUE:
+			fieldValidator = new CloneHeaderData(configItem);
 			break;
 		default:
 			break;

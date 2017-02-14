@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
+import gec.scf.file.configuration.ItemType;
 import gec.scf.file.configuration.PaddingType;
 import gec.scf.file.configuration.RecordType;
 import gec.scf.file.configuration.ValidationType;
@@ -79,12 +80,20 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 		if (!itemConfig.isTransient()) {
 
+			FieldValueSetter fieldSetter = fieldSetters.get(itemConfig);
+
 			Object value = null;
 
 			String tempDataString = null;
 
 			if (StringUtils.isNotBlank(itemConfig.getDefaultValue())) {
 				tempDataString = itemConfig.getDefaultValue();
+			}
+			else if (ItemType.DATA.equals(itemConfig.getItemType())) {
+				if (fieldSetter instanceof DataObserver) {
+					DataObserver<?> obs = (DataObserver<?>) fieldSetter;
+					tempDataString = String.valueOf(obs.getValue());
+				}
 			}
 			else {
 
@@ -100,7 +109,10 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 				}
 			}
 
-			if (StringUtils.isNotBlank(itemConfig.getDocFieldName())) {
+			if (StringUtils.isNotBlank(itemConfig.getDocFieldName())
+					&& tempDataString != null) {
+
+				validateDataLength(itemConfig, tempDataString);
 
 				String signFlagData = null;
 				if (itemConfig.getSignFlagConfig() != null) {
@@ -114,11 +126,15 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 				if (classType.isAssignableFrom(Date.class)) {
 
-					validateDateFormat(itemConfig, tempDataString);
-
-					SimpleDateFormat sdf = new SimpleDateFormat(
-							itemConfig.getDatetimeFormat(), Locale.US);
-					value = sdf.parse(tempDataString);
+					if ("CURRENT_DATE".equals(tempDataString)) {
+						value = new Date();
+					}
+					else {
+						validateDateFormat(itemConfig, tempDataString);
+						SimpleDateFormat sdf = new SimpleDateFormat(
+								itemConfig.getDatetimeFormat(), Locale.US);
+						value = sdf.parse(tempDataString);
+					}
 				}
 				else if (classType.isAssignableFrom(BigDecimal.class)) {
 
@@ -136,15 +152,39 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 					validateRequiredField(itemConfig, tempDataString);
 					value = tempDataString.trim();
 				}
+
 				field.set(entity, value);
 			}
 
 			// Additional
-			FieldValueSetter fieldSetter = fieldSetters.get(itemConfig);
 			if (fieldSetter != null) {
+				validateRequired(itemConfig, value);
 				fieldSetter.setValue(entity, value);
 			}
 
+		}
+
+	}
+
+	private void validateDataLength(FileLayoutConfigItem configItem, String data) {
+		if (configItem.isRequired()) {
+			if (StringUtils.length(data) > configItem.getLenght()) {
+				throw new WrongFormatDetailException(
+						MessageFormat.format(CovertErrorConstant.DATA_OVER_MAX_LENGTH,
+								configItem.getDisplayValue(), data.length(),
+								configItem.getLenght()));
+			}
+		}
+	}
+
+	private void validateRequired(FileLayoutConfigItem itemConfig, Object value) {
+
+		if (itemConfig.isRequired()) {
+			if (value == null) {
+				throw new WrongFormatDetailException(
+						MessageFormat.format(CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
+								itemConfig.getDisplayValue()));
+			}
 		}
 
 	}
@@ -168,40 +208,6 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 			validateData(currentLine, configItem);
 
-			// FieldValidator fieldValidator = getValidator(configItem);
-			//
-			// if (fieldValidator != null) {
-			// if (fieldValidator instanceof SummaryFieldValidator) {
-			// String totalAmoutData = getCuttedData(configItem, currentLine);
-			// try {
-			//
-			// BigDecimal footerTotalAmount = getBigDecimalValue(configItem,
-			// totalAmoutData);
-			//
-			// if (configItem.getSignFlagConfig() != null) {
-			//
-			// String signFlagData = getCuttedData(
-			// configItem.getSignFlagConfig(), currentLine);
-			//
-			// footerTotalAmount = applySignFlag(footerTotalAmount,
-			// configItem, signFlagData);
-			//
-			// }
-			// fieldValidator.validate(footerTotalAmount);
-			// }
-			// catch (WrongFormatFileException | WrongFormatDetailException e) {
-			// throw e;
-			// }
-			// catch (Exception e) {
-			// throw new WrongFormatFileException(
-			// MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
-			// configItem.getDisplayValue(), totalAmoutData));
-			// }
-			// }
-			// else {
-			// fieldValidator.validate(dataValidate);
-			// }
-			// }
 		}
 	}
 
@@ -276,7 +282,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 	}
 
-	abstract String getCuttedData(FileLayoutConfigItem itemConf, Object currentLine);
+	abstract String getCuttedData(FileLayoutConfigItem itemConf, Object currentLine)
+			throws WrongFormatFileException;
 
 	protected long validateDocumentNo(FileLayoutConfigItem configItem, String data,
 			Long lastDocumentNo) throws WrongFormatFileException {
@@ -325,7 +332,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 						MessageFormat.format(CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
 								configItem.getDisplayValue()));
 			}
-			else if (data.length() > configItem.getLenght()) {
+			else if (StringUtils.length(data) > configItem.getLenght()) {
 				throw new WrongFormatDetailException(
 						MessageFormat.format(CovertErrorConstant.DATA_OVER_MAX_LENGTH,
 								configItem.getDisplayValue(), data.length(),
@@ -365,8 +372,6 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 
 		// Validate require field
-		validateRequiredField(configItem, data);
-
 		if (configItem.isRequired()) {
 			try {
 				if (StringUtils.isEmpty(number)) {

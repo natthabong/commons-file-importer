@@ -1,43 +1,32 @@
 package gec.scf.file.validation;
 
-import java.text.MessageFormat;
+import java.lang.reflect.InvocationTargetException;
+
+import org.apache.commons.beanutils.PropertyUtils;
 
 import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.configuration.RecordType;
-import gec.scf.file.converter.CovertErrorConstant;
-import gec.scf.file.converter.FieldValidator;
 import gec.scf.file.converter.DataObserver;
+import gec.scf.file.converter.FieldValidator;
+import gec.scf.file.converter.FieldValueSetter;
 import gec.scf.file.exception.WrongFormatFileException;
 
-public class HeaderMatchingValidator implements FieldValidator, DataObserver<String> {
+public class CloneHeaderData
+		implements FieldValidator, DataObserver<String>, FieldValueSetter {
 
-	/**
-	 * 
-	 */
-
-	private final FileLayoutConfigItem configItem;
-
-	private DataObserver<?> fileObserver;
+	private FileLayoutConfigItem configItem;
 
 	private String value;
 
 	private FileLayoutConfigItem matchingFieldConfig;
 
-	public HeaderMatchingValidator(FileLayoutConfigItem configItem) {
+	public CloneHeaderData(FileLayoutConfigItem configItem) {
 		this.configItem = configItem;
 		this.matchingFieldConfig = configItem.getValidationRecordFieldConfig();
 	}
 
 	@Override
 	public void validate(Object data) throws WrongFormatFileException {
-		String footerData = String.valueOf(data);
-		String headerData = String.valueOf(fileObserver.getValue());
-
-		if (!footerData.equals(headerData)) {
-			throw new WrongFormatFileException(
-					MessageFormat.format(CovertErrorConstant.MISMATCH_WITH_HEADER,
-							configItem.getDisplayValue(), footerData, headerData));
-		}
 
 	}
 
@@ -59,6 +48,17 @@ public class HeaderMatchingValidator implements FieldValidator, DataObserver<Str
 	@Override
 	public FileLayoutConfigItem getObserveFieldConfig() {
 		return matchingFieldConfig;
+	}
+
+	@Override
+	public void setValue(Object target, Object value) {
+		try {
+			PropertyUtils.setProperty(target, configItem.getDocFieldName(), value);
+		}
+		catch (IllegalAccessException | InvocationTargetException
+				| NoSuchMethodException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

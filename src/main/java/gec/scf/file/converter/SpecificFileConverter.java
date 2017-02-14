@@ -4,10 +4,11 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.apache.log4j.Logger;
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.configuration.RecordType;
+import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
 import gec.scf.file.validation.SummaryFieldValidator;
@@ -29,7 +31,11 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 
 	private BufferedReader tempFileReader;
 
+	private boolean currentLineIsHeader;
+
 	private static final Logger log = Logger.getLogger(SpecificFileConverter.class);
+
+	private String tempCurrentLine;
 
 	public SpecificFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
 		this(fileLayoutConfig, clazz, null);
@@ -54,7 +60,8 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 			}
 			FileLayoutConfig layoutConfig = getFileLayoutConfig();
 			tempFile = File.createTempFile("DOCUMENT_T_", ".temp");
-			bufferedWriter = new BufferedWriter(new FileWriter(tempFile));
+			bufferedWriter = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream(tempFile), layoutConfig.getCharsetName()));
 
 			InputStream tempFileContent = new FileInputStream(tempFile);
 
@@ -137,7 +144,8 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 			RecordTypeExtractor detailRecordTypeExtractor = getExtractor(
 					RecordType.DETAIL);
 
-			String currentLine = tempFileReader.readLine();
+			String currentLine = currentLineIsHeader ? tempCurrentLine
+					: tempFileReader.readLine();
 			if (currentLine == null) {
 				detailResult = null;
 				tempFileReader.close();
@@ -149,8 +157,34 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 			if (getFileLayoutConfig().getHeaderFlag().equals(headerRecordType)) {
 
 				Set<DataObserver<?>> detailObservers = getObservers(RecordType.HEADER);
-				observeLine(currentLine, detailObservers);
-				currentLine = tempFileReader.readLine();
+				try {
+					validateLineDataFormat(currentLine,
+							getFileLayoutMappingFor(RecordType.HEADER));
+					observeLine(currentLine, detailObservers);
+					currentLine = tempFileReader.readLine();
+					currentLineNo++;
+					currentLineIsHeader = false;
+					tempCurrentLine = currentLine;
+				}
+				catch (WrongFormatDetailException | WrongFormatFileException e) {
+					WrongFormatDetailException exc = new WrongFormatDetailException(
+							e.getMessage());
+					do {
+						currentLine = tempFileReader.readLine();
+						currentLineNo++;
+						if (currentLine != null) {
+							headerRecordType = headerRecordTypeExtractor
+									.extract(currentLine);
+
+						}
+					}
+					while (!getFileLayoutConfig().getHeaderFlag().equals(headerRecordType)
+							&& currentLine != null);
+					currentLineIsHeader = true;
+					tempCurrentLine = currentLine;
+					throw exc;
+				}
+
 			}
 
 			String detailRecordType = detailRecordTypeExtractor.extract(currentLine);
@@ -159,31 +193,47 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 				List<FileLayoutConfigItem> fileLayoutConfigs = getFileLayoutMappingFor(
 						RecordType.DETAIL);
 				if (currentLine != null) {
-					T detailObject = convertDetail(currentLine, fileLayoutConfigs);
-					detailResult.setSuccess(true);
-					detailResult.setObjectValue(detailObject);
+					try {
+						T detailObject = convertDetail(currentLine, fileLayoutConfigs);
+						detailResult.setSuccess(true);
+						detailResult.setObjectValue(detailObject);
+					}
+					finally {
+						tempFileReader.readLine();
+						currentLineNo++;
+					}
+
 				}
 			}
 
 		}
-		catch (Exception e) {
-			// TODO: handle exception
+		catch (WrongFormatDetailException e) {
+			throw e;
+		}
+		catch (IOException e1) {
+			throw new WrongFormatDetailException(e1.getMessage());
 		}
 
 		return detailResult;
 
 	}
 
-	private void observeLine(String currentLine, Set<DataObserver<?>> detailObservers) {
+	private void observeLine(String currentLine, Set<DataObserver<?>> detailObservers)
+			throws WrongFormatFileException {
 		if (detailObservers != null) {
 			final String detailData = currentLine;
-			detailObservers.forEach(observer -> {
+			for (DataObserver<?> observer : detailObservers) {
 
+				FileLayoutConfigItem aggregationFieldConfig = observer
+						.getObserveFieldConfig();
+
+				String data = detailData;
+				if (aggregationFieldConfig != null) {
+					data = getCuttedData(aggregationFieldConfig, detailData);
+				}
+				
 				if (observer instanceof SummaryFieldValidator) {
 
-					FileLayoutConfigItem aggregationFieldConfig = observer
-							.getObserveFieldConfig();
-					String data = getCuttedData(aggregationFieldConfig, detailData);
 					try {
 						BigDecimal docAmount = getBigDecimalValue(aggregationFieldConfig,
 								data);
@@ -203,10 +253,10 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 					}
 				}
 				else {
-					observer.observe(detailData);
+					observer.observe(data);
 				}
 
-			});
+			}
 		}
 	}
 
@@ -214,5 +264,10 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 	protected int getLengthOfLine(
 			List<? extends FileLayoutConfigItem> fileLayoutConfigItems) {
 		return super.getLengthOfLine(fileLayoutConfigItems);
+	}
+
+	@Override
+	protected void validateLineDataLength(Object currentLine,
+			List<FileLayoutConfigItem> configItems) throws WrongFormatFileException {
 	}
 }

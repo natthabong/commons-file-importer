@@ -206,12 +206,22 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 						final String detailData = currentLine;
 						detailObservers.forEach(observer -> {
 
+							FileLayoutConfigItem aggregationFieldConfig = observer
+									.getObserveFieldConfig();
+
+							String data = detailData;
+							if (aggregationFieldConfig != null) {
+								try {
+									data = getCuttedData(aggregationFieldConfig,
+											detailData);
+								}
+								catch (WrongFormatFileException e) {
+									log.error(e.getErrorMessage(), e);
+								}
+							}
+
 							if (observer instanceof SummaryFieldValidator) {
 
-								FileLayoutConfigItem aggregationFieldConfig = observer
-										.getObserveFieldConfig();
-								String data = getCuttedData(aggregationFieldConfig,
-										detailData);
 								try {
 									BigDecimal docAmount = getBigDecimalValue(
 											aggregationFieldConfig, data);
@@ -233,7 +243,7 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 								}
 							}
 							else {
-								observer.observe(detailData);
+								observer.observe(data);
 							}
 
 						});
@@ -429,10 +439,19 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 	}
 
 	@Override
-	String getCuttedData(FileLayoutConfigItem configItem, Object currentLine) {
+	String getCuttedData(FileLayoutConfigItem configItem, Object currentLine)
+			throws WrongFormatFileException {
 		int start = configItem.getStartIndex() - 1;
 		int end = (configItem.getStartIndex() + configItem.getLenght()) - 1;
-
-		return String.valueOf(currentLine).substring(start, end);
+		String result = "";
+		try {
+			result = String.valueOf(currentLine).substring(start, end);
+		}
+		catch (IndexOutOfBoundsException e) {
+			if (configItem.isRequired()) {
+				throw new WrongFormatFileException();
+			}
+		}
+		return result;
 	}
 }

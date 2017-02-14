@@ -2,10 +2,15 @@ package gec.scf.file.converter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +29,10 @@ import gec.scf.file.configuration.DefaultFileLayoutConfigItem;
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.configuration.FileType;
+import gec.scf.file.configuration.ItemType;
 import gec.scf.file.configuration.PaddingType;
 import gec.scf.file.configuration.RecordType;
+import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
@@ -107,18 +114,18 @@ public class SpecificFileConverterTest {
 
 	@Test
 	public void given_detail_valid_format_should_set_invoice_no_correctly()
-			throws WrongFormatFileException {
+			throws WrongFormatFileException, UnsupportedEncodingException {
 		// Arrange
 		String[] cpacFileContent = new String[3];
 		cpacFileContent[0] = "TXNMC บจ.รจนาพัฒนา                                                                                             110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509002 4702008897    0040470040    9616790.98 0038001491     16012017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000983 0020001145 0020001423 0020242951 0020247508 0020247514 00202483    9618437.51     1406581.97        1646.53";
 		cpacFileContent[1] = "INVINV0020000983      98854.88        6467.14           0.00";
 		cpacFileContent[2] = "INVINVNO/เพิ่มหนี้ค่าหินทราย  09/59  ภ.ตต               DR59/12/D02";
-		InputStream fixedlengthFileContent = new ByteArrayInputStream(
-				StringUtils.join(cpacFileContent, System.lineSeparator()).getBytes());
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(StringUtils
+				.join(cpacFileContent, System.lineSeparator()).getBytes("TIS620"));
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -132,18 +139,18 @@ public class SpecificFileConverterTest {
 
 	@Test
 	public void given_detail_valid_format_should_set_invoice_amonnt_correctly()
-			throws WrongFormatFileException {
+			throws WrongFormatFileException, UnsupportedEncodingException {
 		// Arrange
 		String[] cpacFileContent = new String[3];
 		cpacFileContent[0] = "TXNMC บจ.รจนาพัฒนา                                                                                             110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509002 4702008897    0040470040    9616790.98 0038001491     16012017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000983 0020001145 0020001423 0020242951 0020247508 0020247514 00202483    9618437.51     1406581.97        1646.53";
 		cpacFileContent[1] = "INVINV0020000983      98854.88        6467.14           0.00";
 		cpacFileContent[2] = "INVINVNO/เพิ่มหนี้ค่าหินทราย  09/59  ภ.ตต               DR59/12/D02";
-		InputStream fixedlengthFileContent = new ByteArrayInputStream(
-				StringUtils.join(cpacFileContent, System.lineSeparator()).getBytes());
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(StringUtils
+				.join(cpacFileContent, System.lineSeparator()).getBytes("TIS620"));
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -157,18 +164,18 @@ public class SpecificFileConverterTest {
 
 	@Test
 	public void given_detail_valid_format_should_set_negative_invoice_amount_correctly()
-			throws WrongFormatFileException {
+			throws WrongFormatFileException, UnsupportedEncodingException {
 		// Arrange
 		String[] cpacFileContent = new String[3];
 		cpacFileContent[0] = "TXNMC บจ.รจนาพัฒนา                                                                                             110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509002 4702008897    0040470040    9616790.98 0038001491     16012017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000983 0020001145 0020001423 0020242951 0020247508 0020247514 00202483    9618437.51     1406581.97        1646.53";
 		cpacFileContent[1] = "INVINV0020001423    1229404.31-          0.00           0.00";
 		cpacFileContent[2] = "INVINVNO/ได้โอนสิทธิ์ให้ บจก.พีเอส อุตสาหกรรม           โอนสิทธิ์";
-		InputStream fixedlengthFileContent = new ByteArrayInputStream(
-				StringUtils.join(cpacFileContent, System.lineSeparator()).getBytes());
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(StringUtils
+				.join(cpacFileContent, System.lineSeparator()).getBytes("TIS620"));
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -180,6 +187,325 @@ public class SpecificFileConverterTest {
 		assertEquals("-1229404.31", document.getOptionNumbericField1().toString());
 	}
 
+	@Test
+	public void should_clone_matching_reference_in_header()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		InputStream fixedlengthFileContent = Thread.currentThread()
+				.getContextClassLoader()
+				.getResourceAsStream("gec/scf/file/converter/CPAC.txt");
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("0038001491", document.getMatchingRef());
+	}
+
+	@Test
+	public void should_clone_due_date()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		InputStream fixedlengthFileContent = Thread.currentThread()
+				.getContextClassLoader()
+				.getResourceAsStream("gec/scf/file/converter/CPAC.txt");
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("16/01/2017", new SimpleDateFormat("dd/MM/yyyy")
+				.format(document.getOptionDateField1()));
+	}
+
+	@Test
+	public void should_read_multiple_invoice()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		InputStream fixedlengthFileContent = Thread.currentThread()
+				.getContextClassLoader()
+				.getResourceAsStream("gec/scf/file/converter/CPAC.txt");
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("204433.14", document.getOptionNumbericField1().toString());
+	}
+
+	@Test
+	public void should_read_multiple_txn()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		String[] cpacFileContent = new String[6];
+		cpacFileContent[0] = "TXNMC บจ.รจนาพัฒนา                                                                                             110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509002 4702008897    0040470040    9616790.98 0038001491     16012017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000983 0020001145 0020001423 0020242951 0020247508 0020247514 00202483    9618437.51     1406581.97        1646.53";
+		cpacFileContent[1] = "INVINV0020001423    1229404.31-          0.00           0.00";
+		cpacFileContent[2] = "INVINVNO/ได้โอนสิทธิ์ให้ บจก.พีเอส อุตสาหกรรม           โอนสิทธิ์";
+		cpacFileContent[3] = "TXNMC บจ.อังเคิล อ๊อด                                                                                          110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509002 4701033529    0040470040    1966867.26 0038001492     16012017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000053 0020000084 0020000151 0020000155 0020000157 0020000158 00202392    2101934.19      315156.21      135066.93";
+		cpacFileContent[4] = "INVINV0020000053    1490602.00-          0.00           0.00";
+		cpacFileContent[5] = "INVINVno-โอนสิทธิ์ค่าขนส่งคอนกรีตให้ ลิสซิ่งกสิกรW43/16 โอนสิทธิ์W46/16";
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(StringUtils
+				.join(cpacFileContent, System.lineSeparator()).getBytes("TIS620"));
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("-1490602.00", document.getOptionNumbericField1().toString());
+	}
+
+	@Test
+	public void should_calculate_outstanding_amount()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		String[] cpacFileContent = new String[3];
+		cpacFileContent[0] = "TXNMC บจ.รจนาพัฒนา                                                                                             110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509002 4702008897    0040470040    9616790.98 0038001491     16012017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000983 0020001145 0020001423 0020242951 0020247508 0020247514 00202483    9618437.51     1406581.97        1646.53";
+		cpacFileContent[1] = "INVINV0020001423    1229404.31-          0.00           4.00";
+		cpacFileContent[2] = "INVINVNO/ได้โอนสิทธิ์ให้ บจก.พีเอส อุตสาหกรรม           โอนสิทธิ์";
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(StringUtils
+				.join(cpacFileContent, System.lineSeparator()).getBytes("TIS620"));
+
+		FieldValidatorFactory fieldValidatorFactory = spy(
+				new FieldValidatorFactoryTest());
+
+		DefaultFileLayoutConfigItem outstandingAmountConfig = new DefaultFileLayoutConfigItem();
+		outstandingAmountConfig.setDocFieldName("outstandingAmount");
+		outstandingAmountConfig.setRecordType(RecordType.DETAIL);
+		outstandingAmountConfig.setItemType(ItemType.DATA);
+		outstandingAmountConfig.setTransient(false);
+		outstandingAmountConfig.setDisplayValue("Outstanding Amount");
+		outstandingAmountConfig
+				.setValidationType(ValidationType.CALCULATE_CPAC_OUTSTANDING);
+
+		FieldValidator outstandingValidator = new CalculateCPACOutstanding();
+		doReturn(outstandingValidator).when(fieldValidatorFactory)
+				.create(eq(outstandingAmountConfig));
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout(outstandingAmountConfig);
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("-1229408.31", document.getOutstandingAmount().toString());
+	}
+
+	@Test
+	public void should_set_document_type_positive_value_to_RC()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		String[] cpacFileContent = new String[3];
+		cpacFileContent[0] = "TXNMC บจ.รจนาพัฒนา                                                                                             110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509002 4702008897    0040470040    9616790.98 0038001491     16012017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000983 0020001145 0020001423 0020242951 0020247508 0020247514 00202483    9618437.51     1406581.97        1646.53";
+		cpacFileContent[1] = "INVINV0020001423    1229404.31           0.00           4.00";
+		cpacFileContent[2] = "INVINVNO/ได้โอนสิทธิ์ให้ บจก.พีเอส อุตสาหกรรม           โอนสิทธิ์";
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(StringUtils
+				.join(cpacFileContent, System.lineSeparator()).getBytes("TIS620"));
+
+		FieldValidatorFactory fieldValidatorFactory = spy(
+				new FieldValidatorFactoryTest());
+
+		DefaultFileLayoutConfigItem doctypeConfig = new DefaultFileLayoutConfigItem();
+		doctypeConfig.setDocFieldName("documentType");
+		doctypeConfig.setDisplayValue("Document Type");
+		doctypeConfig.setRecordType(RecordType.DETAIL);
+		doctypeConfig.setItemType(ItemType.DATA);
+		doctypeConfig.setValidationType(ValidationType.CPAC_DOC_TYPE);
+
+		FieldValidator docTypeValidator = new CPACDocumentType();
+		doReturn(docTypeValidator).when(fieldValidatorFactory).create(eq(doctypeConfig));
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout(doctypeConfig);
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("RI", document.getDocumentType());
+	}
+
+	@Test
+	public void should_set_document_type_negtive_value_to_RC()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		String[] cpacFileContent = new String[3];
+		cpacFileContent[0] = "TXNMC บจ.รจนาพัฒนา                                                                                             110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509002 4702008897    0040470040    9616790.98 0038001491     16012017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000983 0020001145 0020001423 0020242951 0020247508 0020247514 00202483    9618437.51     1406581.97        1646.53";
+		cpacFileContent[1] = "INVINV0020001423    1229404.31-          0.00           4.00";
+		cpacFileContent[2] = "INVINVNO/ได้โอนสิทธิ์ให้ บจก.พีเอส อุตสาหกรรม           โอนสิทธิ์";
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(StringUtils
+				.join(cpacFileContent, System.lineSeparator()).getBytes("TIS620"));
+
+		FieldValidatorFactory fieldValidatorFactory = spy(
+				new FieldValidatorFactoryTest());
+
+		DefaultFileLayoutConfigItem doctypeConfig = new DefaultFileLayoutConfigItem();
+		doctypeConfig.setDocFieldName("documentType");
+		doctypeConfig.setDisplayValue("Document Type");
+		doctypeConfig.setRecordType(RecordType.DETAIL);
+		doctypeConfig.setItemType(ItemType.DATA);
+		doctypeConfig.setValidationType(ValidationType.CPAC_DOC_TYPE);
+
+		FieldValidator docTypeValidator = new CPACDocumentType();
+		doReturn(docTypeValidator).when(fieldValidatorFactory).create(eq(doctypeConfig));
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout(doctypeConfig);
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("RC", document.getDocumentType());
+	}
+
+	@Test
+	public void given_txn_wrong_format_date_when_get_detail_should_throw_exception()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		String[] cpacFileContent = new String[3];
+		cpacFileContent[0] = "TXNMC บจ.รจนาพัฒนา                                                                                             110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509002 4702008897    0040470040    9616790.98 0038001491     30022017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000983 0020001145 0020001423 0020242951 0020247508 0020247514 00202483    9618437.51     1406581.97        1646.53";
+		cpacFileContent[1] = "INVINV0020001423    1229404.31-          0.00           4.00";
+		cpacFileContent[2] = "INVINVNO/ได้โอนสิทธิ์ให้ บจก.พีเอส อุตสาหกรรม           โอนสิทธิ์";
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(StringUtils
+				.join(cpacFileContent, System.lineSeparator()).getBytes("TIS620"));
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Assert
+		thrown.expect(WrongFormatDetailException.class);
+		thrown.expectMessage("Value Date (30022017) invalid format");
+
+		// Actual
+		fileConverter.getDetail();
+
+	}
+
+	@Test
+	public void given_first_txn_error_should_skip_to_next_txn()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		String[] cpacFileContent = new String[6];
+		cpacFileContent[0] = "TXNMC บจ.รจนาพัฒนา                                                                                             110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509001 4702008897    0040470040    9616790.98 0038001491     30022017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000983 0020001145 0020001423 0020242951 0020247508 0020247514 00202483    9618437.51     1406581.97        1646.53";
+		cpacFileContent[1] = "INVINV0020001423    1229404.31-          0.00           4.00";
+		cpacFileContent[2] = "INVINVNO/ได้โอนสิทธิ์ให้ บจก.พีเอส อุตสาหกรรม           โอนสิทธิ์";
+		cpacFileContent[3] = "TXNMC บจ.อังเคิล อ๊อด                                                                                          110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509002 4701033529    0040470040    1966867.26 0038001492     16012017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000053 0020000084 0020000151 0020000155 0020000157 0020000158 00202392    2101934.19      315156.21      135066.93";
+		cpacFileContent[4] = "INVINV0020000053    1490602.00-          0.00           0.00";
+		cpacFileContent[5] = "INVINVno-โอนสิทธิ์ค่าขนส่งคอนกรีตให้ ลิสซิ่งกสิกรW43/16 โอนสิทธิ์W46/16";
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(StringUtils
+				.join(cpacFileContent, System.lineSeparator()).getBytes("TIS620"));
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		try {
+			fileConverter.getDetail();
+		}
+		catch (WrongFormatDetailException e) {
+			assertEquals("Value Date (30022017) invalid format", e.getMessage());
+		}
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("0038001492", document.getMatchingRef());
+
+	}
+
+	@Test
+	public void given_first_txn_error_should_skip_to_next_available_txn()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		String[] cpacFileContent = new String[9];
+		cpacFileContent[0] = "TXNMC บจ.รจนาพัฒนา                                                                                             110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509001 4702008897    0040470040    9616790.98 0038001491     30022017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000983 0020001145 0020001423 0020242951 0020247508 0020247514 00202483    9618437.51     1406581.97        1646.53";
+		cpacFileContent[1] = "INVINV0020001423    1229404.31-          0.00           4.00";
+		cpacFileContent[2] = "INVINVNO/ได้โอนสิทธิ์ให้ บจก.พีเอส อุตสาหกรรม           โอนสิทธิ์";
+		cpacFileContent[3] = "TXNMC บจ.อังเคิล อ๊อด                                                                                          110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509002 4701033529    0040470040    1966867.26 0038001492     1313017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000053 0020000084 0020000151 0020000155 0020000157 0020000158 00202392    2101934.19      315156.21      135066.93";
+		cpacFileContent[4] = "INVINV0020000053    1490602.00-          0.00           0.00";
+		cpacFileContent[5] = "INVINVno-โอนสิทธิ์ค่าขนส่งคอนกรีตให้ ลิสซิ่งกสิกรW43/16 โอนสิทธิ์W46/16";
+		cpacFileContent[6] = "TXNMC บจ.อังเคิล อ๊อด                                                                                          110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509003 4701033529    0040470040    1966867.26 0038001493     16012017                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   0020000053 0020000084 0020000151 0020000155 0020000157 0020000158 00202392    2101934.19      315156.21      135066.93";
+		cpacFileContent[7] = "INVINV0020000053    1490602.00-          0.00           0.00";
+		cpacFileContent[8] = "INVINVno-โอนสิทธิ์ค่าขนส่งคอนกรีตให้ ลิสซิ่งกสิกรW43/16 โอนสิทธิ์W46/16";
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(StringUtils
+				.join(cpacFileContent, System.lineSeparator()).getBytes("TIS620"));
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		try {
+			fileConverter.getDetail();
+		}
+		catch (WrongFormatDetailException e) {
+		}
+		
+		try {
+			fileConverter.getDetail();
+		}
+		catch (WrongFormatDetailException e) {
+		}
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("0038001493", document.getMatchingRef());
+
+	}
+
 	protected InputStream getFixedLengthFileContent(String[] fixedLengthContent) {
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
@@ -187,9 +513,14 @@ public class SpecificFileConverterTest {
 	}
 
 	private FileLayoutConfig createCPACFileLayout() {
+		return createCPACFileLayout(null);
+	}
+
+	private FileLayoutConfig createCPACFileLayout(
+			DefaultFileLayoutConfigItem additional) {
 		DefaultFileLayoutConfig fileLayout = new DefaultFileLayoutConfig();
 		fileLayout.setFileType(FileType.SPECIFIC);
-		fileLayout.setCharsetName("UTF-8");
+		fileLayout.setCharsetName("TIS620");
 		fileLayout.setHeaderFlag("TXN");
 		fileLayout.setDetailFlag("INVINV");
 
@@ -203,6 +534,42 @@ public class SpecificFileConverterTest {
 		headerRecordTypeConfig.setRecordType(RecordType.HEADER);
 		headerRecordTypeConfig.setTransient(true);
 		configItems.add(headerRecordTypeConfig);
+
+		DefaultFileLayoutConfigItem yourReferenceConfig = new DefaultFileLayoutConfigItem();
+		yourReferenceConfig.setStartIndex(347);
+		yourReferenceConfig.setLength(15);
+		yourReferenceConfig.setDisplayValue("Your Reference");
+		yourReferenceConfig.setRecordType(RecordType.HEADER);
+		yourReferenceConfig.setTransient(true);
+		configItems.add(yourReferenceConfig);
+
+		DefaultFileLayoutConfigItem valueDateConfig = new DefaultFileLayoutConfigItem();
+		valueDateConfig.setStartIndex(362);
+		valueDateConfig.setLength(8);
+		valueDateConfig.setDisplayValue("Value Date");
+		valueDateConfig.setRecordType(RecordType.HEADER);
+		valueDateConfig.setDatetimeFormat("ddMMyyyy");
+		valueDateConfig.setTransient(true);
+		configItems.add(valueDateConfig);
+
+		DefaultFileLayoutConfigItem matchingRefConfig = new DefaultFileLayoutConfigItem();
+		matchingRefConfig.setDocFieldName("matchingRef");
+		matchingRefConfig.setDisplayValue("Matching Reference No.");
+		matchingRefConfig.setRecordType(RecordType.DETAIL);
+		matchingRefConfig.setItemType(ItemType.DATA);
+		matchingRefConfig.setValidationRecordFieldConfig(yourReferenceConfig);
+		matchingRefConfig.setValidationType(ValidationType.CLONE_VALUE);
+		configItems.add(matchingRefConfig);
+
+		DefaultFileLayoutConfigItem dueDateConfig = new DefaultFileLayoutConfigItem();
+		dueDateConfig.setDocFieldName("optionDateField1");
+		dueDateConfig.setDisplayValue("Due Date");
+		dueDateConfig.setRecordType(RecordType.DETAIL);
+		dueDateConfig.setItemType(ItemType.DATA);
+		dueDateConfig.setDatetimeFormat("ddMMyyyy");
+		dueDateConfig.setValidationRecordFieldConfig(valueDateConfig);
+		dueDateConfig.setValidationType(ValidationType.CLONE_VALUE);
+		configItems.add(dueDateConfig);
 
 		DefaultFileLayoutConfigItem detailRecordTypeConfig = new DefaultFileLayoutConfigItem();
 		detailRecordTypeConfig.setDocFieldName("recordId");
@@ -219,7 +586,6 @@ public class SpecificFileConverterTest {
 		invoiceNoConfig.setStartIndex(7);
 		invoiceNoConfig.setLength(10);
 		invoiceNoConfig.setRecordType(RecordType.DETAIL);
-
 		configItems.add(invoiceNoConfig);
 
 		DefaultFileLayoutConfigItem docAmountFlagConfig = new DefaultFileLayoutConfigItem();
@@ -249,27 +615,114 @@ public class SpecificFileConverterTest {
 		docAmountConfig.setDisplayValue("Document Amount");
 		configItems.add(docAmountConfig);
 
+		DefaultFileLayoutConfigItem vatAmountFlagConfig = new DefaultFileLayoutConfigItem();
+		vatAmountFlagConfig.setStartIndex(46);
+		vatAmountFlagConfig.setLength(1);
+		vatAmountFlagConfig.setRecordType(RecordType.DETAIL);
+		vatAmountFlagConfig.setTransient(true);
+		vatAmountFlagConfig.setPlusSymbol(" ");
+		vatAmountFlagConfig.setMinusSymbol("-");
+		vatAmountFlagConfig.setDisplayValue("VAT Amount Flag");
+		vatAmountFlagConfig.setPaddingCharacter(null);
+		configItems.add(vatAmountFlagConfig);
+
+		DefaultFileLayoutConfigItem vatAmountConfig = new DefaultFileLayoutConfigItem();
+		vatAmountConfig.setSignFlagConfig(vatAmountFlagConfig);
+		vatAmountConfig.setDocFieldName("optionNumbericField2");
+		vatAmountConfig.setStartIndex(32);
+		vatAmountConfig.setLength(14);
+		vatAmountConfig.setPaddingCharacter(" ");
+		vatAmountConfig.setPaddingType(PaddingType.LEFT);
+		vatAmountConfig.setDecimalPlace(2);
+		vatAmountConfig.setHasDecimalPlace(true);
+		vatAmountConfig.setRecordType(RecordType.DETAIL);
+		vatAmountConfig.setTransient(false);
+		vatAmountConfig.setDisplayValue("VAT Amount");
+		configItems.add(vatAmountConfig);
+
+		DefaultFileLayoutConfigItem whtAmountFlagConfig = new DefaultFileLayoutConfigItem();
+		whtAmountFlagConfig.setStartIndex(61);
+		whtAmountFlagConfig.setLength(1);
+		whtAmountFlagConfig.setRecordType(RecordType.DETAIL);
+		whtAmountFlagConfig.setTransient(true);
+		whtAmountFlagConfig.setPlusSymbol(" ");
+		whtAmountFlagConfig.setMinusSymbol("-");
+		whtAmountFlagConfig.setDisplayValue("WHT Amount Flag");
+		whtAmountFlagConfig.setPaddingCharacter(null);
+		configItems.add(whtAmountFlagConfig);
+
+		DefaultFileLayoutConfigItem whtAmountConfig = new DefaultFileLayoutConfigItem();
+		whtAmountConfig.setSignFlagConfig(whtAmountFlagConfig);
+		whtAmountConfig.setDocFieldName("optionNumbericField3");
+		whtAmountConfig.setStartIndex(47);
+		whtAmountConfig.setLength(14);
+		whtAmountConfig.setPaddingCharacter(" ");
+		whtAmountConfig.setPaddingType(PaddingType.LEFT);
+		whtAmountConfig.setDecimalPlace(2);
+		whtAmountConfig.setHasDecimalPlace(true);
+		whtAmountConfig.setRecordType(RecordType.DETAIL);
+		whtAmountConfig.setTransient(false);
+		whtAmountConfig.setDisplayValue("WHT Amount");
+		configItems.add(whtAmountConfig);
+
+		if (additional != null) {
+			configItems.add(additional);
+		}
+
 		fileLayout.setConfigItems(configItems);
 
 		return fileLayout;
 	}
 
-	private final class CloneCustomerCodeValidatorStub
+	private final class CalculateCPACOutstanding
 			implements FieldValidator, FieldValueSetter {
+		@Override
+		public void validate(Object dataValidate) throws WrongFormatFileException {
+			// TODO Auto-generated method stub
+
+		}
 
 		@Override
 		public void setValue(Object target, Object value) {
 			try {
-				PropertyUtils.setProperty(target, "supplierCode", value);
+				BigDecimal imvoiceAmount = (BigDecimal) PropertyUtils.getProperty(target,
+						"optionNumbericField1");
+				Object wht = PropertyUtils.getProperty(target, "optionNumbericField3");
+				if (wht != null) {
+					imvoiceAmount = imvoiceAmount.subtract((BigDecimal) wht);
+				}
+				PropertyUtils.setProperty(target, "outstandingAmount", imvoiceAmount);
+
 			}
-			catch (IllegalAccessException | InvocationTargetException
-					| NoSuchMethodException e) {
-				e.printStackTrace();
+			catch (Exception e) {
+				// TODO: handle exception
 			}
+
+		}
+	}
+
+	private final class CPACDocumentType implements FieldValidator, FieldValueSetter {
+
+		@Override
+		public void validate(Object dataValidate) throws WrongFormatFileException {
+
 		}
 
 		@Override
-		public void validate(Object dataValidate) throws WrongFormatDetailException {
+		public void setValue(Object target, Object value) {
+			try {
+				BigDecimal imvoiceAmount = (BigDecimal) PropertyUtils.getProperty(target,
+						"optionNumbericField1");
+				String documentType = "RI";
+				if (imvoiceAmount.compareTo(new BigDecimal("0.0")) < 0) {
+					documentType = "RC";
+				}
+				PropertyUtils.setProperty(target, "documentType", documentType);
+
+			}
+			catch (Exception e) {
+				// TODO: handle exception
+			}
 
 		}
 	}

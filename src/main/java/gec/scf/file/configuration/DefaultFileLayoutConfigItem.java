@@ -42,6 +42,12 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private FileLayoutConfigItem validationRecordFieldConfig;
 
+	private ItemType itemType;
+
+	public void setItemType(ItemType itemType) {
+		this.itemType = itemType;
+	}
+
 	@Override
 	public String getDocFieldName() {
 		return docFieldName;
@@ -364,6 +370,11 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 		if (validationType != other.validationType)
 			return false;
 		return true;
+	}
+
+	@Override
+	public ItemType getItemType() {
+		return itemType;
 	}
 
 }

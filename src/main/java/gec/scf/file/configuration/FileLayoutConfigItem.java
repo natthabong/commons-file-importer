@@ -41,5 +41,7 @@ public interface FileLayoutConfigItem {
 	ValidationType getValidationType();
 	
 	FileLayoutConfigItem getValidationRecordFieldConfig();
+	
+	ItemType getItemType();
 
 }
