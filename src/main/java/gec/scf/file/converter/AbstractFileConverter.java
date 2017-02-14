@@ -167,13 +167,14 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 	}
 
 	private void validateDataLength(FileLayoutConfigItem configItem, String data) {
-		if (configItem.isRequired()) {
+		if (configItem.isRequired() && configItem.getLenght() != null) {
 			if (StringUtils.length(data) > configItem.getLenght()) {
 				throw new WrongFormatDetailException(
 						MessageFormat.format(CovertErrorConstant.DATA_OVER_MAX_LENGTH,
 								configItem.getDisplayValue(), data.length(),
 								configItem.getLenght()));
 			}
+
 		}
 	}
 
@@ -332,7 +333,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 						MessageFormat.format(CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
 								configItem.getDisplayValue()));
 			}
-			else if (StringUtils.length(data) > configItem.getLenght()) {
+			else if (configItem.getLenght() != null
+					&& StringUtils.length(data) > configItem.getLenght()) {
 				throw new WrongFormatDetailException(
 						MessageFormat.format(CovertErrorConstant.DATA_OVER_MAX_LENGTH,
 								configItem.getDisplayValue(), data.length(),
