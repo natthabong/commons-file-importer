@@ -1,6 +1,7 @@
 package gec.scf.file.converter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -34,7 +35,6 @@ import gec.scf.file.configuration.PaddingType;
 import gec.scf.file.configuration.RecordType;
 import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.example.domain.SponsorDocument;
-import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
 
@@ -417,12 +417,12 @@ public class SpecificFileConverterTest {
 				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
-		// Assert
-		thrown.expect(WrongFormatDetailException.class);
-		thrown.expectMessage("Value Date (30022017) invalid format");
-
 		// Actual
-		fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+		// Assert
+		assertFalse(actualResult.isSuccess());
+		assertEquals("Value Date (30022017) invalid format",
+				actualResult.getErrorLineDetails().get(0).getErrorMessage());
 
 	}
 
@@ -445,14 +445,8 @@ public class SpecificFileConverterTest {
 				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
-		try {
-			fileConverter.getDetail();
-		}
-		catch (WrongFormatDetailException e) {
-			assertEquals("Value Date (30022017) invalid format", e.getMessage());
-		}
-
 		// Actual
+		fileConverter.getDetail();
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
@@ -484,19 +478,10 @@ public class SpecificFileConverterTest {
 				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
-		try {
-			fileConverter.getDetail();
-		}
-		catch (WrongFormatDetailException e) {
-		}
-		
-		try {
-			fileConverter.getDetail();
-		}
-		catch (WrongFormatDetailException e) {
-		}
-
 		// Actual
+		fileConverter.getDetail();
+		fileConverter.getDetail();
+
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
 
 		// Assert
@@ -504,6 +489,160 @@ public class SpecificFileConverterTest {
 		SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
 		assertEquals("0038001493", document.getMatchingRef());
 
+	}
+
+	@Test
+	public void given_txn_wrong_format_date_when_get_detail_multiple_should_throw_exception()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		InputStream fixedlengthFileContent = Thread.currentThread()
+				.getContextClassLoader()
+				.getResourceAsStream("gec/scf/file/converter/CPAC_002.txt");
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+		// Assert
+		assertFalse(actualResult.isSuccess());
+		assertEquals("Your Reference is required",
+				actualResult.getErrorLineDetails().get(0).getErrorMessage());
+		assertEquals("1",
+				actualResult.getErrorLineDetails().get(0).getErrorLineNo().toString());
+	}
+
+	@Test
+	public void given_txn_blank_value_date_when_get_detail_should_error()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		InputStream fixedlengthFileContent = Thread.currentThread()
+				.getContextClassLoader()
+				.getResourceAsStream("gec/scf/file/converter/CPAC_002.txt");
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+		// Assert
+		assertFalse(actualResult.isSuccess());
+		assertEquals("Value Date is required",
+				actualResult.getErrorLineDetails().get(0).getErrorMessage());
+		assertEquals("4",
+				actualResult.getErrorLineDetails().get(0).getErrorLineNo().toString());
+	}
+
+	@Test
+	public void given_txn_and_not_has_INV_when_get_detail_should_error()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		InputStream fixedlengthFileContent = Thread.currentThread()
+				.getContextClassLoader()
+				.getResourceAsStream("gec/scf/file/converter/CPAC_002.txt");
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		fileConverter.getDetail();
+		fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+		// Assert
+		assertFalse(actualResult.isSuccess());
+		assertEquals("INVINV is required",
+				actualResult.getErrorLineDetails().get(0).getErrorMessage());
+		assertEquals("10",
+				actualResult.getErrorLineDetails().get(0).getErrorLineNo().toString());
+	}
+
+	@Test
+	public void given_INV_wrong_amount_format_when_get_detail_should_sjip_to_next_INV()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		InputStream fixedlengthFileContent = Thread.currentThread()
+				.getContextClassLoader()
+				.getResourceAsStream("gec/scf/file/converter/CPAC_002.txt");
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		fileConverter.getDetail();
+		fileConverter.getDetail();
+		fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+		// Assert
+		assertFalse(actualResult.isSuccess());
+		assertEquals("Document Amount (        3,5000) invalid format",
+				actualResult.getErrorLineDetails().get(0).getErrorMessage());
+		assertEquals("13",
+				actualResult.getErrorLineDetails().get(0).getErrorLineNo().toString());
+	}
+
+	@Test
+	public void given_INV_wrong_vat_amount_flag_when_get_detail_should_sjip_to_next_INV()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		InputStream fixedlengthFileContent = Thread.currentThread()
+				.getContextClassLoader()
+				.getResourceAsStream("gec/scf/file/converter/CPAC_002.txt");
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		fileConverter.getDetail();
+		fileConverter.getDetail();
+		fileConverter.getDetail();
+		fileConverter.getDetail();
+		fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+		// Assert
+		assertFalse(actualResult.isSuccess());
+		assertEquals("VAT Amount Flag (A) invalid format",
+				actualResult.getErrorLineDetails().get(0).getErrorMessage());
+		assertEquals("15",
+				actualResult.getErrorLineDetails().get(0).getErrorLineNo().toString());
+	}
+	
+	@Test
+	public void given_txn_blank_value_date_when_get_detail_should_skip_to_next_txn()
+			throws WrongFormatFileException, UnsupportedEncodingException {
+		// Arrange
+		String[] cpacFileContent = new String[6];
+		cpacFileContent[0] = "TXNMC บจ.รจนาพัฒนา                                                                                             110/465 ม.3 ถ.ปิ่นเกล้า-นครชัยศรี  ต.นครชัยศรี อ.นครชัยศรี            จ.นครปฐม                           73120     บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509002 4702008897    0040470040    9616790.98                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           0020000983 0020001145 0020001423 0020242951 0020247508 0020247514 00202483    9618437.51     1406581.97        1646.53";
+		cpacFileContent[1] = "INVINV0020001423    1229404.31-          0.00           4.00";
+		cpacFileContent[2] = "INVINVNO/ได้โอนสิทธิ์ให้ บจก.พีเอส อุตสาหกรรม           โอนสิทธิ์";
+		cpacFileContent[3] = "TXNMC บจ.สานนท์ ขนส่ง                                                                                          206 หมู่ที่ 3 ถ.พหลโยธิน           ต.หน้าพระลาน อ.เฉลิมพระเกียรติ     จ.สระบุรี                               18240บ.ผลิตภัณฑ์&วัตถุก่อสร้าง                                             0003509002     21110281010040211040     65000.00      0038018293 01052017                                                                                                         RM               E-MAI          sanon@gmail.com                                                                   ";
+		cpacFileContent[4] = "INVINV0020001443    1229404.31-          0.00           4.00";
+		cpacFileContent[5] = "INVINVNO/ได้โอนสิทธิ์ให้ บจก.พีเอส อุตสาหกรรม           โอนสิทธิ์";
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(StringUtils
+				.join(cpacFileContent, System.lineSeparator()).getBytes("TIS620"));
+
+		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
+		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+
+		// Actual
+		fileConverter.getDetail();
+		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument document = (SponsorDocument) actualResult.getObjectValue();
+		assertEquals("0038018293", document.getMatchingRef());
 	}
 
 	protected InputStream getFixedLengthFileContent(String[] fixedLengthContent) {
@@ -535,12 +674,22 @@ public class SpecificFileConverterTest {
 		headerRecordTypeConfig.setTransient(true);
 		configItems.add(headerRecordTypeConfig);
 
+		DefaultFileLayoutConfigItem receivingAccountConfig = new DefaultFileLayoutConfigItem();
+		receivingAccountConfig.setStartIndex(308);
+		receivingAccountConfig.setLength(14);
+		receivingAccountConfig.setDisplayValue("Receiving Account");
+		receivingAccountConfig.setRecordType(RecordType.HEADER);
+		receivingAccountConfig.setTransient(true);
+		receivingAccountConfig.setRequired(true);
+		configItems.add(receivingAccountConfig);
+
 		DefaultFileLayoutConfigItem yourReferenceConfig = new DefaultFileLayoutConfigItem();
 		yourReferenceConfig.setStartIndex(347);
 		yourReferenceConfig.setLength(15);
 		yourReferenceConfig.setDisplayValue("Your Reference");
 		yourReferenceConfig.setRecordType(RecordType.HEADER);
 		yourReferenceConfig.setTransient(true);
+		yourReferenceConfig.setRequired(true);
 		configItems.add(yourReferenceConfig);
 
 		DefaultFileLayoutConfigItem valueDateConfig = new DefaultFileLayoutConfigItem();
@@ -550,6 +699,7 @@ public class SpecificFileConverterTest {
 		valueDateConfig.setRecordType(RecordType.HEADER);
 		valueDateConfig.setDatetimeFormat("ddMMyyyy");
 		valueDateConfig.setTransient(true);
+		valueDateConfig.setRequired(true);
 		configItems.add(valueDateConfig);
 
 		DefaultFileLayoutConfigItem matchingRefConfig = new DefaultFileLayoutConfigItem();
@@ -557,6 +707,7 @@ public class SpecificFileConverterTest {
 		matchingRefConfig.setDisplayValue("Matching Reference No.");
 		matchingRefConfig.setRecordType(RecordType.DETAIL);
 		matchingRefConfig.setItemType(ItemType.DATA);
+		matchingRefConfig.setRequired(true);
 		matchingRefConfig.setValidationRecordFieldConfig(yourReferenceConfig);
 		matchingRefConfig.setValidationType(ValidationType.CLONE_VALUE);
 		configItems.add(matchingRefConfig);

@@ -4,7 +4,7 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 
 	private Integer startIndex;
 
-	private int length;
+	private Integer length;
 
 	private RecordType recordType;
 
@@ -96,7 +96,7 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 		this.startIndex = startIndex;
 	}
 
-	public void setLength(int length) {
+	public void setLength(Integer length) {
 		this.length = length;
 
 	}
@@ -263,7 +263,8 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 				+ ((hasDecimalPlace == null) ? 0 : hasDecimalPlace.hashCode());
 		result = prime * result + (isRequired ? 1231 : 1237);
 		result = prime * result + (isTransient ? 1231 : 1237);
-		result = prime * result + length;
+		result = prime * result + ((itemType == null) ? 0 : itemType.hashCode());
+		result = prime * result + ((length == null) ? 0 : length.hashCode());
 		result = prime * result + ((minusSymbol == null) ? 0 : minusSymbol.hashCode());
 		result = prime * result
 				+ ((paddingCharacter == null) ? 0 : paddingCharacter.hashCode());
@@ -337,7 +338,13 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 			return false;
 		if (isTransient != other.isTransient)
 			return false;
-		if (length != other.length)
+		if (itemType != other.itemType)
+			return false;
+		if (length == null) {
+			if (other.length != null)
+				return false;
+		}
+		else if (!length.equals(other.length))
 			return false;
 		if (minusSymbol == null) {
 			if (other.minusSymbol != null)

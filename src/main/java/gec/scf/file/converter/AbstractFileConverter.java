@@ -326,16 +326,17 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 	}
 
-	protected void validateRequiredField(FileLayoutConfigItem configItem, String data) {
+	protected void validateRequiredField(FileLayoutConfigItem configItem, String data)
+			throws WrongFormatFileException {
 		if (configItem.isRequired()) {
 			if (StringUtils.isBlank(data)) {
-				throw new WrongFormatDetailException(
+				throw new WrongFormatFileException(
 						MessageFormat.format(CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
 								configItem.getDisplayValue()));
 			}
 			else if (configItem.getLenght() != null
 					&& StringUtils.length(data) > configItem.getLenght()) {
-				throw new WrongFormatDetailException(
+				throw new WrongFormatFileException(
 						MessageFormat.format(CovertErrorConstant.DATA_OVER_MAX_LENGTH,
 								configItem.getDisplayValue(), data.length(),
 								configItem.getLenght()));

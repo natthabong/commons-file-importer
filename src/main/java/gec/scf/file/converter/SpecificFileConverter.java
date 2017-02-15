@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import gec.scf.file.configuration.RecordType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
+import gec.scf.file.importer.ErrorLineDetail;
 import gec.scf.file.validation.SummaryFieldValidator;
 
 public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
@@ -135,7 +137,6 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 	public DetailResult<T> getDetail() {
 
 		DetailResult<T> detailResult = new DetailResult<T>();
-		detailResult.setLineNo(++currentLineNo);
 
 		try {
 
@@ -162,38 +163,39 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 							getFileLayoutMappingFor(RecordType.HEADER));
 					observeLine(currentLine, detailObservers);
 					currentLine = tempFileReader.readLine();
-					currentLineNo++;
+					detailResult.setLineNo(++currentLineNo);
 					currentLineIsHeader = false;
 					tempCurrentLine = currentLine;
 				}
 				catch (WrongFormatDetailException | WrongFormatFileException e) {
-					WrongFormatDetailException exc = new WrongFormatDetailException(
-							e.getMessage());
+					detailResult.setLineNo(currentLineNo);
+
 					do {
 						currentLine = tempFileReader.readLine();
 						currentLineNo++;
 						if (currentLine != null) {
 							headerRecordType = headerRecordTypeExtractor
 									.extract(currentLine);
-
 						}
 					}
 					while (!getFileLayoutConfig().getHeaderFlag().equals(headerRecordType)
 							&& currentLine != null);
 					currentLineIsHeader = true;
 					tempCurrentLine = currentLine;
-					throw exc;
+					throw e;
 				}
 
 			}
 
 			String detailRecordType = detailRecordTypeExtractor.extract(currentLine);
+
 			if (getFileLayoutConfig().getDetailFlag().equals(detailRecordType)) {
 
 				List<FileLayoutConfigItem> fileLayoutConfigs = getFileLayoutMappingFor(
 						RecordType.DETAIL);
 				if (currentLine != null) {
 					try {
+						detailResult.setLineNo(currentLineNo);
 						T detailObject = convertDetail(currentLine, fileLayoutConfigs);
 						detailResult.setSuccess(true);
 						detailResult.setObjectValue(detailObject);
@@ -202,16 +204,50 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 						tempFileReader.readLine();
 						currentLineNo++;
 					}
-
 				}
 			}
+			else {
+				WrongFormatFileException wrongFormatFileException = new WrongFormatFileException(
+						MessageFormat.format(CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
+								getFileLayoutConfig().getDetailFlag()),
+						currentLineNo);
+				do {
+					currentLine = tempFileReader.readLine();
+					currentLineNo++;
+					if (currentLine != null) {
+						headerRecordType = headerRecordTypeExtractor.extract(currentLine);
+					}
+				}
+				while (!getFileLayoutConfig().getHeaderFlag().equals(headerRecordType)
+						&& currentLine != null);
+				currentLineIsHeader = true;
+				tempCurrentLine = currentLine;
 
+				throw wrongFormatFileException;
+			}
+		}
+		catch (
+
+		WrongFormatFileException e) {
+			ErrorLineDetail errorLineDetail = new ErrorLineDetail();
+			if (e.getErrorLineNo() == null) {
+				errorLineDetail.setErrorLineNo(detailResult.getLineNo());
+			}
+			else {
+				errorLineDetail.setErrorLineNo(e.getErrorLineNo());
+			}
+			errorLineDetail.setErrorMessage(e.getErrorMessage());
+			List<ErrorLineDetail> errorLineDetails = new ArrayList<>();
+			errorLineDetails.add(errorLineDetail);
+			detailResult.setErrorLineDetails(errorLineDetails);
+			detailResult.setSuccess(false);
 		}
 		catch (WrongFormatDetailException e) {
-			throw e;
+			detailResult.setErrorLineDetails(e.getErrorLineDetails());
+			detailResult.setSuccess(false);
 		}
-		catch (IOException e1) {
-			throw new WrongFormatDetailException(e1.getMessage());
+		catch (IOException e) {
+			log.error(e.getMessage(), e);
 		}
 
 		return detailResult;
@@ -221,41 +257,53 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 	private void observeLine(String currentLine, Set<DataObserver<?>> detailObservers)
 			throws WrongFormatFileException {
 		if (detailObservers != null) {
+
+			List<ErrorLineDetail> errors = new ArrayList<ErrorLineDetail>();
+
 			final String detailData = currentLine;
 			for (DataObserver<?> observer : detailObservers) {
+				try {
+					FileLayoutConfigItem aggregationFieldConfig = observer
+							.getObserveFieldConfig();
 
-				FileLayoutConfigItem aggregationFieldConfig = observer
-						.getObserveFieldConfig();
+					String data = detailData;
+					if (aggregationFieldConfig != null) {
+						data = getCuttedData(aggregationFieldConfig, detailData);
+					}
 
-				String data = detailData;
-				if (aggregationFieldConfig != null) {
-					data = getCuttedData(aggregationFieldConfig, detailData);
-				}
-				
-				if (observer instanceof SummaryFieldValidator) {
+					if (observer instanceof SummaryFieldValidator) {
 
-					try {
-						BigDecimal docAmount = getBigDecimalValue(aggregationFieldConfig,
-								data);
-						if (aggregationFieldConfig.getSignFlagConfig() != null) {
+						try {
+							BigDecimal docAmount = getBigDecimalValue(
+									aggregationFieldConfig, data);
+							if (aggregationFieldConfig.getSignFlagConfig() != null) {
 
-							String signFlagData = getCuttedData(
-									aggregationFieldConfig.getSignFlagConfig(),
-									detailData);
-							docAmount = applySignFlag(docAmount, aggregationFieldConfig,
-									signFlagData);
+								String signFlagData = getCuttedData(
+										aggregationFieldConfig.getSignFlagConfig(),
+										detailData);
+								docAmount = applySignFlag(docAmount,
+										aggregationFieldConfig, signFlagData);
 
+							}
+							observer.observe(docAmount);
 						}
-						observer.observe(docAmount);
+						catch (Exception e) {
+							log.warn(e.getMessage(), e);
+						}
 					}
-					catch (Exception e) {
-						log.warn(e.getMessage(), e);
+					else {
+						observer.observe(data);
 					}
 				}
-				else {
-					observer.observe(data);
+				catch (WrongFormatDetailException e) {
+					ErrorLineDetail error = new ErrorLineDetail(currentLineNo,
+							e.getErrorMessage());
+					errors.add(error);
 				}
 
+			}
+			if (errors.size() > 0) {
+				throw new WrongFormatDetailException(errors);
 			}
 		}
 	}
