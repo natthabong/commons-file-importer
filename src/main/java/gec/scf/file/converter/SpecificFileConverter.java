@@ -201,8 +201,9 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 						detailResult.setObjectValue(detailObject);
 					}
 					finally {
+						// 
 						tempFileReader.readLine();
-						currentLineNo++;
+						currentLineNo+=2;
 					}
 				}
 			}

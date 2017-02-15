@@ -10,7 +10,9 @@ import static org.mockito.Mockito.spy;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,7 @@ import gec.scf.file.configuration.PaddingType;
 import gec.scf.file.configuration.RecordType;
 import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.example.domain.SponsorDocument;
+import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
 
@@ -597,6 +600,7 @@ public class SpecificFileConverterTest {
 				.getContextClassLoader()
 				.getResourceAsStream("gec/scf/file/converter/CPAC_002.txt");
 
+		
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
 				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
@@ -613,10 +617,10 @@ public class SpecificFileConverterTest {
 		assertFalse(actualResult.isSuccess());
 		assertEquals("VAT Amount Flag (A) invalid format",
 				actualResult.getErrorLineDetails().get(0).getErrorMessage());
-		assertEquals("15",
+		assertEquals("17",
 				actualResult.getErrorLineDetails().get(0).getErrorLineNo().toString());
 	}
-	
+
 	@Test
 	public void given_txn_blank_value_date_when_get_detail_should_skip_to_next_txn()
 			throws WrongFormatFileException, UnsupportedEncodingException {
@@ -823,6 +827,67 @@ public class SpecificFileConverterTest {
 		fileLayout.setConfigItems(configItems);
 
 		return fileLayout;
+	}
+
+	private final class CloneCustomerCodeValidatorStub
+			implements FieldValidator, FieldValueSetter, DataObserver<String> {
+
+		private static final String CASE_NOT_EXISTING = "{0} ({1}) is not exist {0}";
+
+		private static final String CASE_INACTIVE = "{0} ({1}) is inactive {0}";
+
+		private String value;
+
+		@Override
+		public void setValue(Object target, Object customerCodeData) {
+
+			try {
+				if (value != null) {
+					value = value.trim();
+					PropertyUtils.setProperty(target, "supllierCOde", value);
+				}
+			}
+			catch (IllegalAccessException | InvocationTargetException
+					| NoSuchMethodException e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		@Override
+		public RecordType getObserveSection() {
+			return RecordType.HEADER;
+		}
+
+		@Override
+		public void observe(Object data) {
+			value = String.valueOf(data);
+
+		}
+
+		@Override
+		public String getValue() {
+			return value;
+		}
+
+		@Override
+		public FileLayoutConfigItem getObserveFieldConfig() {
+			return null;
+		}
+
+		@Override
+		public void validate(Object dataValidate) throws WrongFormatFileException {
+			String customerCodeData = String.valueOf(dataValidate).trim();
+			if ("000000".equals(customerCodeData)) {
+				throw new WrongFormatDetailException(MessageFormat
+						.format(CASE_NOT_EXISTING, "Supplier code", "000000"));
+			}
+			else if ("000001".equals(customerCodeData)) {
+				throw new WrongFormatDetailException(
+						MessageFormat.format(CASE_INACTIVE, "Supplier code", "0000001"));
+			}
+
+		}
 	}
 
 	private final class CalculateCPACOutstanding
