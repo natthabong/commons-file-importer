@@ -3,6 +3,8 @@ package gec.scf.file.condition;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import gec.scf.file.condition.exception.ConditionMismatchException;
 
 public class DataValidator {
@@ -10,6 +12,8 @@ public class DataValidator {
 	private List<? extends DataCondition> conditions;
 
 	private ConditionMatchingProvider conditionMatchingProvider;
+
+	private static Logger log = Logger.getLogger(DataValidator.class);
 
 	public DataValidator(List<? extends DataCondition> conditions) {
 		this.setConditions(conditions);
@@ -35,7 +39,7 @@ public class DataValidator {
 					errors.add(e.getMessage());
 				}
 				catch (Exception e) {
-					e.printStackTrace();
+					log.error(e.getMessage(), e);
 				}
 			}
 

@@ -528,6 +528,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			String dataToCheck) {
 		String[] splitter = dataToCheck.toString().split("\\.");
 		if (splitter.length > 1) {
+			// TODO: Implements wrong decimal place
 			int decimalLength = splitter[1].length();
 			if (decimalLength > itemConf.getDecimalPlace()) {
 				throw new WrongFormatDetailException(

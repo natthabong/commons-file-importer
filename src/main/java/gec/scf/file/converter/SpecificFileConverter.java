@@ -182,6 +182,7 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 							&& currentLine != null);
 					currentLineIsHeader = true;
 					tempCurrentLine = currentLine;
+					
 					throw e;
 				}
 
