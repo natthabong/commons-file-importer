@@ -33,7 +33,9 @@ public class DataValidator {
 				try {
 					ConditionMatching<T> conditionMatching = conditionMatchingProvider
 							.create(dataCondition, objectClass);
-					conditionMatching.match(object, dataCondition);
+					
+					if(conditionMatching!=null)
+						conditionMatching.match(object, dataCondition);
 				}
 				catch (ConditionMismatchException e) {
 					errors.add(e.getMessage());
