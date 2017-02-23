@@ -101,9 +101,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 				tempDataString = getCuttedData(itemConfig, currentLine);
 
-				if (itemConfig.getExpectedValue() != null
-						&& !ValidationType.IN_CUSTOMER_CODE_GROUP
-								.equals(itemConfig.getValidationType())) {
+				if (StringUtils.isNotBlank(itemConfig.getExpectedValue())
+						&& itemConfig.getValidationType() == null) {
 
 					validateExpectedValue(itemConfig, tempDataString);
 				}
@@ -152,9 +151,10 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 					validateRequiredField(itemConfig, tempDataString);
 					value = tempDataString.trim();
 				}
-				try{
+				try {
 					field.set(entity, value);
-				}catch(Exception e){
+				}
+				catch (Exception e) {
 					/**
 					 * TODO: manage exception
 					 **/
@@ -210,7 +210,9 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 			String dataValidate = getCuttedData(configItem, currentLine);
 
-			if (StringUtils.isNotBlank(configItem.getExpectedValue())) {
+			if (StringUtils.isNotBlank(configItem.getExpectedValue())
+					&& configItem.getValidationType() == null) {
+
 				validateExpectedValue(configItem, dataValidate);
 			}
 
