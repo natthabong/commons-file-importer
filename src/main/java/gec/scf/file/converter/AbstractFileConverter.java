@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.DateValidator;
 import org.apache.log4j.Logger;
@@ -152,8 +153,13 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 					validateRequiredField(itemConfig, tempDataString);
 					value = tempDataString.trim();
 				}
-
-				field.set(entity, value);
+				try{
+					field.set(entity, value);
+				}catch(Exception e){
+					/**
+					 * TODO: manage exception
+					 **/
+				}
 			}
 
 			// Additional
