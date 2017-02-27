@@ -24,7 +24,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.validator.routines.DateValidator;
 import org.apache.log4j.Logger;
@@ -172,7 +171,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			if (itemConfig.getExpectedValue() != null
 					&& ValidationType.IN_CUSTOMER_CODE_GROUP
 							.equals(itemConfig.getValidationType())) {
-				fieldSetter.setValue(entity, tempDataString);
+				fieldSetter.setValue(entity, value);
 			}
 		}
 
