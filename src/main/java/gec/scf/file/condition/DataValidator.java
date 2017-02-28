@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import gec.scf.file.condition.exception.ConditionMismatchException;
 
+@Deprecated
 public class DataValidator {
 
 	private List<? extends DataCondition> conditions;

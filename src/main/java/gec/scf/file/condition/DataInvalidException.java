@@ -9,6 +9,8 @@ public class DataInvalidException extends Exception {
 
 	private Collection<String> errors;
 
+	private String message;
+
 	public DataInvalidException() {
 		super();
 	}
@@ -16,7 +18,9 @@ public class DataInvalidException extends Exception {
 	public DataInvalidException(List<String> errors) {
 		super();
 		this.errors = errors;
-
+		if (errors != null && errors.size() > 0) {
+			this.message = errors.get(0);
+		}
 	}
 
 	public Collection<String> getErrors() {
@@ -25,6 +29,11 @@ public class DataInvalidException extends Exception {
 
 	public void setErrors(Collection<String> errors) {
 		this.errors = errors;
+	}
+
+	@Override
+	public String getMessage() {
+		return message;
 	}
 
 }
