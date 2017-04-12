@@ -177,6 +177,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		else {
 			
 			//use in drawdown advice
+			validateRequiredField(itemConfig, getCuttedData(itemConfig, currentLine));
+			
 			if (itemConfig.getValidationType() != null) {
 				validateData(currentLine, itemConfig);
 			}
