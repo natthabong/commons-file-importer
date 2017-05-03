@@ -350,15 +350,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 	protected void validateRequiredField(FileLayoutConfigItem configItem, String data)
 			throws WrongFormatFileException {
-		String val = configItem.getDisplayValue().toString();
-			if (StringUtils.isBlank(data) && configItem.getItemDataType().equals(new String("FILLER"))) {
-				if(data.length()==0){
-					throw new WrongFormatFileException(
-							MessageFormat.format(CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
-									configItem.getDisplayValue()));
-				}
-			}
-			else if (StringUtils.isBlank(data) && configItem.getItemDataType().equals(new String("FILLER"))) {
+		if (configItem.isRequired()) {
+			if (StringUtils.isBlank(data)) {
 				throw new WrongFormatFileException(
 						MessageFormat.format(CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
 								configItem.getDisplayValue()));
@@ -370,20 +363,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 								configItem.getDisplayValue(), data.length(),
 								configItem.getLenght()));
 			}
-			else if (configItem.getLenght() != null && configItem.getExpectedValue() != null
-					  && configItem.getItemDataType() != "FILLER") {
-				if(!data.trim().equals(configItem.getExpectedValue()) && !configItem.getItemDataType().equals(new String("CUSTOMER_CODE"))){
-					throw new WrongFormatFileException(
-							MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
-									configItem.getDisplayValue()));
-					}
-			}
-			else if(configItem.getItemDataType().equals(new String("DOCUMENT_TYPE")) && StringUtils.isBlank(data)){
-				throw new WrongFormatFileException(
-						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
-								configItem.getDisplayValue()));
-			}
-		
+		}
 	}
 
 	private void validateBigDecimalFormat(FileLayoutConfigItem configItem, String data) {

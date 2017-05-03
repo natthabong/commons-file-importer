@@ -43,7 +43,5 @@ public interface FileLayoutConfigItem {
 	FileLayoutConfigItem getValidationRecordFieldConfig();
 	
 	ItemType getItemType();
-	
-	String getItemDataType();
 
 }

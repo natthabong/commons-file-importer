@@ -384,10 +384,4 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 		return itemType;
 	}
 
-	@Override
-	public String getItemDataType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
