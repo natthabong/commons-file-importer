@@ -1,4 +1,4 @@
-package gec.scf.file.importer;
+package gec.scf.file.importer.domain;
 
 import java.io.Serializable;
 

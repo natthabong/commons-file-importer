@@ -2,6 +2,8 @@ package gec.scf.file.importer;
 
 import java.util.List;
 
+import gec.scf.file.importer.domain.ErrorLineDetail;
+
 public class DetailResult<T> {
 
 	private boolean success;

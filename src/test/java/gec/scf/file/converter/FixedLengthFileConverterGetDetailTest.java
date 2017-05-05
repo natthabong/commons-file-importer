@@ -31,7 +31,7 @@ import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
-import gec.scf.file.importer.ErrorLineDetail;
+import gec.scf.file.importer.domain.ErrorLineDetail;
 
 public class FixedLengthFileConverterGetDetailTest
 		extends AbstractFixedLengthConverterTest {

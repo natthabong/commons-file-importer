@@ -14,7 +14,7 @@ import gec.scf.file.configuration.RecordType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
-import gec.scf.file.importer.ErrorLineDetail;
+import gec.scf.file.importer.domain.ErrorLineDetail;
 
 public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
@@ -25,8 +25,6 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 	private int totalColumns;
 
 	private int offset;
-
-	private int startLineNo;
 
 	public CSVFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz,
 			FieldValidatorFactory fieldValidatorFactory) {

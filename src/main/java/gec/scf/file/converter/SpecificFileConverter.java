@@ -24,7 +24,7 @@ import gec.scf.file.configuration.RecordType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
-import gec.scf.file.importer.ErrorLineDetail;
+import gec.scf.file.importer.domain.ErrorLineDetail;
 import gec.scf.file.validation.SummaryFieldValidator;
 
 public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {

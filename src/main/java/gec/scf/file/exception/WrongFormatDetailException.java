@@ -2,7 +2,7 @@ package gec.scf.file.exception;
 
 import java.util.List;
 
-import gec.scf.file.importer.ErrorLineDetail;
+import gec.scf.file.importer.domain.ErrorLineDetail;
 
 public class WrongFormatDetailException extends RuntimeException {
 
