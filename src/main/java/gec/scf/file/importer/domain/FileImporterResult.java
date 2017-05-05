@@ -28,6 +28,8 @@ public class FileImporterResult implements Serializable {
 
 	private ProcessType processType;
 
+	private String ownerOrganizeId;
+
 	public FileImporterResult() {
 		success = fail = total = 0;
 	}
@@ -196,5 +198,13 @@ public class FileImporterResult implements Serializable {
 
 	public ProcessType getProcessType() {
 		return processType;
+	}
+
+	public String getOwnerOrganizeId() {
+		return ownerOrganizeId;
+	}
+
+	public void setOwnerOrganizeId(String ownerOrganizeId) {
+		this.ownerOrganizeId = ownerOrganizeId;
 	}
 }
