@@ -68,12 +68,10 @@ public class DefaultFileLayoutConfig implements FileLayoutConfig {
 	}
 
 	public void setFileExtension(String string) {
-		// TODO Auto-generated method stub
 
 	}
 
 	public void setPrefixName(String string) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -121,7 +119,6 @@ public class DefaultFileLayoutConfig implements FileLayoutConfig {
 
 	@Override
 	public String getOwnerId() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

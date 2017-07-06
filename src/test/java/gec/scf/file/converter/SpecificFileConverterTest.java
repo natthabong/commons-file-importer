@@ -894,7 +894,6 @@ public class SpecificFileConverterTest {
 			implements FieldValidator, FieldValueSetter {
 		@Override
 		public void validate(Object dataValidate) throws WrongFormatFileException {
-			// TODO Auto-generated method stub
 
 		}
 
