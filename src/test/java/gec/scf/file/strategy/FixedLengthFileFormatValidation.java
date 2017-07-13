@@ -11,7 +11,6 @@ public class FixedLengthFileFormatValidation implements FileFormatValidation {
 	public void validateLineDataLength(String lineData,
 			List<? extends FileLayoutConfigItem> layoutConfigItems)
 			throws WrongFormatFileException {
-		// TODO Auto-generated method stub
 
 	}
 
