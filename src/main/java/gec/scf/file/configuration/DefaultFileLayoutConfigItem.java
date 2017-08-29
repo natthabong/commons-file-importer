@@ -41,6 +41,8 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	private ValidationType validationType;
 
 	private FileLayoutConfigItem validationRecordFieldConfig;
+	
+	private String mappingToFieldName;
 
 	private ItemType itemType;
 
@@ -245,6 +247,7 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 		this.validationRecordFieldConfig = validationRecordFieldConfig;
 	}
 
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -265,13 +268,19 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 		result = prime * result + (isTransient ? 1231 : 1237);
 		result = prime * result + ((itemType == null) ? 0 : itemType.hashCode());
 		result = prime * result + ((length == null) ? 0 : length.hashCode());
+		result = prime * result
+				+ ((mappingToFieldName == null) ? 0 : mappingToFieldName.hashCode());
 		result = prime * result + ((minusSymbol == null) ? 0 : minusSymbol.hashCode());
 		result = prime * result
 				+ ((paddingCharacter == null) ? 0 : paddingCharacter.hashCode());
 		result = prime * result + ((paddingType == null) ? 0 : paddingType.hashCode());
 		result = prime * result + ((plusSymbol == null) ? 0 : plusSymbol.hashCode());
 		result = prime * result + ((recordType == null) ? 0 : recordType.hashCode());
+		result = prime * result
+				+ ((signFlagConfig == null) ? 0 : signFlagConfig.hashCode());
 		result = prime * result + ((startIndex == null) ? 0 : startIndex.hashCode());
+		result = prime * result + ((validationRecordFieldConfig == null) ? 0
+				: validationRecordFieldConfig.hashCode());
 		result = prime * result
 				+ ((validationType == null) ? 0 : validationType.hashCode());
 		return result;
@@ -346,6 +355,12 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 		}
 		else if (!length.equals(other.length))
 			return false;
+		if (mappingToFieldName == null) {
+			if (other.mappingToFieldName != null)
+				return false;
+		}
+		else if (!mappingToFieldName.equals(other.mappingToFieldName))
+			return false;
 		if (minusSymbol == null) {
 			if (other.minusSymbol != null)
 				return false;
@@ -368,11 +383,23 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 			return false;
 		if (recordType != other.recordType)
 			return false;
+		if (signFlagConfig == null) {
+			if (other.signFlagConfig != null)
+				return false;
+		}
+		else if (!signFlagConfig.equals(other.signFlagConfig))
+			return false;
 		if (startIndex == null) {
 			if (other.startIndex != null)
 				return false;
 		}
 		else if (!startIndex.equals(other.startIndex))
+			return false;
+		if (validationRecordFieldConfig == null) {
+			if (other.validationRecordFieldConfig != null)
+				return false;
+		}
+		else if (!validationRecordFieldConfig.equals(other.validationRecordFieldConfig))
 			return false;
 		if (validationType != other.validationType)
 			return false;
@@ -383,5 +410,17 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	public ItemType getItemType() {
 		return itemType;
 	}
+
+	@Override
+	public String getMappingToFieldName() {
+		// TODO Auto-generated method stub
+		return mappingToFieldName;
+	}
+
+	public void setMappingToFieldName(String mappingToFieldName) {
+		this.mappingToFieldName = mappingToFieldName;
+	}
+	
+	
 
 }
