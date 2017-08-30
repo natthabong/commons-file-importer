@@ -58,6 +58,9 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 	private Map<FileLayoutConfigItem, FieldValueSetter> fieldSetters = new HashMap<FileLayoutConfigItem, FieldValueSetter>();
 
+	private Map<FileLayoutConfigItem, ValueAdjustment> adjustments = new HashMap<FileLayoutConfigItem, ValueAdjustment>();
+
+	
 	private static final Logger log = Logger.getLogger(AbstractFileConverter.class);
 
 	public AbstractFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
@@ -159,7 +162,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 					if (itemConfig.getApplyValueFieldNames() != null) {
 						for (String fieldName : itemConfig.getApplyValueFieldNames()) {
 							try {
-								Field cloneField = entityClass.getDeclaredField(fieldName);
+								Field cloneField = entityClass
+										.getDeclaredField(fieldName);
 								cloneField.setAccessible(true);
 								cloneField.set(entity, value);
 							}
@@ -586,17 +590,25 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			FileLayoutConfigItem configItem, String signFlagData) {
 
 		FileLayoutConfigItem signFlagConfig = configItem.getSignFlagConfig();
-		if (signFlagData.equals(signFlagConfig.getNegativeFlag())) {
-			valueAmount = valueAmount.multiply(new BigDecimal("-1"));
-		}
-		else if (signFlagData.equals(signFlagConfig.getPositiveFlag())) {
-			valueAmount = valueAmount.multiply(new BigDecimal("1"));
+
+		if (ValidationType.IN_MAPPING_TYPE.equals(signFlagConfig.getValidationType())) {
+			ValueAdjustment adjustment = adjustments.get(signFlagConfig);
+			valueAmount = (BigDecimal) adjustment.adjust(valueAmount, signFlagData);
 		}
 		else {
-			throw new WrongFormatDetailException(
-					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
-							signFlagConfig.getDisplayValue(), signFlagData));
+			if (signFlagData.equals(signFlagConfig.getNegativeFlag())) {
+				valueAmount = valueAmount.multiply(new BigDecimal("-1"));
+			}
+			else if (signFlagData.equals(signFlagConfig.getPositiveFlag())) {
+				valueAmount = valueAmount.multiply(new BigDecimal("1"));
+			}
+			else {
+				throw new WrongFormatDetailException(
+						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+								signFlagConfig.getDisplayValue(), signFlagData));
+			}
 		}
+
 		return valueAmount;
 	}
 
@@ -706,6 +718,11 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 						if (fieldValidator instanceof FieldValueSetter) {
 							FieldValueSetter fileSetter = (FieldValueSetter) fieldValidator;
 							fieldSetters.put(fileLayoutConfigItem, fileSetter);
+						}
+						
+						if(fieldValidator instanceof ValueAdjustment){
+							ValueAdjustment valueAdjustment = (ValueAdjustment) fieldValidator;
+							adjustments.put(fileLayoutConfigItem, valueAdjustment);
 						}
 						validators.put(fileLayoutConfigItem, fieldValidator);
 
