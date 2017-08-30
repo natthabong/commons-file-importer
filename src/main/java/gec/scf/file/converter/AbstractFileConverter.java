@@ -58,6 +58,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 	private Map<FileLayoutConfigItem, FieldValueSetter> fieldSetters = new HashMap<FileLayoutConfigItem, FieldValueSetter>();
 
+	private static final Logger log = Logger.getLogger(AbstractFileConverter.class);
+
 	public AbstractFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
 		this(fileLayoutConfig, clazz, null);
 	}
@@ -175,10 +177,10 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			}
 		}
 		else {
-			
-			//use in drawdown advice
+
+			// use in drawdown advice
 			validateRequiredField(itemConfig, getCuttedData(itemConfig, currentLine));
-			
+
 			if (itemConfig.getValidationType() != null) {
 				validateData(currentLine, itemConfig);
 			}
@@ -537,6 +539,12 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 		}
 		catch (NumberFormatException e) {
+			throw new WrongFormatDetailException(
+					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+							configItem.getDisplayValue(), data));
+		}
+		catch (Exception e) {
+			log .error(e.getMessage(), e);
 			throw new WrongFormatDetailException(
 					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
 							configItem.getDisplayValue(), data));
