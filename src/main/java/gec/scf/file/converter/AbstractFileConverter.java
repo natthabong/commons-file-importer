@@ -155,6 +155,20 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 				}
 				try {
 					field.set(entity, value);
+
+					if (itemConfig.getApplyValueFieldNames() != null) {
+						for (String fieldName : itemConfig.getApplyValueFieldNames()) {
+							try {
+								Field cloneField = entityClass.getDeclaredField(fieldName);
+								cloneField.setAccessible(true);
+								cloneField.set(entity, value);
+							}
+							catch (Exception e) {
+								log.warn(e.getMessage(), e);
+							}
+						}
+
+					}
 				}
 				catch (Exception e) {
 					/**
@@ -544,7 +558,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 							configItem.getDisplayValue(), data));
 		}
 		catch (Exception e) {
-			log .error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw new WrongFormatDetailException(
 					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
 							configItem.getDisplayValue(), data));

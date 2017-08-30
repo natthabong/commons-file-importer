@@ -420,6 +420,11 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	public void setMappingToFieldName(String mappingToFieldName) {
 		this.mappingToFieldName = mappingToFieldName;
 	}
+
+	@Override
+	public String[] getApplyValueFieldNames() {
+		return null;
+	}
 	
 	
 
