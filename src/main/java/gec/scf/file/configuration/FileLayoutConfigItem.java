@@ -46,7 +46,7 @@ public interface FileLayoutConfigItem {
 	
 	String getMappingToFieldName();
 	
-	//String[] getApplyValueFieldNames();
+	String[] getApplyValueFieldNames();
 	
 
 }
