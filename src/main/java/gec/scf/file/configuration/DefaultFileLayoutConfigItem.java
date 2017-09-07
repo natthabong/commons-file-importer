@@ -425,7 +425,5 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 //	public String[] getApplyValueFieldNames() {
 //		return null;
 //	}
-	
-	
 
 }
