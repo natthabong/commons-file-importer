@@ -1,4 +1,4 @@
-def GIT_REPOSITORY_REPO = "http://gitlab.gec.co.th/gecscf/commons-file-importer.git"
+def GIT_REPOSITORY_REPO = "http://gitlab.gec.io/gecscf/commons-file-importer.git"
 pipeline {
   agent { node { label 'gecscf-unix-001' } }
   triggers { pollSCM('H/3 * * * *') }
