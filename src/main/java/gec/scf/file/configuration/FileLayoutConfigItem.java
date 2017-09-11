@@ -39,14 +39,15 @@ public interface FileLayoutConfigItem {
 	FileLayoutConfigItem getSignFlagConfig();
 
 	ValidationType getValidationType();
-	
+
 	FileLayoutConfigItem getValidationRecordFieldConfig();
-	
+
 	ItemType getItemType();
-	
+
 	String getMappingToFieldName();
-	
+
+	String getDocumentFieldName();
+
 	String[] getApplyValueFieldNames();
-	
 
 }

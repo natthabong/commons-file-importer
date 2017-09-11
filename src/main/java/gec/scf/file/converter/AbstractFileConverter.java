@@ -113,7 +113,15 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 				}
 			}
 
-			if (StringUtils.isNotBlank(itemConfig.getDocFieldName())
+			//TODO refactor when bank use gecscf document field
+			String docFieldName = null;
+			if (StringUtils.isNotBlank(itemConfig.getDocumentFieldName())) {
+				docFieldName = itemConfig.getDocumentFieldName();
+			}else{
+				docFieldName = itemConfig.getDocFieldName();
+			}			
+			
+			if (StringUtils.isNotBlank(docFieldName)
 					&& tempDataString != null) {
 
 				validateDataLength(itemConfig, tempDataString);
@@ -124,7 +132,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 					signFlagData = getCuttedData(signFlagConfig, currentLine);
 				}
 
-				Field field = entityClass.getDeclaredField(itemConfig.getDocFieldName());
+				Field field = entityClass.getDeclaredField(docFieldName);
 				field.setAccessible(true);
 				Class<?> classType = field.getType();
 
@@ -691,7 +699,16 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		List<FileLayoutConfigItem> footerList = new ArrayList<FileLayoutConfigItem>();
 
 		for (FileLayoutConfigItem fileLayoutConfigItem : list) {
-			if ("recordId".equals(fileLayoutConfigItem.getDocFieldName())) {
+			
+			//TODO refactor when bank use gecscf document field
+			String docFieldName = null;
+			if (StringUtils.isNotBlank(fileLayoutConfigItem.getDocumentFieldName())) {
+				docFieldName = fileLayoutConfigItem.getDocumentFieldName();
+			}else{
+				docFieldName = fileLayoutConfigItem.getDocFieldName();
+			}	
+			
+			if ("recordId".equals(docFieldName)) {
 				RecordTypeExtractor extractor = new RecordTypeExtractor(
 						fileLayoutConfigItem);
 				extractors.put(fileLayoutConfigItem.getRecordTypeData(), extractor);

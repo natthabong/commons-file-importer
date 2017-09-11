@@ -15,8 +15,7 @@ import gec.scf.file.converter.FieldValueSetter;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 
-public class CloneHeaderData
-		implements FieldValidator, DataObserver<String>, FieldValueSetter {
+public class CloneHeaderData implements FieldValidator, DataObserver<String>, FieldValueSetter {
 
 	private FileLayoutConfigItem configItem;
 
@@ -43,9 +42,8 @@ public class CloneHeaderData
 	public void observe(Object data) {
 		value = String.valueOf(data);
 		if (matchingFieldConfig.isRequired() && StringUtils.isBlank(value)) {
-			throw new WrongFormatDetailException(
-					MessageFormat.format(CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
-							matchingFieldConfig.getDisplayValue()));
+			throw new WrongFormatDetailException(MessageFormat.format(CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
+					matchingFieldConfig.getDisplayValue()));
 		}
 	}
 
@@ -62,10 +60,16 @@ public class CloneHeaderData
 	@Override
 	public void setValue(Object target, Object value) {
 		try {
-			PropertyUtils.setProperty(target, configItem.getDocFieldName(), value);
-		}
-		catch (IllegalAccessException | InvocationTargetException
-				| NoSuchMethodException e) {
+			// TODO refactor when bank use gecscf document field
+			String docFieldName = null;
+			if (StringUtils.isNotBlank(configItem.getDocumentFieldName())) {
+				docFieldName = configItem.getDocumentFieldName();
+			} else {
+				docFieldName = configItem.getDocFieldName();
+			}
+			
+			PropertyUtils.setProperty(target, docFieldName, value);
+		} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
 			e.printStackTrace();
 		}
 	}

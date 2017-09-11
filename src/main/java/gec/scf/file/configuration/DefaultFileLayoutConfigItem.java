@@ -426,4 +426,9 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 		return null;
 	}
 
+	@Override
+	public String getDocumentFieldName() {
+		return null;
+	}
+
 }
