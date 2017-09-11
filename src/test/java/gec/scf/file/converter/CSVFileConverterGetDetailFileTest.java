@@ -852,7 +852,7 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_set_offset_row_no_2_and_set_detail_has_2_record_when_get_detail_should_recieve_detail_1_record()
+	public void given_set_offset_row_no_2_and_set_header_has_1_record_and_detail_has_2_record_when_get_detail_should_recieve_detail_1_record()
 	        throws WrongFormatFileException {
 		// Arrange
 		long OFFSET_ROWNO = 2;
@@ -877,7 +877,7 @@ public class CSVFileConverterGetDetailFileTest {
 	}
 
 	@Test
-	public void given_set_offset_row_no_2_and_set_detail_has_3_record_when_get_detail_should_recieve_detail_2_record()
+	public void given_set_offset_row_no_2_and_set_header_has_1_record_and_detail_has_3_record_when_get_detail_should_recieve_detail_2_record()
 	        throws WrongFormatFileException {
 		// Arrange
 		long OFFSET_ROWNO = 2;
@@ -902,11 +902,61 @@ public class CSVFileConverterGetDetailFileTest {
 		assertEquals(2, countDetail);
 	}
 
+	
+	@Test
+	public void given_set_offset_row_no_1_and_set_header_has_1_record_and_detail_has_2_record_when_get_detail_should_recieve_detail_2_record()
+	        throws WrongFormatFileException {
+		// Arrange
+		long OFFSET_ROWNO = 1;
+		String[] csvValidFileContent = new String[3];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,560000,";
+		csvValidFileContent[2] = "23,10278973,หาดใหญ่ใน,บจก ประจงกิจปาล์มออยล์,7,SCB,พระประแดง,480611,15/02/2015,16/03/2015,24/10/2014,250000,";
+
+		DefaultFileLayoutConfig fileLayout = getLayoutConfig();
+		fileLayout.setOffsetRowNo(OFFSET_ROWNO);
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent, fileLayout);
+
+		DetailResult<SponsorDocument> actualResult = null;
+		int countDetail = 0;
+		// Actual
+		while ((actualResult = csvFileConverter.getDetail()) != null) {
+			countDetail++;
+		}
+
+		// Assert
+		assertEquals(2, countDetail);
+	}
+	
+	@Test
+	public void given_set_offset_row_no_0_and_set_header_has_0_record_and_detail_has_2_record_when_get_detail_should_recieve_detail_2_record()
+	        throws WrongFormatFileException {
+		// Arrange
+		long OFFSET_ROWNO = 0;
+		String[] csvValidFileContent = new String[3];
+		csvValidFileContent[0] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,560000,";
+		csvValidFileContent[1] = "23,10278973,หาดใหญ่ใน,บจก ประจงกิจปาล์มออยล์,7,SCB,พระประแดง,480611,15/02/2015,16/03/2015,24/10/2014,250000,";
+
+		DefaultFileLayoutConfig fileLayout = getLayoutConfig();
+		fileLayout.setOffsetRowNo(OFFSET_ROWNO);
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent, fileLayout);
+
+		DetailResult<SponsorDocument> actualResult = null;
+		int countDetail = 0;
+		// Actual
+		while ((actualResult = csvFileConverter.getDetail()) != null) {
+			countDetail++;
+		}
+
+		// Assert
+		assertEquals(2, countDetail);
+	}
 	private CSVFileConverter<SponsorDocument> mockSponsorFileLayout(
 	        String[] csvValidFileContent, DefaultFileLayoutConfigItem chequeAmount)
 	        throws WrongFormatFileException {
 
 		DefaultFileLayoutConfig fileLayout = getLayoutConfig(chequeAmount);
+		fileLayout.setOffsetRowNo(1);
 
 		return mockSponsorFileLayout(csvValidFileContent, fileLayout);
 	}
@@ -915,6 +965,7 @@ public class CSVFileConverterGetDetailFileTest {
 	        String[] csvValidFileContent) throws WrongFormatFileException {
 
 		DefaultFileLayoutConfig fileLayout = getLayoutConfig();
+		fileLayout.setOffsetRowNo(1);
 
 		return mockSponsorFileLayout(csvValidFileContent, fileLayout);
 	}

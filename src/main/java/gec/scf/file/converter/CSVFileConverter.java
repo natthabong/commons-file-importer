@@ -58,7 +58,7 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 		}
 
 		if (offset < 1) {
-			offset = 1;
+			offset = 0;
 		}
 
 		int cuurentRow = offset;
