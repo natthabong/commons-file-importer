@@ -599,7 +599,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 		FileLayoutConfigItem signFlagConfig = configItem.getSignFlagConfig();
 
-		if (ValidationType.IN_MAPPING_TYPE.equals(signFlagConfig.getValidationType())) {
+		if (ValidationType.IN_MAPPING_TYPE_SIGN_FLAG.equals(signFlagConfig.getValidationType())) {
 			ValueAdjustment adjustment = adjustments.get(signFlagConfig);
 			valueAmount = (BigDecimal) adjustment.adjust(valueAmount, signFlagData);
 		}
