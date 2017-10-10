@@ -37,7 +37,7 @@ public class DetailCountingValidator implements FieldValidator, DataObserver<Int
 		}
 		catch (NumberFormatException e) {
 			throw new WrongFormatFileException(
-					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+					MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 							configItem.getDisplayValue(), data));
 		}
 

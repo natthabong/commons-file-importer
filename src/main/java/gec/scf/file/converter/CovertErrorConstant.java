@@ -16,7 +16,7 @@ public interface CovertErrorConstant {
 
 	String ERROR_MESSAGE_IS_REQUIRE = "{0} is required";
 
-	String INVALIDE_FORMAT = "{0} ({1}) invalid format";
+	String INVALID_FORMAT = "{0} ({1}) invalid format";
 	String MISMATCH_FORMAT = "{0} ({1}) mismatch";
 
 	String DOCUMENT_NO_INVALID = " ({0}) is invalid. current Document No is {1}";
