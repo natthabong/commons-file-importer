@@ -292,7 +292,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 				}
 				catch (Exception e) {
 					throw new WrongFormatFileException(
-							MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+							MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 									configItem.getDisplayValue(), totalAmoutData));
 				}
 			}
@@ -365,12 +365,12 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			if (configItem.getRecordTypeData() == null
 					|| RecordType.DETAIL.equals(configItem.getRecordTypeData())) {
 				throw new WrongFormatDetailException(
-						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+						MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 								configItem.getDisplayValue(), data));
 			}
 			else {
 				throw new WrongFormatFileException(
-						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+						MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 								configItem.getDisplayValue(), data));
 			}
 		}
@@ -411,7 +411,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			Matcher m = r.matcher(data);
 			if (!m.matches()) {
 				throw new WrongFormatDetailException(
-						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+						MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 								configItem.getDisplayValue(), data));
 			}
 			else {
@@ -441,7 +441,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			}
 			catch (NumberFormatException e) {
 				throw new WrongFormatDetailException(
-						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+						MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 								configItem.getDisplayValue(), data));
 			}
 		}
@@ -457,7 +457,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 				&& data.contains(".")) {
 
 			throw new WrongFormatDetailException(
-					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+					MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 							configItem.getDisplayValue(), data));
 		}
 
@@ -471,7 +471,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		else if (Boolean.FALSE.equals(configItem.has1000Separator())
 				&& data.contains(",")) {
 			throw new WrongFormatDetailException(
-					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+					MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 							configItem.getDisplayValue(), data));
 		}
 
@@ -493,7 +493,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		Matcher m = r.matcher(dataToCheck);
 		if (!m.matches()) {
 			throw new WrongFormatDetailException(
-					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+					MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 							configItem.getDisplayValue(), dataToCheck));
 		}
 	}
@@ -511,7 +511,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 				int decimalLength = splitter[index].length();
 				if (decimalLength != 3) {
 					throw new WrongFormatDetailException(
-							MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+							MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 									configItem.getDisplayValue(), dataToCheck));
 				}
 			}
@@ -566,13 +566,13 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		}
 		catch (NumberFormatException e) {
 			throw new WrongFormatDetailException(
-					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+					MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 							configItem.getDisplayValue(), data));
 		}
 		catch (Exception e) {
 			log.error(e.getMessage(), e);
 			throw new WrongFormatDetailException(
-					MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+					MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 							configItem.getDisplayValue(), data));
 		}
 
@@ -612,7 +612,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			}
 			else {
 				throw new WrongFormatDetailException(
-						MessageFormat.format(CovertErrorConstant.INVALIDE_FORMAT,
+						MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 								signFlagConfig.getDisplayValue(), signFlagData));
 			}
 		}
