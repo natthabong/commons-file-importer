@@ -549,7 +549,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			String normalNumber = data;
 
 			if (configItem.getDecimalPlace() != null
-					&& Boolean.FALSE.equals(configItem.hasDecimalPlace())
+					&& (Boolean.FALSE.equals(configItem.hasDecimalPlace()) || configItem.hasDecimalPlace() == null)
 					&& !normalNumber.contains(".")) {
 				normalNumber = data.substring(0,
 						(data.length() - configItem.getDecimalPlace()));
@@ -789,8 +789,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			try {
 				recordType = currentLine.substring(beginIndex,
 						beginIndex + configItem.getLenght());
-			}
-			catch (IndexOutOfBoundsException e) {
+			} catch (IndexOutOfBoundsException e) {
 				log.debug(e.getMessage());
 			}
 			return recordType;

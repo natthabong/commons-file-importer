@@ -1111,7 +1111,7 @@ public class CSVFileConverterGetDetailFileTest {
 			chequeAmount.setDisplayValue("Cheque Amount");
 			chequeAmount.setDecimalPlace(2);
 			chequeAmount.setHas1000Separator(null);
-			chequeAmount.setHasDecimalPlace(null);
+			chequeAmount.setHasDecimalPlace(true);
 			chequeAmount.setTransient(false);
 			chequeAmount.setPlusSymbol(null);
 			layoutItems.add(chequeAmount);
