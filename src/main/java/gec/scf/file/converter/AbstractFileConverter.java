@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
+import gec.scf.file.configuration.FileType;
 import gec.scf.file.configuration.ItemType;
 import gec.scf.file.configuration.PaddingType;
 import gec.scf.file.configuration.RecordType;
@@ -551,11 +552,11 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			if (configItem.getDecimalPlace() != null
 					&& (Boolean.FALSE.equals(configItem.hasDecimalPlace()) || configItem.hasDecimalPlace() == null)
 					&& !normalNumber.contains(".")) {
-				normalNumber = data.substring(0,
-						(data.length() - configItem.getDecimalPlace()));
-				String degitNumber = data
-						.substring(data.length() - configItem.getDecimalPlace());
-				normalNumber = normalNumber + "." + degitNumber;
+				if (FileType.FIXED_LENGTH.equals(this.fileLayoutConfig.getFileType())) {
+					normalNumber = data.substring(0, (data.length() - configItem.getDecimalPlace()));
+					String degitNumber = data.substring(data.length() - configItem.getDecimalPlace());
+					normalNumber = normalNumber + "." + degitNumber;
+				}
 			}
 
 			normalNumber = normalNumber.replaceAll(",", "");

@@ -19,6 +19,7 @@ import gec.scf.file.configuration.DefaultFileLayoutConfig;
 import gec.scf.file.configuration.DefaultFileLayoutConfigItem;
 import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
+import gec.scf.file.configuration.FileType;
 import gec.scf.file.configuration.RecordType;
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatFileException;
@@ -814,6 +815,43 @@ public class CSVFileConverterGetDetailFileTest {
 		                expected, sponsorDoc.getDocumentAmount()),
 		        sponsorDoc.getDocumentAmount().compareTo(expected) == 0);
 	}
+	
+	@Test
+	public void given_configs_that_has_decimal_place_is_null_and_decimal_place_is_2_and_cheque_amount_is_100000_when_get_detail_cheque_amount_should_is_100000_00()
+	        throws WrongFormatFileException {
+		// Arrange
+		String[] csvValidFileContent = new String[2];
+		csvValidFileContent[0] = "No,Payer Code,Deposit Branch,Payer,Bank Code,Bank,Cheque Branch,Cheque No,Cheque Due Date,Good Fund Date,Deposit Date,Cheque Amount,Clearing Type";
+		csvValidFileContent[1] = "22,5572692,หาดใหญ่ใน,โรงโม่หินศิลามหานคร,6,KTB,พระประแดง,100093235,22/02/2015,22/02/2015,24/10/2014,\"100000\",";
+
+		DefaultFileLayoutConfigItem chequeAmount = new DefaultFileLayoutConfigItem();
+		chequeAmount.setRecordType(RecordType.DETAIL);
+		chequeAmount.setStartIndex(12);
+		chequeAmount.setLength(10);
+		chequeAmount.setDocFieldName("documentAmount");
+		chequeAmount.setRequired(true);
+		chequeAmount.setDisplayValue("Cheque Amount");
+		chequeAmount.setDecimalPlace(2);
+		chequeAmount.setHas1000Separator(null);
+		chequeAmount.setHasDecimalPlace(null);
+		chequeAmount.setTransient(false);
+		chequeAmount.setPlusSymbol(null);
+
+		csvFileConverter = mockSponsorFileLayout(csvValidFileContent, chequeAmount);
+
+		// Actual
+		DetailResult<SponsorDocument> actualResult = csvFileConverter.getDetail();
+
+		// Assert
+		assertTrue(actualResult.isSuccess());
+		SponsorDocument sponsorDoc = (SponsorDocument) actualResult.getObjectValue();
+
+		BigDecimal expected = new BigDecimal("100000.00");
+		assertTrue(
+		        MessageFormat.format("Sponsor document amount should be {0} but {1}",
+		                expected, sponsorDoc.getDocumentAmount()),
+		        sponsorDoc.getDocumentAmount().compareTo(expected) == 0);
+	}
 
 	@Test
 	public void given_config_is_no_required_and_cheque_amount_is_blank_when_get_detail_cheque_amount_should_is_null()
@@ -957,7 +995,7 @@ public class CSVFileConverterGetDetailFileTest {
 
 		DefaultFileLayoutConfig fileLayout = getLayoutConfig(chequeAmount);
 		fileLayout.setOffsetRowNo(1);
-
+		fileLayout.setFileType(FileType.CSV);
 		return mockSponsorFileLayout(csvValidFileContent, fileLayout);
 	}
 
@@ -966,6 +1004,7 @@ public class CSVFileConverterGetDetailFileTest {
 
 		DefaultFileLayoutConfig fileLayout = getLayoutConfig();
 		fileLayout.setOffsetRowNo(1);
+		fileLayout.setFileType(FileType.CSV);
 
 		return mockSponsorFileLayout(csvValidFileContent, fileLayout);
 	}
