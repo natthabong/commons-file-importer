@@ -1,18 +1,13 @@
 package gec.scf.file.converter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang.StringUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import gec.scf.file.configuration.DefaultFileLayoutConfig;
@@ -24,27 +19,27 @@ import gec.scf.file.configuration.PaddingType;
 import gec.scf.file.configuration.RecordType;
 import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.example.domain.DrawdownDocument;
-import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
+import gec.scf.file.importer.domain.ErrorLineDetail;
 
 public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengthConverterTest {
-
+	
 	@Test
-	@Ignore
-	public void given_detail_valid_format_should_status_success() throws WrongFormatFileException {
+	public void given_detail_valid_format_should_return_status_success() throws WrongFormatFileException{
 		// Arrage
 		String[] fixedLengthContent = new String[3];
-		fixedLengthContent[0] = "HDR20160620DRAWDOWNADVICE      18             ";
-		fixedLengthContent[1] = "DTLEDS000000000012BF14129316          2016112210221100025419            00031323            0000080000000000000000000001000000000101000B 2  Drawdown success                                                                                    1MOR       0000740000000000000+00000000000000000007.40000000                    ";
-		fixedLengthContent[2] = "TLR0000036";
+		fixedLengthContent[0] = "HDR20171114DRAWDOWNADVICE      14             ";
+		fixedLengthContent[1] = "DTLEDS123000000028BF14129349          2016112210221100025408            00031323            0000080000000000000020000001000000010003000B 2  Process successfully                                                                                1MOR       0000740000000000000+00000000000000000007.40000000                    ";
+		fixedLengthContent[2] = "TLR0000001";
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-
+		
 		FileLayoutConfig fileLayoutConfig = createDrawdownAdviceFixedLengthFileLayout();
 		FixedLengthFileConverter<DrawdownDocument> fileConverter = new FixedLengthFileConverter<DrawdownDocument>(
 				fileLayoutConfig, DrawdownDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
+		
 		// Actual
 		DetailResult<DrawdownDocument> actualResult = fileConverter.getDetail();
 
@@ -53,668 +48,30 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 		DrawdownDocument document = (DrawdownDocument) actualResult.getObjectValue();
 		assertEquals("B", document.getReturnStatus());
 	}
+	
+	@Test
+	public void given_GEC_transaction_no_is_empty_should_return_status_fail() throws WrongFormatFileException{
+		// Arrage
+		String[] fixedLengthContent = new String[3];
+		fixedLengthContent[0] = "HDR20171114DRAWDOWNADVICE      14             ";
+		fixedLengthContent[1] = "DTL               BF14129349          2016112210221100025408            00031323            0000080000000000000020000001000000010003000B 2  Process successfully                                                                                1MOR       0000740000000000000+00000000000000000007.40000000                    ";
+		fixedLengthContent[2] = "TLR0000001";
+		InputStream fixedlengthFileContent = new ByteArrayInputStream(
+				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
+		
+		FileLayoutConfig fileLayoutConfig = createDrawdownAdviceFixedLengthFileLayout();
+		FixedLengthFileConverter<DrawdownDocument> fileConverter = new FixedLengthFileConverter<DrawdownDocument>(
+				fileLayoutConfig, DrawdownDocument.class);
+		fileConverter.checkFileFormat(fixedlengthFileContent);
+		
+		// Actual
+		DetailResult<DrawdownDocument> actualResult = fileConverter.getDetail();
 
-	// @Test
-	// public void given_corporate_code_mismatch_should_status_fail() throws
-	// WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "Dmak 232112 1122031
-	// 20160910201609010000000100000000 ";
-	// fixedLengthContent[2] = "T0000010000000100000000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertFalse(actualResult.isSuccess());
-	// ErrorLineDetail errorLineDetail =
-	// actualResult.getErrorLineDetails().get(0);
-	// assertEquals("Corporate Code (mak) mismatch",
-	// errorLineDetail.getErrorMessage());
-	// }
-	//
-	// @Test
-	// public void given_corporate_code_is_blank_should_status_fail() throws
-	// WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "D 232112 1122031
-	// 20160910201609010000000100000000 ";
-	// fixedLengthContent[2] = "T0000010000000100000000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertFalse(actualResult.isSuccess());
-	// ErrorLineDetail errorLineDetail =
-	// actualResult.getErrorLineDetails().get(0);
-	// assertEquals("Corporate Code is required",
-	// errorLineDetail.getErrorMessage());
-	// }
-	//
-	// @Test
-	// public void
-	// given_supplier_code_has_space_when_get_detail_should_trim_data_and_status_success()
-	// throws WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK 232112 1122031
-	// 20160910201609010000000100000000 ";
-	// fixedLengthContent[2] = "T0000010000000100000000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// SponsorDocument actualDocument = (SponsorDocument)
-	// actualResult.getObjectValue();
-	// assertEquals("232112", actualDocument.getSupplierCode());
-	// }
-	//
-	// @Test
-	// public void
-	// given_supplier_code_is_blank_when_get_detail_should_status_fail() throws
-	// WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK 1122033 20160910201609010000000100000001 ";
-	// fixedLengthContent[2] = "T0000010000000100000001 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertFalse(actualResult.isSuccess());
-	// ErrorLineDetail errorLineDetail =
-	// actualResult.getErrorLineDetails().get(0);
-	// assertEquals("Supplier Code is required",
-	// errorLineDetail.getErrorMessage());
-	// }
-	//
-	// @Test
-	// public void
-	// given_receipt_number_is_blank_when_get_detail_should_status_fail() throws
-	// WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK001 20160910201609010000000100000001 ";
-	// fixedLengthContent[2] = "T0000010000000100000000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertFalse(actualResult.isSuccess());
-	// ErrorLineDetail errorLineDetail =
-	// actualResult.getErrorLineDetails().get(0);
-	// assertEquals("Receipt Number is required",
-	// errorLineDetail.getErrorMessage());
-	// }
-	//
-	// @Test
-	// public void
-	// given_receipt_date_is_blank_when_get_detail_should_status_fail() throws
-	// WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK001 1122034 201609010000000100000001 ";
-	// fixedLengthContent[2] = "T0000010000000100000000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertFalse(actualResult.isSuccess());
-	// ErrorLineDetail errorLineDetail =
-	// actualResult.getErrorLineDetails().get(0);
-	// assertEquals("Receipt Date is required",
-	// errorLineDetail.getErrorMessage());
-	// }
-	//
-	// @Test
-	// public void
-	// given_receipt_date_invalid_when_get_detail_should_status_fail() throws
-	// WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK001 1122034
-	// 20150229201609010000000100000001 ";
-	// fixedLengthContent[2] = "T0000010000000100000000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertFalse(actualResult.isSuccess());
-	// ErrorLineDetail errorLineDetail =
-	// actualResult.getErrorLineDetails().get(0);
-	// assertEquals("Receipt Date (20150229) invalid format",
-	// errorLineDetail.getErrorMessage());
-	// }
-	//
-	// @Test
-	// public void
-	// given_document_date_has_value_is_0_when_get_detail_should_status_fail()
-	// throws WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK001 1122034
-	// 20160229000000000000000100000001 ";
-	// fixedLengthContent[2] = "T0000010000000100000000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertFalse(actualResult.isSuccess());
-	// ErrorLineDetail errorLineDetail =
-	// actualResult.getErrorLineDetails().get(0);
-	// assertEquals("Document Due Date is required",
-	// errorLineDetail.getErrorMessage());
-	// }
-	//
-	// @Test
-	// public void
-	// given_document_due_date_invalid_when_get_detail_should_status_fail()
-	// throws WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK001 1122034
-	// 20160229201502290000000100000001 ";
-	// fixedLengthContent[2] = "T0000010000000100000000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertFalse(actualResult.isSuccess());
-	// ErrorLineDetail errorLineDetail =
-	// actualResult.getErrorLineDetails().get(0);
-	// assertEquals("Document Due Date (20150229) invalid format",
-	// errorLineDetail.getErrorMessage());
-	// }
-	//
-	// @Test
-	// public void
-	// given_document_amount_is_0_when_get_detail_should_status_fail() throws
-	// WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[4];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK001 1122033
-	// 20160812201606010000000000000001 ";
-	// fixedLengthContent[2] = "DMAK MK001 1122033
-	// 20160812201606010000000000010001 ";
-	// fixedLengthContent[3] = "T0000020000000000010000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertFalse(actualResult.isSuccess());
-	// ErrorLineDetail errorLineDetail =
-	// actualResult.getErrorLineDetails().get(0);
-	// assertEquals("Document Amount is required",
-	// errorLineDetail.getErrorMessage());
-	// }
-	//
-	// @Ignore
-	// @Test
-	// public void
-	// given_document_amount_has_dot_when_get_detail_should_status_fail() throws
-	// WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK001 1122033
-	// 2016081220160601000000000100.001 ";
-	// fixedLengthContent[2] = "T0000010000000000100000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertFalse(actualResult.isSuccess());
-	// ErrorLineDetail errorLineDetail =
-	// actualResult.getErrorLineDetails().get(0);
-	// assertEquals("Document Amount (000000000100.00) invalid format",
-	// errorLineDetail.getErrorMessage());
-	// }
-	//
-	// @Ignore
-	// @Test
-	// public void
-	// given_document_amount_and_document_due_date_invalid_format_when_get_detail_should_status_fail_and_has_error_detail_2_record()
-	// throws WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK001 1122033
-	// 2016081220152601000000000100.001 ";
-	// fixedLengthContent[2] = "T0000010000000000100000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertEquals(2, actualResult.getErrorLineDetails().size());
-	// }
-	//
-	// @Ignore
-	// @Test
-	// public void
-	// given_document_amount_and_document_due_date_invalid_format_when_get_detail_should_status_fail_and_has_error_detail_2_message()
-	// throws WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK001 1122033
-	// 2016081220152601000000000100.001 ";
-	// fixedLengthContent[2] = "T0000010000000000100000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// ErrorLineDetail errorLineDetail =
-	// actualResult.getErrorLineDetails().get(0);
-	// ErrorLineDetail errorLineDetail1 =
-	// actualResult.getErrorLineDetails().get(1);
-	// assertEquals("Document Due Date (20152601) invalid format",
-	// errorLineDetail.getErrorMessage());
-	// assertEquals("Document Amount (000000000100.00) invalid format",
-	// errorLineDetail1.getErrorMessage());
-	// }
-	//
-	// @Test
-	// public void
-	// given_document_amount_which_has_pading_charecter_is_space_when_get_detail_should_success()
-	// throws WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK001 1122033 2016081220150106 1000001 ";
-	// fixedLengthContent[2] = "T0000010000000001000001 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// DefaultFileLayoutConfigItem docAmountConfig = new
-	// DefaultFileLayoutConfigItem();
-	// docAmountConfig.setDocFieldName("documentAmount");
-	// docAmountConfig.setStartIndex(63);
-	// docAmountConfig.setLength(15);
-	// docAmountConfig.setPaddingCharacter(" ");
-	// docAmountConfig.setPaddingType(PaddingType.LEFT);
-	// docAmountConfig.setDecimalPlace(2);
-	// docAmountConfig.setRecordType(RecordType.DETAIL);
-	// docAmountConfig.setTransient(false);
-	// docAmountConfig.setRequired(true);
-	// docAmountConfig.setHasDecimalPlace(false);
-	// docAmountConfig.setDisplayValue("Document Amount");
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout(docAmountConfig);
-	//
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	//
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertTrue(actualResult.isSuccess());
-	// }
-	//
-	// @Test
-	// public void
-	// given_document_type_not_found_in_file_when_import_the_file_should_set_default_value_to_field_document_type()
-	// throws WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[3];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK 232112 1122031
-	// 20160910201609010000000100000000 ";
-	// fixedLengthContent[2] = "T0000010000000100000000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertTrue(actualResult.isSuccess());
-	// SponsorDocument document = (SponsorDocument)
-	// actualResult.getObjectValue();
-	// assertEquals("INV", document.getDocumentType());
-	// }
-	//
-	// // @Test
-	// // public void
-	// //
-	// given_supplier_code_is_transient_when_get_detail_then_supplier_code_should_is_null()
-	// // throws WrongFormatFileException {
-	// // // Arrage
-	// // String[] fixedLengthContent = new String[4];
-	// // fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// // fixedLengthContent[1] = "DMAK MK001 1122033
-	// // 20160812201611010000000100000000 ";
-	// // fixedLengthContent[2] = "T0000010000000100000000 ";
-	// // InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// // StringUtils.join(fixedLengthContent,
-	// System.lineSeparator()).getBytes());
-	// //
-	// //// isTransient = true;
-	// //
-	// // FileLayoutConfig fileLayoutConfig =
-	// // createDrawdownAdviceFixedLengthFileLayout();
-	// // FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// // FixedLengthFileConverter<SponsorDocument>(
-	// // fileLayoutConfig, SponsorDocument.class);
-	// // fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // // Actual
-	// // DetailResult<SponsorDocument> actualResult =
-	// fileConverter.getDetail();
-	// //
-	// // // Assert
-	// // assertTrue(actualResult.isSuccess());
-	// // SponsorDocument document = (SponsorDocument)
-	// // actualResult.getObjectValue();
-	// // assertNull(document.getSupplierCode());
-	// // }
-	//
-	// @Test
-	// public void
-	// given_document_amount_flag_is_0_when_get_detail_then_document_amount_should_is_negative_value()
-	// throws WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[4];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK001 1122033
-	// 20160812201611010000000100000000 ";
-	// fixedLengthContent[2] = "T0000010000000100000000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout();
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	// // Assert
-	// assertTrue(actualResult.isSuccess());
-	// SponsorDocument document = (SponsorDocument)
-	// actualResult.getObjectValue();
-	// assertEquals("-100000.00", document.getDocumentAmount().toString());
-	// }
-	//
-	// @Test
-	// public void should_map_supplier_code_to_supplier_id() throws
-	// WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[4];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK002 1122033
-	// 20160812201611010000000100000000 ";
-	// fixedLengthContent[2] = "T0000010000000100000000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// DefaultFileLayoutConfigItem supplierCode = new
-	// DefaultFileLayoutConfigItem();
-	// supplierCode.setDocFieldName("supplierCode");
-	// supplierCode.setStartIndex(7);
-	// supplierCode.setLength(20);
-	// supplierCode.setRequired(true);
-	// supplierCode.setRecordType(RecordType.DETAIL);
-	// supplierCode.setTransient(false);
-	// supplierCode.setDisplayValue("Supplier Code");
-	// supplierCode.setValidationType(ValidationType.IN_CUSTOMER_CODE_GROUP);
-	// supplierCode.setExpectedValue("1");
-	//
-	// FieldValidatorFactory fieldValidatorFactory = spy(new
-	// FieldValidatorFactoryTest());
-	//
-	// FieldValidator supplierIdSetter = new
-	// ExpectedCustomerCodeValidatorStub();
-	// doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCode));
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout(supplierCode);
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	//
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	// // Assert
-	// assertTrue(actualResult.isSuccess());
-	// SponsorDocument document = (SponsorDocument)
-	// actualResult.getObjectValue();
-	// assertEquals("002", document.getSupplierId());
-	// }
-	//
-	// @Test
-	// public void should_throw_when_customer_code_inactive() throws
-	// WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[4];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK001 1122034
-	// 20160812201611010000000100000000 ";
-	// fixedLengthContent[2] = "T0000010000000100000000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// DefaultFileLayoutConfigItem supplierCode = new
-	// DefaultFileLayoutConfigItem();
-	// supplierCode.setDocFieldName("supplierCode");
-	// supplierCode.setStartIndex(7);
-	// supplierCode.setLength(20);
-	// supplierCode.setRequired(true);
-	// supplierCode.setRecordType(RecordType.DETAIL);
-	// supplierCode.setTransient(false);
-	// supplierCode.setDisplayValue("Supplier Code");
-	// supplierCode.setValidationType(ValidationType.IN_CUSTOMER_CODE_GROUP);
-	// supplierCode.setExpectedValue("1");
-	//
-	// FieldValidatorFactory fieldValidatorFactory = spy(new
-	// FieldValidatorFactoryTest());
-	//
-	// FieldValidator supplierIdSetter = new
-	// ExpectedCustomerCodeValidatorStub();
-	// doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCode));
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout(supplierCode);
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	//
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertFalse(actualResult.isSuccess());
-	// ErrorLineDetail errorLine = actualResult.getErrorLineDetails().get(0);
-	// assertEquals("Supplier code (MK001) is inactive Supplier code",
-	// errorLine.getErrorMessage());
-	// }
-	//
-	// @Test
-	// public void should_throw_when_customer_code_not_existed() throws
-	// WrongFormatFileException {
-	// // Arrage
-	// String[] fixedLengthContent = new String[4];
-	// fixedLengthContent[0] = "H20160927120000Siam Makro Plc. MAK 004 ";
-	// fixedLengthContent[1] = "DMAK MK004 1122034
-	// 20160812201611010000000100000000 ";
-	// fixedLengthContent[2] = "T0000010000000100000000 ";
-	// InputStream fixedlengthFileContent = new ByteArrayInputStream(
-	// StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-	//
-	// DefaultFileLayoutConfigItem supplierCodeConfig = new
-	// DefaultFileLayoutConfigItem();
-	// supplierCodeConfig.setDocFieldName("supplierCode");
-	// supplierCodeConfig.setStartIndex(7);
-	// supplierCodeConfig.setLength(20);
-	// supplierCodeConfig.setRequired(true);
-	// supplierCodeConfig.setRecordType(RecordType.DETAIL);
-	// supplierCodeConfig.setTransient(false);
-	// supplierCodeConfig.setDisplayValue("Supplier Code");
-	// supplierCodeConfig.setValidationType(ValidationType.IN_CUSTOMER_CODE_GROUP);
-	// supplierCodeConfig.setExpectedValue("1");
-	//
-	// FieldValidatorFactory fieldValidatorFactory = spy(new
-	// FieldValidatorFactoryTest());
-	//
-	// FieldValidator supplierIdSetter = new
-	// ExpectedCustomerCodeValidatorStub();
-	// doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCodeConfig));
-	//
-	// FileLayoutConfig fileLayoutConfig =
-	// createDrawdownAdviceFixedLengthFileLayout(supplierCodeConfig);
-	// FixedLengthFileConverter<SponsorDocument> fileConverter = new
-	// FixedLengthFileConverter<SponsorDocument>(
-	// fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
-	// fileConverter.checkFileFormat(fixedlengthFileContent);
-	//
-	// // Actual
-	// DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
-	//
-	// // Assert
-	// assertFalse(actualResult.isSuccess());
-	// ErrorLineDetail errorLine = actualResult.getErrorLineDetails().get(0);
-	// assertEquals("Supplier code (MK004) is not exist Supplier code",
-	// errorLine.getErrorMessage());
-	// }
+		// Assert
+		assertFalse(actualResult.isSuccess());
+		ErrorLineDetail errorLineDetail = actualResult.getErrorLineDetails().get(0);
+		assertEquals("GEC Transaction No is required", errorLineDetail.getErrorMessage());
+	}
 
 	protected FileLayoutConfig createDrawdownAdviceFixedLengthFileLayout() {
 		return createDrawdownAdviceFixedLengthFileLayout(null);
@@ -730,15 +87,50 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 
 		List<FileLayoutConfigItem> configItems = new ArrayList<FileLayoutConfigItem>();
 
-		DefaultFileLayoutConfigItem headerRecordTypeConfig = new DefaultFileLayoutConfigItem();
-		headerRecordTypeConfig.setDocumentFieldName("recordId");
-		headerRecordTypeConfig.setStartIndex(1);
-		headerRecordTypeConfig.setLength(3);
-		headerRecordTypeConfig.setExpectedValue("HDR");
-		headerRecordTypeConfig.setDisplayValue("Record Id");
-		headerRecordTypeConfig.setRecordType(RecordType.HEADER);
+		DefaultFileLayoutConfigItem headerRecordId = new DefaultFileLayoutConfigItem();
+		headerRecordId.setDocumentFieldName("recordId");
+		headerRecordId.setStartIndex(1);
+		headerRecordId.setLength(3);
+		headerRecordId.setExpectedValue("HDR");
+		headerRecordId.setDisplayValue("Record Id");
+		headerRecordId.setRecordType(RecordType.HEADER);
+		headerRecordId.setRequired(true);
+		headerRecordId.setTransient(true);
 
-		configItems.add(headerRecordTypeConfig);
+		configItems.add(headerRecordId);
+		
+		DefaultFileLayoutConfigItem headerDocumentDate = new DefaultFileLayoutConfigItem();
+		headerDocumentDate.setDocumentFieldName(null);
+		headerDocumentDate.setStartIndex(4);
+		headerDocumentDate.setLength(8);
+		headerDocumentDate.setRecordType(RecordType.HEADER);
+		headerDocumentDate.setRequired(true);
+		headerDocumentDate.setTransient(true);
+		headerDocumentDate.setCalendarEra("A.D.");
+		headerDocumentDate.setDatetimeFormat("yyyyMMdd");
+		
+		configItems.add(headerDocumentDate);
+		
+		DefaultFileLayoutConfigItem headerRefId = new DefaultFileLayoutConfigItem();
+		headerRefId.setDocumentFieldName(null);
+		headerRefId.setStartIndex(12);
+		headerRefId.setLength(20);
+		headerRefId.setRecordType(RecordType.HEADER);
+		headerRefId.setRequired(true);
+		headerRefId.setTransient(true);
+		headerRefId.setExpectedValue("DRAWDOWNADVICE");
+		
+		configItems.add(headerRefId);
+		
+		DefaultFileLayoutConfigItem headerDocumentNo = new DefaultFileLayoutConfigItem();
+		headerDocumentNo.setDocumentFieldName(null);
+		headerDocumentNo.setStartIndex(32);
+		headerDocumentNo.setLength(15);
+		headerDocumentNo.setRecordType(RecordType.HEADER);
+		headerDocumentNo.setRequired(true);
+		headerDocumentNo.setTransient(true);
+		
+		configItems.add(headerDocumentNo);
 
 		DefaultFileLayoutConfigItem detailRecordTypeConfig = new DefaultFileLayoutConfigItem();
 		detailRecordTypeConfig.setDocumentFieldName("recordId");
@@ -791,7 +183,7 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			configItems.add(bankTransactionTime);
 
 			DefaultFileLayoutConfigItem sponsorRef = new DefaultFileLayoutConfigItem();
-			sponsorRef.setDocumentFieldName("sponsorRef");
+			sponsorRef.setDocumentFieldName("buyerId");
 			sponsorRef.setStartIndex(53);
 			sponsorRef.setLength(20);
 			sponsorRef.setRequired(true);
@@ -803,7 +195,7 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			configItems.add(sponsorRef);
 
 			DefaultFileLayoutConfigItem buyerSellerRef = new DefaultFileLayoutConfigItem();
-			buyerSellerRef.setDocumentFieldName("buyerSellerRef");
+			buyerSellerRef.setDocumentFieldName("supplierId");
 			buyerSellerRef.setStartIndex(73);
 			buyerSellerRef.setLength(20);
 			buyerSellerRef.setRequired(true);
@@ -843,6 +235,37 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			interestAmount.setRecordType(RecordType.DETAIL);
 			interestAmount.setTransient(false);
 			configItems.add(interestAmount);
+			
+			DefaultFileLayoutConfigItem repaymentFee = new DefaultFileLayoutConfigItem();
+			repaymentFee.setDocumentFieldName("repaymentFee");
+			repaymentFee.setStartIndex(117);
+			repaymentFee.setLength(7);
+			repaymentFee.setRequired(true);
+			repaymentFee.setExpectedValue(null);
+			repaymentFee.setDisplayValue("Repayment Fee");
+			repaymentFee.setPaddingCharacter("");
+			repaymentFee.setPaddingType(null);
+			repaymentFee.setDecimalPlace(2);
+			repaymentFee.setHasDecimalPlace(false);
+			repaymentFee.setRecordType(RecordType.DETAIL);
+			repaymentFee.setTransient(false);
+			configItems.add(repaymentFee);
+			
+			DefaultFileLayoutConfigItem repaymentAmount = new DefaultFileLayoutConfigItem();
+			repaymentAmount.setDocumentFieldName("repaymentAmount");
+			repaymentAmount.setStartIndex(124);
+			repaymentAmount.setLength(12);
+			repaymentAmount.setRequired(true);
+			repaymentAmount.setExpectedValue(null);
+			repaymentAmount.setDisplayValue("Repayment Amount");
+			repaymentAmount.setPaddingCharacter("");
+			repaymentAmount.setPaddingType(null);
+			repaymentAmount.setDecimalPlace(2);
+			repaymentAmount.setHasDecimalPlace(false);
+			repaymentAmount.setRecordType(RecordType.DETAIL);
+			repaymentAmount.setTransient(false);
+			configItems.add(repaymentAmount);
+			
 
 			DefaultFileLayoutConfigItem returnStatus = new DefaultFileLayoutConfigItem();
 			returnStatus.setDocumentFieldName("returnStatus");
@@ -853,8 +276,32 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			returnStatus.setDisplayValue("return Status");
 			returnStatus.setRecordType(RecordType.DETAIL);
 			returnStatus.setTransient(false);
-			returnStatus.setValidationType(null);
+			returnStatus.setValidationType(ValidationType.DRAWDOWN_ADVICE_RETURN_STATUS);
 			configItems.add(returnStatus);
+			
+			DefaultFileLayoutConfigItem returnCode = new DefaultFileLayoutConfigItem();
+			returnCode.setDocumentFieldName("returnCode");
+			returnCode.setStartIndex(138);
+			returnCode.setLength(3);
+			returnCode.setRequired(false);
+			returnCode.setExpectedValue(null);
+			returnCode.setDisplayValue("Return code");
+			returnCode.setRecordType(RecordType.DETAIL);
+			returnCode.setTransient(false);
+			returnCode.setValidationType(null);
+			configItems.add(returnCode);
+			
+			DefaultFileLayoutConfigItem returnMessage = new DefaultFileLayoutConfigItem();
+			returnMessage.setDocumentFieldName("returnMessage");
+			returnMessage.setStartIndex(141);
+			returnMessage.setLength(100);
+			returnMessage.setRequired(false);
+			returnMessage.setExpectedValue(null);
+			returnMessage.setDisplayValue("Return message");
+			returnMessage.setRecordType(RecordType.DETAIL);
+			returnMessage.setTransient(false);
+			returnMessage.setValidationType(null);
+			configItems.add(returnMessage);
 
 			DefaultFileLayoutConfigItem interestFlag = new DefaultFileLayoutConfigItem();
 			interestFlag.setDocumentFieldName(null);
@@ -867,6 +314,17 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			interestFlag.setTransient(true);
 			interestFlag.setValidationType(ValidationType.DRAWDOWN_ADVICE_INTEREST_FLAG);
 			configItems.add(interestFlag);
+			
+			DefaultFileLayoutConfigItem interestCode = new DefaultFileLayoutConfigItem();
+			interestCode.setDocumentFieldName(null);
+			interestCode.setStartIndex(242);
+			interestCode.setLength(10);
+			interestCode.setRequired(false);
+			interestCode.setExpectedValue(null);
+			interestCode.setDisplayValue("Interest Code");
+			interestCode.setRecordType(RecordType.DETAIL);
+			interestCode.setTransient(true);
+			configItems.add(interestCode);
 
 			DefaultFileLayoutConfigItem interestBasis = new DefaultFileLayoutConfigItem();
 			interestBasis.setDocumentFieldName(null);
@@ -899,6 +357,22 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			interestSpread.setTransient(true);
 			interestSpread.setValidationType(ValidationType.DRAWDOWN_ADVICE_INTEREST_SPREAD);
 			configItems.add(interestSpread);
+			
+			DefaultFileLayoutConfigItem allInterestRate = new DefaultFileLayoutConfigItem();
+			allInterestRate.setDocumentFieldName(null);
+			allInterestRate.setStartIndex(291);
+			allInterestRate.setLength(30);
+			allInterestRate.setRequired(true);
+			allInterestRate.setExpectedValue(null);
+			allInterestRate.setDisplayValue("All Interest Rate");
+			allInterestRate.setPaddingCharacter("");
+			allInterestRate.setPaddingType(null);
+			allInterestRate.setDecimalPlace(8);
+			allInterestRate.setHasDecimalPlace(false);
+			allInterestRate.setRecordType(RecordType.DETAIL);
+			allInterestRate.setTransient(true);
+			allInterestRate.setValidationType(ValidationType.DRAWDOWN_ADVICE_INTEREST_SPREAD);
+			configItems.add(allInterestRate);
 
 		} else {
 			configItems.add(otherConfig);
@@ -929,30 +403,4 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 		return fileLayout;
 	}
 
-	private final class ExpectedCustomerCodeValidatorStub implements FieldValidator, FieldValueSetter {
-
-		private static final String CASE_NOT_EXISTING = "{0} ({1}) is not exist {0}";
-
-		private static final String CASE_INACTIVE = "{0} ({1}) is inactive {0}";
-
-		@Override
-		public void setValue(Object target, Object value) {
-			try {
-				PropertyUtils.setProperty(target, "supplierId", "002");
-			} catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		public void validate(Object dataValidate) throws WrongFormatDetailException {
-			String customerCodeData = String.valueOf(dataValidate).trim();
-			if ("MK004".equals(customerCodeData)) {
-				throw new WrongFormatDetailException(MessageFormat.format(CASE_NOT_EXISTING, "Supplier code", "MK004"));
-			} else if ("MK001".equals(customerCodeData)) {
-				throw new WrongFormatDetailException(MessageFormat.format(CASE_INACTIVE, "Supplier code", "MK001"));
-			}
-
-		}
-	}
 }
