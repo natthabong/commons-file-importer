@@ -102,10 +102,10 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 				}
 			}
 			else {
-
-				validateData(currentLine, itemConfig);
-
 				tempDataString = getCuttedData(itemConfig, currentLine);
+				
+				validateRequiredField(itemConfig, tempDataString);
+				validateData(currentLine, itemConfig);
 
 				if (StringUtils.isNotBlank(itemConfig.getExpectedValue())
 						&& itemConfig.getValidationType() == null) {
