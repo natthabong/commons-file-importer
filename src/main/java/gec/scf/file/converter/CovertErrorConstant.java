@@ -39,4 +39,6 @@ public interface CovertErrorConstant {
 	String EQUAL_OR_LESS_THAN_UPLOAD_DATE_INVALID =  "{0} ({1}) not equal or less than current date ({2})";
 	
 	String LESS_THAN_UPLOAD_DATE_INVALID =  "{0} ({1}) not less than current date ({2})";
+	
+	String TRANSACTION_TYPE_MISMATCH = "{0} ({1}) transaction type mismatch";
 }
