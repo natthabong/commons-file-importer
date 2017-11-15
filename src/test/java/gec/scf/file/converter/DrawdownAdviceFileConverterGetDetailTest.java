@@ -153,7 +153,7 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			transactionNo.setRecordType(RecordType.DETAIL);
 			transactionNo.setDisplayValue("GEC Transaction No");
 			transactionNo.setTransient(false);
-			transactionNo.setValidationType(ValidationType.FOUND_TRANSACTION_NO);
+			transactionNo.setValidationType(ValidationType.FOUND_DRAWDOWN_TRANSACTION_NO);
 			configItems.add(transactionNo);
 
 			DefaultFileLayoutConfigItem bankTransactionNo = new DefaultFileLayoutConfigItem();
