@@ -144,9 +144,10 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 					}
 					else {
 						validateDateFormat(itemConfig, tempDataString);
-						SimpleDateFormat sdf = new SimpleDateFormat(
-								itemConfig.getDatetimeFormat(), Locale.US);
-						value = sdf.parse(tempDataString);
+						SimpleDateFormat sdf = new SimpleDateFormat(itemConfig.getDatetimeFormat(), Locale.US);
+						if(StringUtils.isNotBlank(tempDataString)){
+							value = sdf.parse(tempDataString);
+						}
 					}
 				}
 				else if (classType.isAssignableFrom(BigDecimal.class)) {
@@ -361,7 +362,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 							configItem.getDisplayValue()));
 		}
 
-		if (!dateValidator.isValid(data.trim(), configItem.getDatetimeFormat(),
+		if (configItem.isRequired() && !dateValidator.isValid(data.trim(), configItem.getDatetimeFormat(),
 				Locale.US)) {
 			if (configItem.getRecordTypeData() == null
 					|| RecordType.DETAIL.equals(configItem.getRecordTypeData())) {
