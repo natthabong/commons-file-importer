@@ -375,6 +375,21 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 						MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 								configItem.getDisplayValue(), data));
 			}
+			
+		}else if(!configItem.isRequired() && StringUtils.isNotBlank(data.trim()) && !dateValidator.isValid(data.trim(), configItem.getDatetimeFormat(),
+				Locale.US)){
+			
+			if (configItem.getRecordTypeData() == null
+					|| RecordType.DETAIL.equals(configItem.getRecordTypeData())) {
+				throw new WrongFormatDetailException(
+						MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
+								configItem.getDisplayValue(), data));
+			}
+			else {
+				throw new WrongFormatFileException(
+						MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
+								configItem.getDisplayValue(), data));
+			}
 		}
 	}
 
