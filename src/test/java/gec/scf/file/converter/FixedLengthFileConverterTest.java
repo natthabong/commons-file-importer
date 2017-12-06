@@ -426,6 +426,71 @@ public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTe
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
 	}
+	
+	@Test 
+	public void given_item_config_required_field_when_call_validateRequiredField_then_throw_WrongFormat()
+			throws WrongFormatFileException {
+
+		// Arrange
+		String data = "";
+		DefaultFileLayoutConfigItem detailFilterConfig = new DefaultFileLayoutConfigItem();
+		detailFilterConfig.setDisplayValue("Filler");
+		detailFilterConfig.setExpectedValue("a");
+		detailFilterConfig.setRequired(true);
+		detailFilterConfig.setStartIndex(54);
+		detailFilterConfig.setLength(248);
+		detailFilterConfig.setRecordType(RecordType.DETAIL);
+
+		// Assert
+		thrown.expect(WrongFormatFileException.class);
+		thrown.expectMessage("Filler is required");
+		
+		// Actual
+		fixLengthFileConverter.validateRequiredField(detailFilterConfig, data);
+	}
+	
+	@Test
+	public void given_item_config_required_field_when_call_validateRequiredField_then_not_throw_WrongFormat()
+			throws WrongFormatFileException {
+
+		// Arrange
+		String data = "                ";
+		DefaultFileLayoutConfigItem detailFilterConfig = new DefaultFileLayoutConfigItem();
+		detailFilterConfig.setDisplayValue("Filler");
+		detailFilterConfig.setExpectedValue(" ");
+		detailFilterConfig.setRequired(true);
+		detailFilterConfig.setStartIndex(54);
+		detailFilterConfig.setLength(248);
+		detailFilterConfig.setRecordType(RecordType.DETAIL);
+
+		// Assert
+		// not throw exception
+		
+		// Actual
+		fixLengthFileConverter.validateRequiredField(detailFilterConfig, data);
+	}
+	
+	@Test
+	public void given_item_config_required_field_and_expected_null_when_call_validateRequiredField_then_throw_WrongFormat()
+			throws WrongFormatFileException {
+
+		// Arrange
+		String data = "                ";
+		DefaultFileLayoutConfigItem detailFilterConfig = new DefaultFileLayoutConfigItem();
+		detailFilterConfig.setDisplayValue("Filler");
+		detailFilterConfig.setExpectedValue(null);
+		detailFilterConfig.setRequired(true);
+		detailFilterConfig.setStartIndex(54);
+		detailFilterConfig.setLength(248);
+		detailFilterConfig.setRecordType(RecordType.DETAIL);
+
+		// Assert
+		thrown.expect(WrongFormatFileException.class);
+		thrown.expectMessage("Filler is required");
+		
+		// Actual
+		fixLengthFileConverter.validateRequiredField(detailFilterConfig, data);
+	}
 
 	private FileLayoutConfig createFixedLengthFileLayout() {
 		DefaultFileLayoutConfig fileLayout = new DefaultFileLayoutConfig();
