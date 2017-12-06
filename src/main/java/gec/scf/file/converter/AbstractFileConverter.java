@@ -396,7 +396,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 	protected void validateRequiredField(FileLayoutConfigItem configItem, String data)
 			throws WrongFormatFileException {
 		if (configItem.isRequired()) {
-			if (StringUtils.isBlank(data)) {
+			if (StringUtils.isBlank(data)) { 
 				if(!StringUtils.isBlank(configItem.getExpectedValue())
 						|| configItem.getExpectedValue() == null){
 							throw new WrongFormatFileException(

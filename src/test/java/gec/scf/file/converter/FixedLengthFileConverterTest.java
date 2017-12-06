@@ -427,7 +427,7 @@ public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTe
 		fixLengthFileConverter.checkFileFormat(documentFile);
 	}
 	
-	@Test
+	@Test 
 	public void given_item_config_required_field_when_call_validateRequiredField_then_throw_WrongFormat()
 			throws WrongFormatFileException {
 
