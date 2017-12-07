@@ -5,7 +5,7 @@ pipeline {
   stages {
     stage('[SCM] Checkout Common file importer service') {
       steps {
-        git branch: 'dev', credentialsId: '28413f37-4882-46c8-9b30-6530cc145bed', url: GIT_REPOSITORY_REPO
+        git branch: '${git_branch}', credentialsId: '28413f37-4882-46c8-9b30-6530cc145bed', url: GIT_REPOSITORY_REPO
       }
     }
     stage('[MAVEN] Pack sources') {
