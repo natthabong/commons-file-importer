@@ -55,6 +55,7 @@ public class AbstractFixedLengthConverterTest {
 		footerSendDateConfig.setTransient(true);
 		footerSendDateConfig.setDisplayValue(displayValue);
 		footerSendDateConfig.setValidationType(validationType);
+		footerSendDateConfig.setLayoutConfigId(53L);
 		return footerSendDateConfig;
 	}
 

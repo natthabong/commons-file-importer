@@ -70,7 +70,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 		
 		DateTimeFieldValidator validator = Mockito.spy(new DateTimeFieldValidator(fileLayoutConfigItem));
 		Mockito.when(validator.getValue()).thenReturn(LocalDate.of(2017, Month.FEBRUARY, 1));
-		Mockito.doReturn(validator).when(fieldValidatorFactory).create(Mockito.any(FileLayoutConfigItem.class) , Channel.WEB);
+		Mockito.doReturn(validator).when(fieldValidatorFactory).create(Mockito.any(FileLayoutConfigItem.class) , Mockito.any(Channel.class));
 
 		fixLengthFileConverter = spyToAnswerValidation(fieldValidatorFactory, fileLayoutConfig);
 	}
