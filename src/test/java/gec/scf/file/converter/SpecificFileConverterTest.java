@@ -40,6 +40,7 @@ import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
+import gec.scf.file.importer.domain.Channel;
 
 public class SpecificFileConverterTest {
 
@@ -58,7 +59,7 @@ public class SpecificFileConverterTest {
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 
 		cpacFileConverter = new SpecificFileConverter<SponsorDocument>(fileLayoutConfig,
-				SponsorDocument.class, fieldValidatorFactory);
+				SponsorDocument.class, fieldValidatorFactory , Channel.WEB);
 
 		MockitoAnnotations.initMocks(this);
 	}
@@ -128,7 +129,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -153,7 +154,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -178,7 +179,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -200,7 +201,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -222,7 +223,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -245,7 +246,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -274,7 +275,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -312,11 +313,11 @@ public class SpecificFileConverterTest {
 
 		FieldValidator outstandingValidator = new CalculateCPACOutstanding();
 		doReturn(outstandingValidator).when(fieldValidatorFactory)
-				.create(eq(outstandingAmountConfig));
+				.create(eq(outstandingAmountConfig) , eq(Channel.WEB));
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout(outstandingAmountConfig);
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -350,11 +351,11 @@ public class SpecificFileConverterTest {
 		doctypeConfig.setValidationType(ValidationType.CPAC_DOC_TYPE);
 
 		FieldValidator docTypeValidator = new CPACDocumentType();
-		doReturn(docTypeValidator).when(fieldValidatorFactory).create(eq(doctypeConfig));
+		doReturn(docTypeValidator).when(fieldValidatorFactory).create(eq(doctypeConfig) , eq(Channel.WEB));
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout(doctypeConfig);
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -388,11 +389,11 @@ public class SpecificFileConverterTest {
 		doctypeConfig.setValidationType(ValidationType.CPAC_DOC_TYPE);
 
 		FieldValidator docTypeValidator = new CPACDocumentType();
-		doReturn(docTypeValidator).when(fieldValidatorFactory).create(eq(doctypeConfig));
+		doReturn(docTypeValidator).when(fieldValidatorFactory).create(eq(doctypeConfig) , eq(Channel.WEB));
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout(doctypeConfig);
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -417,7 +418,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -445,7 +446,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -478,7 +479,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -504,7 +505,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -527,7 +528,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -551,7 +552,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -576,7 +577,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -603,7 +604,7 @@ public class SpecificFileConverterTest {
 		
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -637,7 +638,7 @@ public class SpecificFileConverterTest {
 
 		FileLayoutConfig fileLayoutConfig = createCPACFileLayout();
 		SpecificFileConverter<SponsorDocument> fileConverter = new SpecificFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest());
+				fileLayoutConfig, SponsorDocument.class, new FieldValidatorFactoryTest() , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual

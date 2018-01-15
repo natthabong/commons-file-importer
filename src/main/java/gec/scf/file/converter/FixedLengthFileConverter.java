@@ -23,6 +23,7 @@ import gec.scf.file.configuration.RecordType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
+import gec.scf.file.importer.domain.Channel;
 import gec.scf.file.importer.domain.ErrorLineDetail;
 import gec.scf.file.validation.SummaryFieldValidator;
 
@@ -37,12 +38,12 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 	private BufferedReader tempFileReader;
 
 	public FixedLengthFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz,
-			FieldValidatorFactory fieldValidatorFactory) {
-		super(fileLayoutConfig, clazz, fieldValidatorFactory);
+			FieldValidatorFactory fieldValidatorFactory , Channel channel) {
+		super(fileLayoutConfig, clazz, fieldValidatorFactory , channel);
 	}
 
-	public FixedLengthFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
-		this(fileLayoutConfig, clazz, null);
+	public FixedLengthFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz , Channel channel) {
+		this(fileLayoutConfig, clazz, null , channel);
 	}
 
 	@Override

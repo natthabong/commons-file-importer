@@ -25,6 +25,7 @@ import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.configuration.RecordType;
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatFileException;
+import gec.scf.file.importer.domain.Channel;
 
 public class CSVFileConverterCheckFileFormatTest {
 
@@ -149,7 +150,7 @@ public class CSVFileConverterCheckFileFormatTest {
 		DefaultFileLayoutConfig fileLayout = getLayoutConfig(checkBinaryFile);
 
 		CSVFileConverter<SponsorDocument> csvFileConverter = Mockito.spy(
-				new CSVFileConverter<SponsorDocument>(fileLayout, SponsorDocument.class));
+				new CSVFileConverter<SponsorDocument>(fileLayout, SponsorDocument.class , Channel.WEB));
 		return csvFileConverter;
 	}
 

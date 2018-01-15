@@ -21,6 +21,7 @@ import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.example.domain.DrawdownDocument;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
+import gec.scf.file.importer.domain.Channel;
 import gec.scf.file.importer.domain.ErrorLineDetail;
 
 public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengthConverterTest {
@@ -37,7 +38,7 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 		
 		FileLayoutConfig fileLayoutConfig = createDrawdownAdviceFixedLengthFileLayout();
 		FixedLengthFileConverter<DrawdownDocument> fileConverter = new FixedLengthFileConverter<DrawdownDocument>(
-				fileLayoutConfig, DrawdownDocument.class);
+				fileLayoutConfig, DrawdownDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		
 		// Actual
@@ -61,7 +62,7 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 		
 		FileLayoutConfig fileLayoutConfig = createDrawdownAdviceFixedLengthFileLayout();
 		FixedLengthFileConverter<DrawdownDocument> fileConverter = new FixedLengthFileConverter<DrawdownDocument>(
-				fileLayoutConfig, DrawdownDocument.class);
+				fileLayoutConfig, DrawdownDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		
 		// Actual

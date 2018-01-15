@@ -24,6 +24,7 @@ import gec.scf.file.configuration.RecordType;
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
+import gec.scf.file.importer.domain.Channel;
 
 public class CSVFileConverterGetDetailFileTest {
 
@@ -1018,7 +1019,7 @@ public class CSVFileConverterGetDetailFileTest {
 		        StringUtils.join(csvValidFileContent, System.lineSeparator()).getBytes());
 
 		CSVFileConverter<SponsorDocument> csvFileConverter = new CSVFileConverter<SponsorDocument>(
-		        fileLayout, SponsorDocument.class);
+		        fileLayout, SponsorDocument.class , Channel.WEB);
 
 		csvFileConverter.checkFileFormat(csvFileContent);
 

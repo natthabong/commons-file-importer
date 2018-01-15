@@ -2,6 +2,8 @@ package gec.scf.file.configuration;
 
 import java.util.List;
 
+import gec.scf.file.importer.domain.ProcessType;
+
 public class DefaultFileLayoutConfig implements FileLayoutConfig {
 
 	private Integer startIndex;
@@ -23,6 +25,16 @@ public class DefaultFileLayoutConfig implements FileLayoutConfig {
 	private String charsetName;
 
 	private long offsetRowNo;
+	
+	private ProcessType processType;
+	
+	public ProcessType getProcessType() {
+		return processType;
+	}
+
+	public void setProcessType(ProcessType processType) {
+		this.processType = processType;
+	}
 
 	public Integer getStartIndex() {
 		return startIndex;

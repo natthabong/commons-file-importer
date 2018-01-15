@@ -16,6 +16,7 @@ import gec.scf.file.configuration.PaddingType;
 import gec.scf.file.configuration.RecordType;
 import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.example.domain.SponsorDocument;
+import gec.scf.file.importer.domain.Channel;
 
 public class AbstractFixedLengthConverterTest {
 
@@ -24,7 +25,7 @@ public class AbstractFixedLengthConverterTest {
 
 		FieldValidatorFactory fieldValidatorFactory = new FieldValidatorFactoryTest();
 		AbstractFileConverter<SponsorDocument> fixLengthFileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory , Channel.WEB);
 
 		return fixLengthFileConverter;
 	}
@@ -34,7 +35,7 @@ public class AbstractFixedLengthConverterTest {
 			FileLayoutConfig fileLayoutConfig) {
 
 		AbstractFileConverter<SponsorDocument> fixLengthFileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory , Channel.WEB);
 		return fixLengthFileConverter;
 	}
 

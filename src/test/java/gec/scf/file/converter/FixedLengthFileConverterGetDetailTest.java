@@ -31,6 +31,7 @@ import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
+import gec.scf.file.importer.domain.Channel;
 import gec.scf.file.importer.domain.ErrorLineDetail;
 
 public class FixedLengthFileConverterGetDetailTest
@@ -49,7 +50,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -73,7 +74,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -97,7 +98,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -121,7 +122,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -144,7 +145,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -168,7 +169,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -192,7 +193,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -216,7 +217,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -241,7 +242,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -265,7 +266,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -291,7 +292,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -316,7 +317,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -342,7 +343,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -365,7 +366,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -407,7 +408,7 @@ public class FixedLengthFileConverterGetDetailTest
 				docAmountConfig);
 
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
@@ -430,7 +431,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -482,7 +483,7 @@ public class FixedLengthFileConverterGetDetailTest
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout();
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class);
+				fileLayoutConfig, SponsorDocument.class , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 		// Actual
 		DetailResult<SponsorDocument> actualResult = fileConverter.getDetail();
@@ -518,12 +519,12 @@ public class FixedLengthFileConverterGetDetailTest
 				new FieldValidatorFactoryTest());
 
 		FieldValidator supplierIdSetter = new ExpectedCustomerCodeValidatorStub();
-		doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCode));
+		doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCode) , eq( Channel.WEB));
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout(
 				supplierCode);
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -560,12 +561,12 @@ public class FixedLengthFileConverterGetDetailTest
 				new FieldValidatorFactoryTest());
 
 		FieldValidator supplierIdSetter = new ExpectedCustomerCodeValidatorStub();
-		doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCode));
+		doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCode) , eq( Channel.WEB));
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout(
 				supplierCode);
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual
@@ -604,12 +605,12 @@ public class FixedLengthFileConverterGetDetailTest
 				new FieldValidatorFactoryTest());
 
 		FieldValidator supplierIdSetter = new ExpectedCustomerCodeValidatorStub();
-		doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCodeConfig));
+		doReturn(supplierIdSetter).when(fieldValidatorFactory).create(eq(supplierCodeConfig) , eq( Channel.WEB));
 
 		FileLayoutConfig fileLayoutConfig = createMakroFixedLengthFileLayout(
 				supplierCodeConfig);
 		FixedLengthFileConverter<SponsorDocument> fileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory , Channel.WEB);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
 
 		// Actual

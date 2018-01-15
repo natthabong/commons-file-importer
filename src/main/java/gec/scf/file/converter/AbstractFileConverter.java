@@ -37,6 +37,8 @@ import gec.scf.file.configuration.RecordType;
 import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
+import gec.scf.file.importer.domain.Channel;
+import gec.scf.file.importer.domain.ProcessType;
 import gec.scf.file.validation.SummaryFieldValidator;
 
 public abstract class AbstractFileConverter<T> implements FileConverter<T> {
@@ -64,17 +66,17 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 	
 	private static final Logger log = Logger.getLogger(AbstractFileConverter.class);
 
-	public AbstractFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
-		this(fileLayoutConfig, clazz, null);
+	public AbstractFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz , Channel channel) {
+		this(fileLayoutConfig, clazz, null , channel);
 	}
 
 	public AbstractFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz,
-			FieldValidatorFactory fieldValidatorFactory) {
+			FieldValidatorFactory fieldValidatorFactory , Channel channel) {
 		this.fileLayoutConfig = fileLayoutConfig;
 		this.entityClass = clazz;
 		this.fieldValidatorFactory = fieldValidatorFactory;
 		if (fileLayoutConfig != null && fileLayoutConfig.getConfigItems() != null) {
-			fileLayoutMapping = prepareConfiguration(fileLayoutConfig.getConfigItems());
+			fileLayoutMapping = prepareConfiguration(fileLayoutConfig.getConfigItems() , channel);
 		}
 
 	}
@@ -710,7 +712,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 	}
 
 	protected Map<RecordType, List<FileLayoutConfigItem>> prepareConfiguration(
-			List<? extends FileLayoutConfigItem> list) {
+			List<? extends FileLayoutConfigItem> list , Channel channel ) {
 
 		Map<RecordType, List<FileLayoutConfigItem>> fileLayoutMapping = new EnumMap<RecordType, List<FileLayoutConfigItem>>(
 				RecordType.class);
@@ -739,7 +741,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 						&& fileLayoutConfigItem.getValidationType() != null) {
 
 					FieldValidator fieldValidator = fieldValidatorFactory
-							.create(fileLayoutConfigItem);
+							.create(fileLayoutConfigItem , channel);
 					if (fieldValidator != null) {
 
 						if (fieldValidator instanceof DataObserver) {

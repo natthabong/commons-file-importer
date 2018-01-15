@@ -23,6 +23,7 @@ import gec.scf.file.configuration.PaddingType;
 import gec.scf.file.configuration.RecordType;
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatFileException;
+import gec.scf.file.importer.domain.Channel;
 
 public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTest {
 
@@ -41,7 +42,7 @@ public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTe
 		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
 
 		fixLengthFileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory);
+				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory , Channel.WEB);
 
 		MockitoAnnotations.initMocks(this);
 	}

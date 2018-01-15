@@ -49,6 +49,17 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	private ItemType itemType;
 
 	private String calendarEra;
+	
+	private Long layoutConfigId;
+	
+	@Override
+	public Long getLayoutConfigId() {
+		return layoutConfigId;
+	}
+
+	public void setLayoutConfigId(Long layoutConfigId) {
+		this.layoutConfigId = layoutConfigId;
+	}
 
 	public void setItemType(ItemType itemType) {
 		this.itemType = itemType;
@@ -283,6 +294,8 @@ public class DefaultFileLayoutConfigItem implements FileLayoutConfigItem {
 	public void setCalendarEra(String calendarEra) {
 		this.calendarEra = calendarEra;
 	}
+	
+
 
 	@Override
 	public int hashCode() {

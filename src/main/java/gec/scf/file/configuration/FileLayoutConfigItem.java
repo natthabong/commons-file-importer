@@ -51,4 +51,6 @@ public interface FileLayoutConfigItem {
 	String[] getApplyValueFieldNames();
 
 	String getCalendarEra();
+	
+	Long getLayoutConfigId();
 }

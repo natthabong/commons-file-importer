@@ -24,6 +24,7 @@ import gec.scf.file.configuration.RecordType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
+import gec.scf.file.importer.domain.Channel;
 import gec.scf.file.importer.domain.ErrorLineDetail;
 import gec.scf.file.validation.SummaryFieldValidator;
 
@@ -39,13 +40,13 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 
 	private String tempCurrentLine;
 
-	public SpecificFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz) {
-		this(fileLayoutConfig, clazz, null);
+	public SpecificFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz , Channel channel) {
+		this(fileLayoutConfig, clazz, null , channel);
 	}
 
 	public SpecificFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz,
-			FieldValidatorFactory fieldValidatorFactory) {
-		super(fileLayoutConfig, clazz, fieldValidatorFactory);
+			FieldValidatorFactory fieldValidatorFactory , Channel channel) {
+		super(fileLayoutConfig, clazz, fieldValidatorFactory , channel);
 	}
 
 	@Override
