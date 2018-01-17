@@ -1,5 +1,7 @@
 package gec.scf.file.importer.domain;
 
+import java.util.List;
+
 import gec.scf.file.configuration.FileLayoutConfig;
 
 public class ImportContext {
@@ -15,6 +17,8 @@ public class ImportContext {
 	private String actor;
 
 	private FileLayoutConfig fileLayoutConfig;
+
+	private List<String> owners;
 
 	public String getProcessNo() {
 		return processNo;
@@ -64,6 +68,14 @@ public class ImportContext {
 
 	public FileLayoutConfig getFileLayoutConfig() {
 		return fileLayoutConfig;
+	}
+
+	public List<String> getOwners() {
+		return owners;
+	}
+
+	public void setOwners(List<String> owners) {
+		this.owners = owners;
 	}
 
 }
