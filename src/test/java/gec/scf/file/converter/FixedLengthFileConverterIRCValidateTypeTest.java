@@ -20,7 +20,7 @@ import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatFileException;
-import gec.scf.file.importer.domain.Channel;
+import gec.scf.file.importer.domain.ImportContext;
 import gec.scf.file.validation.DateTimeFieldValidator;
 
 public class FixedLengthFileConverterIRCValidateTypeTest
@@ -70,7 +70,7 @@ public class FixedLengthFileConverterIRCValidateTypeTest
 		
 		DateTimeFieldValidator validator = Mockito.spy(new DateTimeFieldValidator(fileLayoutConfigItem));
 		Mockito.when(validator.getValue()).thenReturn(LocalDate.of(2017, Month.FEBRUARY, 1));
-		Mockito.doReturn(validator).when(fieldValidatorFactory).create(Mockito.any(FileLayoutConfigItem.class) , Mockito.any(Channel.class));
+		Mockito.doReturn(validator).when(fieldValidatorFactory).create(Mockito.any(FileLayoutConfigItem.class) , Mockito.any(ImportContext.class));
 
 		fixLengthFileConverter = spyToAnswerValidation(fieldValidatorFactory, fileLayoutConfig);
 	}

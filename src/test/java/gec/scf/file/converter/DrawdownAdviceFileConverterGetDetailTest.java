@@ -23,11 +23,14 @@ import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
 import gec.scf.file.importer.domain.Channel;
 import gec.scf.file.importer.domain.ErrorLineDetail;
+import gec.scf.file.importer.domain.ImportContext;
 
-public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengthConverterTest {
-	
+public class DrawdownAdviceFileConverterGetDetailTest
+		extends AbstractFixedLengthConverterTest {
+
 	@Test
-	public void given_detail_valid_format_should_return_status_success() throws WrongFormatFileException{
+	public void given_detail_valid_format_should_return_status_success()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] fixedLengthContent = new String[3];
 		fixedLengthContent[0] = "HDR20171114DRAWDOWNADVICE      14             ";
@@ -35,12 +38,16 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 		fixedLengthContent[2] = "TLR0000001";
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-		
+
 		FileLayoutConfig fileLayoutConfig = createDrawdownAdviceFixedLengthFileLayout();
+		ImportContext importContext = new ImportContext();
+		importContext.setFileLayoutConfig(fileLayoutConfig);
+		importContext.setChannel(Channel.WEB);
+
 		FixedLengthFileConverter<DrawdownDocument> fileConverter = new FixedLengthFileConverter<DrawdownDocument>(
-				fileLayoutConfig, DrawdownDocument.class , Channel.WEB);
+				importContext, DrawdownDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
-		
+
 		// Actual
 		DetailResult<DrawdownDocument> actualResult = fileConverter.getDetail();
 
@@ -49,9 +56,10 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 		DrawdownDocument document = (DrawdownDocument) actualResult.getObjectValue();
 		assertEquals("B", document.getReturnStatus());
 	}
-	
+
 	@Test
-	public void given_GEC_transaction_no_is_empty_should_return_status_fail() throws WrongFormatFileException{
+	public void given_GEC_transaction_no_is_empty_should_return_status_fail()
+			throws WrongFormatFileException {
 		// Arrage
 		String[] fixedLengthContent = new String[3];
 		fixedLengthContent[0] = "HDR20171114DRAWDOWNADVICE      14             ";
@@ -59,12 +67,16 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 		fixedLengthContent[2] = "TLR0000001";
 		InputStream fixedlengthFileContent = new ByteArrayInputStream(
 				StringUtils.join(fixedLengthContent, System.lineSeparator()).getBytes());
-		
+
 		FileLayoutConfig fileLayoutConfig = createDrawdownAdviceFixedLengthFileLayout();
+		ImportContext importContext = new ImportContext();
+		importContext.setFileLayoutConfig(fileLayoutConfig);
+		importContext.setChannel(Channel.WEB);
+
 		FixedLengthFileConverter<DrawdownDocument> fileConverter = new FixedLengthFileConverter<DrawdownDocument>(
-				fileLayoutConfig, DrawdownDocument.class , Channel.WEB);
+				importContext, DrawdownDocument.class);
 		fileConverter.checkFileFormat(fixedlengthFileContent);
-		
+
 		// Actual
 		DetailResult<DrawdownDocument> actualResult = fileConverter.getDetail();
 
@@ -78,7 +90,8 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 		return createDrawdownAdviceFixedLengthFileLayout(null);
 	}
 
-	protected FileLayoutConfig createDrawdownAdviceFixedLengthFileLayout(DefaultFileLayoutConfigItem otherConfig) {
+	protected FileLayoutConfig createDrawdownAdviceFixedLengthFileLayout(
+			DefaultFileLayoutConfigItem otherConfig) {
 
 		DefaultFileLayoutConfig fileLayout = new DefaultFileLayoutConfig();
 		fileLayout.setFileType(FileType.FIXED_LENGTH);
@@ -99,7 +112,7 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 		headerRecordId.setTransient(true);
 
 		configItems.add(headerRecordId);
-		
+
 		DefaultFileLayoutConfigItem headerDocumentDate = new DefaultFileLayoutConfigItem();
 		headerDocumentDate.setDocumentFieldName(null);
 		headerDocumentDate.setStartIndex(4);
@@ -109,9 +122,9 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 		headerDocumentDate.setTransient(true);
 		headerDocumentDate.setCalendarEra("A.D.");
 		headerDocumentDate.setDatetimeFormat("yyyyMMdd");
-		
+
 		configItems.add(headerDocumentDate);
-		
+
 		DefaultFileLayoutConfigItem headerRefId = new DefaultFileLayoutConfigItem();
 		headerRefId.setDocumentFieldName(null);
 		headerRefId.setStartIndex(12);
@@ -120,9 +133,9 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 		headerRefId.setRequired(true);
 		headerRefId.setTransient(true);
 		headerRefId.setExpectedValue("DRAWDOWNADVICE");
-		
+
 		configItems.add(headerRefId);
-		
+
 		DefaultFileLayoutConfigItem headerDocumentNo = new DefaultFileLayoutConfigItem();
 		headerDocumentNo.setDocumentFieldName(null);
 		headerDocumentNo.setStartIndex(32);
@@ -130,7 +143,7 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 		headerDocumentNo.setRecordType(RecordType.HEADER);
 		headerDocumentNo.setRequired(true);
 		headerDocumentNo.setTransient(true);
-		
+
 		configItems.add(headerDocumentNo);
 
 		DefaultFileLayoutConfigItem detailRecordTypeConfig = new DefaultFileLayoutConfigItem();
@@ -236,7 +249,7 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			interestAmount.setRecordType(RecordType.DETAIL);
 			interestAmount.setTransient(false);
 			configItems.add(interestAmount);
-			
+
 			DefaultFileLayoutConfigItem repaymentFee = new DefaultFileLayoutConfigItem();
 			repaymentFee.setDocumentFieldName("repaymentFee");
 			repaymentFee.setStartIndex(117);
@@ -251,7 +264,7 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			repaymentFee.setRecordType(RecordType.DETAIL);
 			repaymentFee.setTransient(false);
 			configItems.add(repaymentFee);
-			
+
 			DefaultFileLayoutConfigItem repaymentAmount = new DefaultFileLayoutConfigItem();
 			repaymentAmount.setDocumentFieldName("repaymentAmount");
 			repaymentAmount.setStartIndex(124);
@@ -266,7 +279,6 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			repaymentAmount.setRecordType(RecordType.DETAIL);
 			repaymentAmount.setTransient(false);
 			configItems.add(repaymentAmount);
-			
 
 			DefaultFileLayoutConfigItem returnStatus = new DefaultFileLayoutConfigItem();
 			returnStatus.setDocumentFieldName("returnStatus");
@@ -279,7 +291,7 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			returnStatus.setTransient(false);
 			returnStatus.setValidationType(ValidationType.DRAWDOWN_ADVICE_RETURN_STATUS);
 			configItems.add(returnStatus);
-			
+
 			DefaultFileLayoutConfigItem returnCode = new DefaultFileLayoutConfigItem();
 			returnCode.setDocumentFieldName("returnCode");
 			returnCode.setStartIndex(138);
@@ -291,7 +303,7 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			returnCode.setTransient(false);
 			returnCode.setValidationType(null);
 			configItems.add(returnCode);
-			
+
 			DefaultFileLayoutConfigItem returnMessage = new DefaultFileLayoutConfigItem();
 			returnMessage.setDocumentFieldName("returnMessage");
 			returnMessage.setStartIndex(141);
@@ -315,7 +327,7 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			interestFlag.setTransient(true);
 			interestFlag.setValidationType(ValidationType.DRAWDOWN_ADVICE_INTEREST_FLAG);
 			configItems.add(interestFlag);
-			
+
 			DefaultFileLayoutConfigItem interestCode = new DefaultFileLayoutConfigItem();
 			interestCode.setDocumentFieldName(null);
 			interestCode.setStartIndex(242);
@@ -340,7 +352,8 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			interestBasis.setHasDecimalPlace(false);
 			interestBasis.setRecordType(RecordType.DETAIL);
 			interestBasis.setTransient(true);
-			interestBasis.setValidationType(ValidationType.DRAWDOWN_ADVICE_INTEREST_BASIS);
+			interestBasis
+					.setValidationType(ValidationType.DRAWDOWN_ADVICE_INTEREST_BASIS);
 			configItems.add(interestBasis);
 
 			DefaultFileLayoutConfigItem interestSpread = new DefaultFileLayoutConfigItem();
@@ -356,9 +369,10 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			interestSpread.setHasDecimalPlace(false);
 			interestSpread.setRecordType(RecordType.DETAIL);
 			interestSpread.setTransient(true);
-			interestSpread.setValidationType(ValidationType.DRAWDOWN_ADVICE_INTEREST_SPREAD);
+			interestSpread
+					.setValidationType(ValidationType.DRAWDOWN_ADVICE_INTEREST_SPREAD);
 			configItems.add(interestSpread);
-			
+
 			DefaultFileLayoutConfigItem allInterestRate = new DefaultFileLayoutConfigItem();
 			allInterestRate.setDocumentFieldName(null);
 			allInterestRate.setStartIndex(291);
@@ -372,10 +386,12 @@ public class DrawdownAdviceFileConverterGetDetailTest extends AbstractFixedLengt
 			allInterestRate.setHasDecimalPlace(false);
 			allInterestRate.setRecordType(RecordType.DETAIL);
 			allInterestRate.setTransient(true);
-			allInterestRate.setValidationType(ValidationType.DRAWDOWN_ADVICE_INTEREST_SPREAD);
+			allInterestRate
+					.setValidationType(ValidationType.DRAWDOWN_ADVICE_INTEREST_SPREAD);
 			configItems.add(allInterestRate);
 
-		} else {
+		}
+		else {
 			configItems.add(otherConfig);
 		}
 

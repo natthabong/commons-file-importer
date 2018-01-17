@@ -1,10 +1,10 @@
 package gec.scf.file.converter;
 
-import gec.scf.file.configuration.FileLayoutConfig;
-import gec.scf.file.importer.domain.Channel;
+import gec.scf.file.importer.domain.ImportContext;
 
 public interface FileConverterFactory {
 
-	public <T> FileConverter<T> createConverter(FileLayoutConfig config, Class<T> clazz , Channel channel);
+	public <T> FileConverter<T> createConverter(ImportContext importContext,
+			Class<T> clazz);
 
 }

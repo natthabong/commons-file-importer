@@ -24,6 +24,7 @@ import gec.scf.file.configuration.RecordType;
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.domain.Channel;
+import gec.scf.file.importer.domain.ImportContext;
 
 public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTest {
 
@@ -41,8 +42,12 @@ public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTe
 
 		FileLayoutConfig fileLayoutConfig = createFixedLengthFileLayout();
 
+		ImportContext importContext = new ImportContext();
+		importContext.setFileLayoutConfig(fileLayoutConfig);
+		importContext.setChannel(Channel.WEB);
+
 		fixLengthFileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory , Channel.WEB);
+				importContext, SponsorDocument.class, fieldValidatorFactory);
 
 		MockitoAnnotations.initMocks(this);
 	}
@@ -427,8 +432,8 @@ public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTe
 		// Actual
 		fixLengthFileConverter.checkFileFormat(documentFile);
 	}
-	
-	@Test 
+
+	@Test
 	public void given_item_config_required_field_when_call_validateRequiredField_then_throw_WrongFormat()
 			throws WrongFormatFileException {
 
@@ -445,11 +450,11 @@ public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTe
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage("Filler is required");
-		
+
 		// Actual
 		fixLengthFileConverter.validateRequiredField(detailFilterConfig, data);
 	}
-	
+
 	@Test
 	public void given_item_config_required_field_when_call_validateRequiredField_then_not_throw_WrongFormat()
 			throws WrongFormatFileException {
@@ -466,11 +471,11 @@ public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTe
 
 		// Assert
 		// not throw exception
-		
+
 		// Actual
 		fixLengthFileConverter.validateRequiredField(detailFilterConfig, data);
 	}
-	
+
 	@Test
 	public void given_item_config_required_field_and_expected_null_when_call_validateRequiredField_then_throw_WrongFormat()
 			throws WrongFormatFileException {
@@ -488,7 +493,7 @@ public class FixedLengthFileConverterTest extends AbstractFixedLengthConverterTe
 		// Assert
 		thrown.expect(WrongFormatFileException.class);
 		thrown.expectMessage("Filler is required");
-		
+
 		// Actual
 		fixLengthFileConverter.validateRequiredField(detailFilterConfig, data);
 	}

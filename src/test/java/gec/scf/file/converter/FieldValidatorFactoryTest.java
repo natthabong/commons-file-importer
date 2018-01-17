@@ -1,7 +1,7 @@
 package gec.scf.file.converter;
 
 import gec.scf.file.configuration.FileLayoutConfigItem;
-import gec.scf.file.importer.domain.Channel;
+import gec.scf.file.importer.domain.ImportContext;
 import gec.scf.file.validation.CloneHeaderData;
 import gec.scf.file.validation.DateTimeFieldValidator;
 import gec.scf.file.validation.DetailCountingValidator;
@@ -11,7 +11,7 @@ import gec.scf.file.validation.SummaryFieldValidator;
 public class FieldValidatorFactoryTest implements FieldValidatorFactory {
 
 	@Override
-	public FieldValidator create(FileLayoutConfigItem configItem , Channel channel) {
+	public FieldValidator create(FileLayoutConfigItem configItem , ImportContext context) {
 
 		FieldValidator fieldValidator = null;
 		switch (configItem.getValidationType()) {

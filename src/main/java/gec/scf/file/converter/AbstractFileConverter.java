@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -37,15 +38,14 @@ import gec.scf.file.configuration.RecordType;
 import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
-import gec.scf.file.importer.domain.Channel;
-import gec.scf.file.importer.domain.ProcessType;
+import gec.scf.file.importer.domain.ImportContext;
 import gec.scf.file.validation.SummaryFieldValidator;
 
 public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 	private Class<T> entityClass;
 
-	private FileLayoutConfig fileLayoutConfig;
+	private ImportContext importContext;
 
 	protected FieldValidatorFactory fieldValidatorFactory;
 
@@ -63,22 +63,21 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 	private Map<FileLayoutConfigItem, ValueAdjustment> adjustments = new HashMap<FileLayoutConfigItem, ValueAdjustment>();
 
-	
 	private static final Logger log = Logger.getLogger(AbstractFileConverter.class);
 
-	public AbstractFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz , Channel channel) {
-		this(fileLayoutConfig, clazz, null , channel);
+	public AbstractFileConverter(ImportContext importContext, Class<T> clazz) {
+		this(importContext, clazz, null);
 	}
 
-	public AbstractFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz,
-			FieldValidatorFactory fieldValidatorFactory , Channel channel) {
-		this.fileLayoutConfig = fileLayoutConfig;
+	public AbstractFileConverter(ImportContext importContext, Class<T> clazz,
+			FieldValidatorFactory fieldValidatorFactory) {
+		this.importContext = importContext;
 		this.entityClass = clazz;
 		this.fieldValidatorFactory = fieldValidatorFactory;
-		if (fileLayoutConfig != null && fileLayoutConfig.getConfigItems() != null) {
-			fileLayoutMapping = prepareConfiguration(fileLayoutConfig.getConfigItems() , channel);
+		if (Optional.of(importContext.getFileLayoutConfig()).isPresent()) {
+			fileLayoutMapping = prepareConfiguration(
+					importContext.getFileLayoutConfig().getConfigItems());
 		}
-
 	}
 
 	protected void applyObjectValue(T entity, FileLayoutConfigItem itemConfig,
@@ -105,7 +104,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			}
 			else {
 				tempDataString = getCuttedData(itemConfig, currentLine);
-				
+
 				validateRequiredField(itemConfig, tempDataString);
 				validateData(currentLine, itemConfig);
 
@@ -116,16 +115,16 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 				}
 			}
 
-			//TODO refactor when bank use gecscf document field
+			// TODO refactor when bank use gecscf document field
 			String docFieldName = null;
 			if (StringUtils.isNotBlank(itemConfig.getDocumentFieldName())) {
 				docFieldName = itemConfig.getDocumentFieldName();
-			}else{
+			}
+			else {
 				docFieldName = itemConfig.getDocFieldName();
-			}			
-			
-			if (StringUtils.isNotBlank(docFieldName)
-					&& tempDataString != null) {
+			}
+
+			if (StringUtils.isNotBlank(docFieldName) && tempDataString != null) {
 
 				validateDataLength(itemConfig, tempDataString);
 
@@ -146,8 +145,9 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 					}
 					else {
 						validateDateFormat(itemConfig, tempDataString);
-						SimpleDateFormat sdf = new SimpleDateFormat(itemConfig.getDatetimeFormat(), Locale.US);
-						if(StringUtils.isNotBlank(tempDataString)){
+						SimpleDateFormat sdf = new SimpleDateFormat(
+								itemConfig.getDatetimeFormat(), Locale.US);
+						if (StringUtils.isNotBlank(tempDataString)) {
 							value = sdf.parse(tempDataString);
 						}
 					}
@@ -364,8 +364,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 							configItem.getDisplayValue()));
 		}
 
-		if (configItem.isRequired() && !dateValidator.isValid(data.trim(), configItem.getDatetimeFormat(),
-				Locale.US)) {
+		if (configItem.isRequired() && !dateValidator.isValid(data.trim(),
+				configItem.getDatetimeFormat(), Locale.US)) {
 			if (configItem.getRecordTypeData() == null
 					|| RecordType.DETAIL.equals(configItem.getRecordTypeData())) {
 				throw new WrongFormatDetailException(
@@ -377,10 +377,12 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 						MessageFormat.format(CovertErrorConstant.INVALID_FORMAT,
 								configItem.getDisplayValue(), data));
 			}
-			
-		}else if(!configItem.isRequired() && StringUtils.isNotBlank(data.trim()) && !dateValidator.isValid(data.trim(), configItem.getDatetimeFormat(),
-				Locale.US)){
-			
+
+		}
+		else if (!configItem.isRequired() && StringUtils.isNotBlank(data.trim())
+				&& !dateValidator.isValid(data.trim(), configItem.getDatetimeFormat(),
+						Locale.US)) {
+
 			if (configItem.getRecordTypeData() == null
 					|| RecordType.DETAIL.equals(configItem.getRecordTypeData())) {
 				throw new WrongFormatDetailException(
@@ -398,12 +400,12 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 	protected void validateRequiredField(FileLayoutConfigItem configItem, String data)
 			throws WrongFormatFileException {
 		if (configItem.isRequired()) {
-			if (StringUtils.isBlank(data)) { 
-				if(!StringUtils.isBlank(configItem.getExpectedValue())
-						|| configItem.getExpectedValue() == null){
-							throw new WrongFormatFileException(
-									MessageFormat.format(CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
-									configItem.getDisplayValue()));
+			if (StringUtils.isBlank(data)) {
+				if (!StringUtils.isBlank(configItem.getExpectedValue())
+						|| configItem.getExpectedValue() == null) {
+					throw new WrongFormatFileException(MessageFormat.format(
+							CovertErrorConstant.ERROR_MESSAGE_IS_REQUIRE,
+							configItem.getDisplayValue()));
 				}
 			}
 			else if (configItem.getLenght() != null
@@ -571,11 +573,17 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			String normalNumber = data;
 
 			if (configItem.getDecimalPlace() != null
-					&& (Boolean.FALSE.equals(configItem.hasDecimalPlace()) || configItem.hasDecimalPlace() == null)
+					&& (Boolean.FALSE.equals(configItem.hasDecimalPlace())
+							|| configItem.hasDecimalPlace() == null)
 					&& !normalNumber.contains(".")) {
-				if (FileType.FIXED_LENGTH.equals(this.fileLayoutConfig.getFileType())) {
-					normalNumber = data.substring(0, (data.length() - configItem.getDecimalPlace()));
-					String degitNumber = data.substring(data.length() - configItem.getDecimalPlace());
+
+				if (FileType.FIXED_LENGTH
+						.equals(this.importContext.getFileLayoutConfig().getFileType())) {
+
+					normalNumber = data.substring(0,
+							(data.length() - configItem.getDecimalPlace()));
+					String degitNumber = data
+							.substring(data.length() - configItem.getDecimalPlace());
 					normalNumber = normalNumber + "." + degitNumber;
 				}
 			}
@@ -621,7 +629,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 		FileLayoutConfigItem signFlagConfig = configItem.getSignFlagConfig();
 
-		if (ValidationType.IN_MAPPING_TYPE_SIGN_FLAG.equals(signFlagConfig.getValidationType())) {
+		if (ValidationType.IN_MAPPING_TYPE_SIGN_FLAG
+				.equals(signFlagConfig.getValidationType())) {
 			ValueAdjustment adjustment = adjustments.get(signFlagConfig);
 			valueAmount = (BigDecimal) adjustment.adjust(valueAmount, signFlagData);
 		}
@@ -712,7 +721,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 	}
 
 	protected Map<RecordType, List<FileLayoutConfigItem>> prepareConfiguration(
-			List<? extends FileLayoutConfigItem> list , Channel channel ) {
+			List<? extends FileLayoutConfigItem> list) {
 
 		Map<RecordType, List<FileLayoutConfigItem>> fileLayoutMapping = new EnumMap<RecordType, List<FileLayoutConfigItem>>(
 				RecordType.class);
@@ -721,15 +730,16 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 		List<FileLayoutConfigItem> footerList = new ArrayList<FileLayoutConfigItem>();
 
 		for (FileLayoutConfigItem fileLayoutConfigItem : list) {
-			
-			//TODO refactor when bank use gecscf document field
+
+			// TODO refactor when bank use gecscf document field
 			String docFieldName = null;
 			if (StringUtils.isNotBlank(fileLayoutConfigItem.getDocumentFieldName())) {
 				docFieldName = fileLayoutConfigItem.getDocumentFieldName();
-			}else{
+			}
+			else {
 				docFieldName = fileLayoutConfigItem.getDocFieldName();
-			}	
-			
+			}
+
 			if ("recordId".equals(docFieldName)) {
 				RecordTypeExtractor extractor = new RecordTypeExtractor(
 						fileLayoutConfigItem);
@@ -741,7 +751,7 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 						&& fileLayoutConfigItem.getValidationType() != null) {
 
 					FieldValidator fieldValidator = fieldValidatorFactory
-							.create(fileLayoutConfigItem , channel);
+							.create(fileLayoutConfigItem, importContext);
 					if (fieldValidator != null) {
 
 						if (fieldValidator instanceof DataObserver) {
@@ -758,8 +768,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 							FieldValueSetter fileSetter = (FieldValueSetter) fieldValidator;
 							fieldSetters.put(fileLayoutConfigItem, fileSetter);
 						}
-						
-						if(fieldValidator instanceof ValueAdjustment){
+
+						if (fieldValidator instanceof ValueAdjustment) {
 							ValueAdjustment valueAdjustment = (ValueAdjustment) fieldValidator;
 							adjustments.put(fileLayoutConfigItem, valueAdjustment);
 						}
@@ -811,7 +821,8 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 			try {
 				recordType = currentLine.substring(beginIndex,
 						beginIndex + configItem.getLenght());
-			} catch (IndexOutOfBoundsException e) {
+			}
+			catch (IndexOutOfBoundsException e) {
 				log.debug(e.getMessage());
 			}
 			return recordType;
@@ -825,14 +836,6 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 	protected List<FileLayoutConfigItem> getFileLayoutMappingFor(RecordType recordType) {
 		return fileLayoutMapping.get(recordType);
-	}
-
-	public FileLayoutConfig getFileLayoutConfig() {
-		return fileLayoutConfig;
-	}
-
-	public void setFileLayoutConfig(FileLayoutConfig fileLayoutConfig) {
-		this.fileLayoutConfig = fileLayoutConfig;
 	}
 
 	public Class<T> getEntityClass() {
@@ -849,5 +852,9 @@ public abstract class AbstractFileConverter<T> implements FileConverter<T> {
 
 	public FieldValidator getValidator(FileLayoutConfigItem configItem) {
 		return validators.get(configItem);
+	}
+
+	public FileLayoutConfig getFileLayoutConfig() {
+		return importContext.getFileLayoutConfig();
 	}
 }

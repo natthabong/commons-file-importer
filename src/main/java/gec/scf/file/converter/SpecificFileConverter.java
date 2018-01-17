@@ -24,8 +24,8 @@ import gec.scf.file.configuration.RecordType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
-import gec.scf.file.importer.domain.Channel;
 import gec.scf.file.importer.domain.ErrorLineDetail;
+import gec.scf.file.importer.domain.ImportContext;
 import gec.scf.file.validation.SummaryFieldValidator;
 
 public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
@@ -40,13 +40,13 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 
 	private String tempCurrentLine;
 
-	public SpecificFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz , Channel channel) {
-		this(fileLayoutConfig, clazz, null , channel);
+	public SpecificFileConverter(ImportContext importContext, Class<T> clazz) {
+		this(importContext, clazz, null);
 	}
 
-	public SpecificFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz,
-			FieldValidatorFactory fieldValidatorFactory , Channel channel) {
-		super(fileLayoutConfig, clazz, fieldValidatorFactory , channel);
+	public SpecificFileConverter(ImportContext importContext, Class<T> clazz,
+			FieldValidatorFactory fieldValidatorFactory) {
+		super(importContext, clazz, fieldValidatorFactory);
 	}
 
 	@Override
@@ -183,7 +183,7 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 							&& currentLine != null);
 					currentLineIsHeader = true;
 					tempCurrentLine = currentLine;
-					
+
 					throw e;
 				}
 
@@ -203,9 +203,9 @@ public class SpecificFileConverter<T> extends FixedLengthFileConverter<T> {
 						detailResult.setObjectValue(detailObject);
 					}
 					finally {
-						// 
+						//
 						tempFileReader.readLine();
-						currentLineNo+=2;
+						currentLineNo += 2;
 					}
 				}
 			}

@@ -17,15 +17,20 @@ import gec.scf.file.configuration.RecordType;
 import gec.scf.file.configuration.ValidationType;
 import gec.scf.file.example.domain.SponsorDocument;
 import gec.scf.file.importer.domain.Channel;
+import gec.scf.file.importer.domain.ImportContext;
 
 public class AbstractFixedLengthConverterTest {
 
 	protected AbstractFileConverter<SponsorDocument> stubToAnswerValidation(
 			FileLayoutConfig fileLayoutConfig) {
 
+		ImportContext importContext = new ImportContext();
+		importContext.setFileLayoutConfig(fileLayoutConfig);
+		importContext.setChannel(Channel.WEB);
+
 		FieldValidatorFactory fieldValidatorFactory = new FieldValidatorFactoryTest();
 		AbstractFileConverter<SponsorDocument> fixLengthFileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory , Channel.WEB);
+				importContext, SponsorDocument.class, fieldValidatorFactory);
 
 		return fixLengthFileConverter;
 	}
@@ -34,8 +39,12 @@ public class AbstractFixedLengthConverterTest {
 			FieldValidatorFactory fieldValidatorFactory,
 			FileLayoutConfig fileLayoutConfig) {
 
+		ImportContext importContext = new ImportContext();
+		importContext.setFileLayoutConfig(fileLayoutConfig);
+		importContext.setChannel(Channel.WEB);
+
 		AbstractFileConverter<SponsorDocument> fixLengthFileConverter = new FixedLengthFileConverter<SponsorDocument>(
-				fileLayoutConfig, SponsorDocument.class, fieldValidatorFactory , Channel.WEB);
+				importContext, SponsorDocument.class, fieldValidatorFactory);
 		return fixLengthFileConverter;
 	}
 

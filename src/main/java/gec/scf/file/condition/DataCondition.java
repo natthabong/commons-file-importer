@@ -1,5 +1,6 @@
 package gec.scf.file.condition;
 
+@Deprecated
 public class DataCondition {
 
 	private ConditionType conditionType;

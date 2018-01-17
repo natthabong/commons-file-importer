@@ -43,6 +43,10 @@ public class FileImporterResult implements Serializable {
 		this(processNo, null, channel);
 	}
 
+	public FileImporterResult(ImportContext context) {
+		this(context.getProcessNo(), context.getFileName(), context.getChannel());
+	}
+
 	public void increaseSuccess() {
 		success++;
 		updateTotal();

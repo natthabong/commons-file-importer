@@ -8,14 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import au.com.bytecode.opencsv.CSVReader;
-import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.configuration.RecordType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
-import gec.scf.file.importer.domain.Channel;
 import gec.scf.file.importer.domain.ErrorLineDetail;
+import gec.scf.file.importer.domain.ImportContext;
 
 public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
@@ -27,10 +26,10 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 
 	private int offset;
 
-	public CSVFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz,
-			FieldValidatorFactory fieldValidatorFactory , Channel channel) {
+	public CSVFileConverter(ImportContext importContext, Class<T> clazz,
+			FieldValidatorFactory fieldValidatorFactory) {
 
-		super(fileLayoutConfig, clazz, fieldValidatorFactory , channel);
+		super(importContext, clazz, fieldValidatorFactory);
 
 		List<FileLayoutConfigItem> detailConfigs = getFileLayoutMappingFor(
 				RecordType.DETAIL);
@@ -47,8 +46,8 @@ public class CSVFileConverter<T> extends AbstractFileConverter<T> {
 		}
 	}
 
-	public CSVFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz , Channel  channel) {
-		this(fileLayoutConfig, clazz, null , channel);
+	public CSVFileConverter(ImportContext importContext, Class<T> clazz) {
+		this(importContext, clazz, null);
 	}
 
 	@Override

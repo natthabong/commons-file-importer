@@ -17,14 +17,13 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.configuration.RecordType;
 import gec.scf.file.exception.WrongFormatDetailException;
 import gec.scf.file.exception.WrongFormatFileException;
 import gec.scf.file.importer.DetailResult;
-import gec.scf.file.importer.domain.Channel;
 import gec.scf.file.importer.domain.ErrorLineDetail;
+import gec.scf.file.importer.domain.ImportContext;
 import gec.scf.file.validation.SummaryFieldValidator;
 
 public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
@@ -37,13 +36,13 @@ public class FixedLengthFileConverter<T> extends AbstractFileConverter<T> {
 
 	private BufferedReader tempFileReader;
 
-	public FixedLengthFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz,
-			FieldValidatorFactory fieldValidatorFactory , Channel channel) {
-		super(fileLayoutConfig, clazz, fieldValidatorFactory , channel);
+	public FixedLengthFileConverter(ImportContext importContext, Class<T> clazz,
+			FieldValidatorFactory fieldValidatorFactory) {
+		super(importContext, clazz, fieldValidatorFactory);
 	}
 
-	public FixedLengthFileConverter(FileLayoutConfig fileLayoutConfig, Class<T> clazz , Channel channel) {
-		this(fileLayoutConfig, clazz, null , channel);
+	public FixedLengthFileConverter(ImportContext importContext, Class<T> clazz) {
+		this(importContext, clazz, null);
 	}
 
 	@Override
