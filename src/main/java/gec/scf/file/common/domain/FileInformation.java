@@ -2,7 +2,7 @@ package gec.scf.file.common.domain;
 
 import java.io.Serializable;
 
-public class FileInformation implements Serializable {
+public class FileInformation implements Comparable<FileInformation>, Serializable {
 
 	/**
 	 * 
@@ -13,7 +13,15 @@ public class FileInformation implements Serializable {
 
 	private String fileName;
 
+	private Long fileSize;
+
 	private String reference;
+
+	private String filePath;
+
+	public FileInformation() {
+
+	}
 
 	public FileInformation(String fileType, String fileName, String reference) {
 		this.fileType = fileType;
@@ -43,6 +51,28 @@ public class FileInformation implements Serializable {
 
 	public void setReference(String reference) {
 		this.reference = reference;
+	}
+
+	public Long getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(Long fileSize) {
+		this.fileSize = fileSize;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+
+	}
+
+	public String getFilePath() {
+		return filePath;
+	}
+
+	@Override
+	public int compareTo(FileInformation o) {
+		return this.getFileName().compareToIgnoreCase(o.getFileName());
 	}
 
 }
