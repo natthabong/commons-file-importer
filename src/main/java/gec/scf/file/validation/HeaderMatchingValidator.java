@@ -5,8 +5,8 @@ import java.text.MessageFormat;
 import gec.scf.file.configuration.FileLayoutConfigItem;
 import gec.scf.file.configuration.RecordType;
 import gec.scf.file.converter.CovertErrorConstant;
-import gec.scf.file.converter.FieldValidator;
 import gec.scf.file.converter.DataObserver;
+import gec.scf.file.converter.FieldValidator;
 import gec.scf.file.exception.WrongFormatFileException;
 
 public class HeaderMatchingValidator implements FieldValidator, DataObserver<String> {
