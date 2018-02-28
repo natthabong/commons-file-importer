@@ -18,5 +18,8 @@ pipeline {
     always { 
        junit 'target/surefire-reports/*.xml'
     }
+    success {
+       sh "mvn sonar:sonar -Dsonar.host.url=http://${sonar_host}:9000 -Dsonar.junit.reportPaths=target/surefire-reports"
+    }
   }
 }
