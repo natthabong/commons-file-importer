@@ -20,7 +20,7 @@ public class ImportContext {
 	private FileLayoutConfig fileLayoutConfig;
 
 	private String ownerFundingId;
-	
+
 	private BigDecimal totalAmount;
 
 	private Map<String, ImportContext> fundingImportContexts;
@@ -68,7 +68,11 @@ public class ImportContext {
 
 	public void setFileLayoutConfig(FileLayoutConfig fileLayoutConfig) {
 		this.fileLayoutConfig = fileLayoutConfig;
-
+		if (fundingImportContexts != null && fundingImportContexts.size() > 0) {
+			fundingImportContexts.entrySet().stream().forEach(fundingImportContext -> {
+				fundingImportContext.getValue().setFileLayoutConfig(fileLayoutConfig);
+			});
+		}
 	}
 
 	public FileLayoutConfig getFileLayoutConfig() {
@@ -87,7 +91,8 @@ public class ImportContext {
 		return fundingImportContexts;
 	}
 
-	public void setFundingImportContexts(Map<String, ImportContext> fundingImportContexts) {
+	public void setFundingImportContexts(
+			Map<String, ImportContext> fundingImportContexts) {
 		this.fundingImportContexts = fundingImportContexts;
 	}
 
@@ -104,5 +109,5 @@ public class ImportContext {
 	public BigDecimal getTotalAmount() {
 		return totalAmount;
 	}
-	
+
 }
