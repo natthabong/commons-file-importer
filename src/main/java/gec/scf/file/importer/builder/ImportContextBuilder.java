@@ -1,5 +1,6 @@
 package gec.scf.file.importer.builder;
 
+import gec.scf.file.configuration.FileLayoutConfig;
 import gec.scf.file.importer.domain.Channel;
 import gec.scf.file.importer.domain.ImportContext;
 
@@ -12,6 +13,8 @@ public class ImportContextBuilder {
 	private String fileName;
 
 	private Long fileLayoutConfigId;
+
+	private FileLayoutConfig fileLayoutConfig;
 
 	private String actor;
 
@@ -47,6 +50,11 @@ public class ImportContextBuilder {
 		return this;
 	}
 
+	public ImportContextBuilder fileLayoutConfig(FileLayoutConfig fileLayoutConfig) {
+		this.fileLayoutConfig = fileLayoutConfig;
+		return this;
+	}
+
 	public ImportContext build() {
 		ImportContext importContext = new ImportContext();
 		importContext.setChannel(channel);
@@ -55,7 +63,9 @@ public class ImportContextBuilder {
 		importContext.setOwnerFundingId(ownerFundingId);
 		importContext.setActor(actor);
 		importContext.setFileLayoutConfigId(fileLayoutConfigId);
+		importContext.setFileLayoutConfig(fileLayoutConfig);
 
 		return importContext;
 	}
+
 }

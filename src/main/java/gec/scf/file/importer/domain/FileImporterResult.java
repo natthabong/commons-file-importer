@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class FileImporterResult implements Serializable {
 
@@ -53,11 +54,13 @@ public class FileImporterResult implements Serializable {
 	}
 
 	public void increaseSuccess() {
+		success = Optional.ofNullable(success).orElse(0);
 		success++;
 		updateTotal();
 	}
 
 	public void increaseFail() {
+		fail = Optional.ofNullable(fail).orElse(0);
 		fail++;
 		updateTotal();
 	}
@@ -75,12 +78,16 @@ public class FileImporterResult implements Serializable {
 	public boolean isComplete() {
 		if (total != null) {
 			return success.compareTo(total) == 0;
-		} else {
+		}
+		else {
 			return false;
 		}
 	}
 
 	private void updateTotal() {
+		total = Optional.ofNullable(total).orElse(0);
+		success = Optional.ofNullable(success).orElse(0);
+		fail = Optional.ofNullable(fail).orElse(0);
 		total = success + fail;
 	}
 
@@ -193,7 +200,8 @@ public class FileImporterResult implements Serializable {
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
 		if (fileImporterResults != null && fileImporterResults.size() > 0) {
-			fileImporterResults.forEach((key, fileImporterResult) -> fileImporterResult.setEndTime(endTime));
+			fileImporterResults.forEach(
+					(key, fileImporterResult) -> fileImporterResult.setEndTime(endTime));
 		}
 
 	}
@@ -237,7 +245,8 @@ public class FileImporterResult implements Serializable {
 		return fileImporterResults;
 	}
 
-	public void setFileImporterResults(Map<String, FileImporterResult> fileImporterResults) {
+	public void setFileImporterResults(
+			Map<String, FileImporterResult> fileImporterResults) {
 		this.fileImporterResults = fileImporterResults;
 	}
 
