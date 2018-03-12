@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class FileImporterResult implements Serializable {
 
@@ -31,6 +32,8 @@ public class FileImporterResult implements Serializable {
 	private String ownerOrganizeId;
 
 	private String ownerFundingId;
+
+	private Map<String, FileImporterResult> fileImporterResults;
 
 	public FileImporterResult() {
 		success = fail = total = 0;
@@ -72,8 +75,7 @@ public class FileImporterResult implements Serializable {
 	public boolean isComplete() {
 		if (total != null) {
 			return success.compareTo(total) == 0;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
@@ -124,6 +126,13 @@ public class FileImporterResult implements Serializable {
 		}
 		errors.add(error);
 
+	}
+
+	public void addErrors(List<ErrorLineDetail> errors) {
+		if (this.errors == null) {
+			this.errors = new ArrayList<ErrorLineDetail>();
+		}
+		this.errors.addAll(errors);
 	}
 
 	public List<ErrorLineDetail> getErrors() {
@@ -183,6 +192,9 @@ public class FileImporterResult implements Serializable {
 
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
+		if (fileImporterResults != null && fileImporterResults.size() > 0) {
+			fileImporterResults.forEach((key, fileImporterResult) -> fileImporterResult.setEndTime(endTime));
+		}
 
 	}
 
@@ -219,6 +231,14 @@ public class FileImporterResult implements Serializable {
 
 	public void setOwnerFundingId(String ownerFundingId) {
 		this.ownerFundingId = ownerFundingId;
+	}
+
+	public Map<String, FileImporterResult> getFileImporterResults() {
+		return fileImporterResults;
+	}
+
+	public void setFileImporterResults(Map<String, FileImporterResult> fileImporterResults) {
+		this.fileImporterResults = fileImporterResults;
 	}
 
 }

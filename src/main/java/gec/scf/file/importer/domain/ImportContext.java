@@ -1,6 +1,7 @@
 package gec.scf.file.importer.domain;
 
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.Map;
 
 import gec.scf.file.configuration.FileLayoutConfig;
 
@@ -18,7 +19,11 @@ public class ImportContext {
 
 	private FileLayoutConfig fileLayoutConfig;
 
-	private List<String> owners;
+	private String ownerFundingId;
+	
+	private BigDecimal totalAmount;
+
+	private Map<String, ImportContext> fundingImportContexts;
 
 	public String getProcessNo() {
 		return processNo;
@@ -70,12 +75,34 @@ public class ImportContext {
 		return fileLayoutConfig;
 	}
 
-	public List<String> getOwners() {
-		return owners;
+	public String getOwnerFundingId() {
+		return ownerFundingId;
 	}
 
-	public void setOwners(List<String> owners) {
-		this.owners = owners;
+	public void setOwnerFundingId(String ownerFundingId) {
+		this.ownerFundingId = ownerFundingId;
 	}
 
+	public Map<String, ImportContext> getFundingImportContexts() {
+		return fundingImportContexts;
+	}
+
+	public void setFundingImportContexts(Map<String, ImportContext> fundingImportContexts) {
+		this.fundingImportContexts = fundingImportContexts;
+	}
+
+	public void increaseAmount(BigDecimal amount) {
+		if (totalAmount == null) {
+			totalAmount = new BigDecimal("0.0");
+		}
+
+		if (amount != null) {
+			totalAmount = totalAmount.add(amount);
+		}
+	}
+
+	public BigDecimal getTotalAmount() {
+		return totalAmount;
+	}
+	
 }

@@ -15,6 +15,10 @@ public class DataInvalidException extends Exception {
 		super();
 	}
 
+	public DataInvalidException(String message) {
+		this.message = message;
+	}
+	
 	public DataInvalidException(List<String> errors) {
 		super();
 		this.errors = errors;
