@@ -9,6 +9,10 @@ import gec.scf.file.importer.domain.ImportFileInformation;
 import gec.scf.file.importer.domain.ProcessType;
 
 public class FileImporterResultBuilder {
+	
+	public static FileImporterResultBuilder builder() {
+		return new FileImporterResultBuilder();
+	}
 
 	private ImportFileInformation information;
 
@@ -102,7 +106,8 @@ public class FileImporterResultBuilder {
 	}
 
 	public FileImporterResult build() {
-		FileImporterResult fileImporterResult = new FileImporterResult(processNo, fileName, channel);
+		FileImporterResult fileImporterResult = new FileImporterResult(processNo,
+				fileName, channel);
 		fileImporterResult.setInformation(information);
 		fileImporterResult.setSuccess(success);
 		fileImporterResult.setFail(fail);

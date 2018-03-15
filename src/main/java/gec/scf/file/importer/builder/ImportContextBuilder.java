@@ -5,6 +5,10 @@ import gec.scf.file.importer.domain.Channel;
 import gec.scf.file.importer.domain.ImportContext;
 
 public class ImportContextBuilder {
+	
+	public static ImportContextBuilder builder() {
+		return new ImportContextBuilder();
+	}
 
 	private Channel channel;
 
