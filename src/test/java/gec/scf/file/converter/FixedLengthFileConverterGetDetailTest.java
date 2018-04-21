@@ -708,7 +708,7 @@ public class FixedLengthFileConverterGetDetailTest
 		// Assert
 		assertFalse(actualResult.isSuccess());
 		ErrorLineDetail errorLine = actualResult.getErrorLineDetails().get(0);
-		assertEquals("Supplier code (MK004) is not exist Supplier code",
+		assertEquals("Supplier code (MK004) does not exist Supplier code",
 				errorLine.getErrorMessage());
 	}
 
@@ -920,7 +920,7 @@ public class FixedLengthFileConverterGetDetailTest
 	private final class ExpectedCustomerCodeValidatorStub
 			implements FieldValidator, FieldValueSetter {
 
-		private static final String CASE_NOT_EXISTING = "{0} ({1}) is not exist {0}";
+		private static final String CASE_NOT_EXISTING = "{0} ({1}) does not exist {0}";
 
 		private static final String CASE_INACTIVE = "{0} ({1}) is inactive {0}";
 
